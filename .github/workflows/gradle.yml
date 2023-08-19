@@ -46,7 +46,7 @@ jobs:
     
     # 3) 환경변수 파일 생성
     - name: make application.properties 파일 생성(main branch)
-      if: contains(github.ref, 'main')
+      if: github.ref == 'refs/heads/main'
       run: |
         ## create application.yml
         mkdir ./src/main/resources
@@ -63,7 +63,7 @@ jobs:
       shell: bash
 
     - name: make application.properties 파일 생성(dev branch)
-      if: contains(github.ref, 'dev')
+      if: github.ref == 'refs/heads/dev'
       run: |
         ## create application.yml
         mkdir ./src/main/resources

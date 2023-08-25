@@ -1,4 +1,4 @@
-package org.runnect.server.common.resolver.userIdx;
+package org.runnect.server.common.resolver.userId;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,5 +7,5 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UserIdx {
+public @interface UserId {
 }

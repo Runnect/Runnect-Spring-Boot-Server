@@ -1,4 +1,4 @@
-package org.runnect.server.common.resolver.userIdx;
+package org.runnect.server.common.resolver.userId;
 
 import org.runnect.server.common.exception.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +18,13 @@ import javax.validation.constraints.NotNull;
 
 @RequiredArgsConstructor
 @Component
-public class UserIdxResolver implements HandlerMethodArgumentResolver {
+public class UserIdResolver implements HandlerMethodArgumentResolver {
 
     private final JwtService jwtService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(UserIdx.class) && Long.class.equals(parameter.getParameterType());
+        return parameter.hasParameterAnnotation(UserId.class) && Long.class.equals(parameter.getParameterType());
     }
 
     @Override

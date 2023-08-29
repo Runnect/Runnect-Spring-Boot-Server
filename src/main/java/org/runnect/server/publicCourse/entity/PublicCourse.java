@@ -8,8 +8,6 @@ import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.course.entity.Course;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -20,7 +18,7 @@ public class PublicCourse extends AuditingTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
@@ -29,9 +27,6 @@ public class PublicCourse extends AuditingTimeEntity {
 
     @Column(nullable = false)
     private String description;
-
-    @OneToMany(mappedBy = "public_course", cascade = CascadeType.REMOVE)
-    private List<PublicCourse> publicCourses = new ArrayList<>();
 
     @Builder
     public PublicCourse(Course course, String title, String description) {

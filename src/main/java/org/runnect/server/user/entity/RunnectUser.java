@@ -17,14 +17,13 @@ import java.util.List;
 
 @Getter
 @Entity
-@DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = {
         @UniqueConstraint(
                 columnNames = {"email", "provider"}
         )
 })
-public class User extends AuditingTimeEntity {
+public class RunnectUser extends AuditingTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,53 +42,53 @@ public class User extends AuditingTimeEntity {
     @Enumerated(EnumType.STRING)
     private SocialType provider;
 
-    @ColumnDefault("CSPR0")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private StampType latestStamp;
 
-    @ColumnDefault("1")
     @Column(nullable = false)
     private int level;
 
     @Column
     private String refreshToken;
 
-    @ColumnDefault("0")
     @Column(nullable = false)
     private Long createdCourse;
 
-    @ColumnDefault("0")
     @Column(nullable = false)
     private Long createdRecord;
 
-    @ColumnDefault("0")
     @Column(nullable = false)
     private Long createdPublicCourse;
 
-    @ColumnDefault("0")
     @Column(nullable = false)
     private Long createdScrap;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "runnectUser", cascade = CascadeType.REMOVE)
     private List<Course> courses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "runnectUser", cascade = CascadeType.REMOVE)
     private List<Record> records = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "runnectUser", cascade = CascadeType.REMOVE)
     private List<Scrap> scraps = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "runnectUser", cascade = CascadeType.REMOVE)
     private List<UserStamp> userStamps = new ArrayList<>();
 
     @Builder
-    public User(String nickname, String socialId, String email, SocialType provider, String refreshToken) {
+    public RunnectUser(String nickname, String socialId, String email, SocialType provider, String refreshToken) {
         this.nickname = nickname;
         this.socialId = socialId;
         this.email = email;
         this.provider = provider;
         this.refreshToken = refreshToken;
+        this.latestStamp = StampType.CSPR0;
+        this.level = 1;
+        this.createdCourse = 0L;
+        this.createdRecord = 0L;
+        this.createdPublicCourse = 0L;
+        this.createdScrap = 0L;
     }
 
 }

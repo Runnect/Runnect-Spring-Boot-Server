@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.publicCourse.entity.PublicCourse;
-import org.runnect.server.user.entity.User;
+import org.runnect.server.user.entity.RunnectUser;
 
 import javax.persistence.*;
 
@@ -26,7 +26,7 @@ public class Scrap extends AuditingTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private RunnectUser runnectUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "public_course_id", nullable = false)
@@ -36,8 +36,8 @@ public class Scrap extends AuditingTimeEntity {
     private Boolean scrapTF;
 
     @Builder
-    public Scrap(User user, PublicCourse publicCourse, Boolean scrapTF) {
-        this.user = user;
+    public Scrap(RunnectUser runnectUser, PublicCourse publicCourse, Boolean scrapTF) {
+        this.runnectUser = runnectUser;
         this.publicCourse = publicCourse;
         this.scrapTF = scrapTF;
     }

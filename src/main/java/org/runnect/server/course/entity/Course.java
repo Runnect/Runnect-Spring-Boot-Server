@@ -4,12 +4,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.record.entity.Record;
-import org.runnect.server.user.entity.User;
+import org.runnect.server.user.entity.RunnectUser;
+import org.postgresql.geometric.PGpath;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.List;
 
 @Getter
 @Entity
-@DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Course extends AuditingTimeEntity {
 
@@ -27,7 +25,7 @@ public class Course extends AuditingTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private RunnectUser runnectUser;
 
     @Column(nullable = false, length = 10)
     private String departureRegion;
@@ -50,22 +48,21 @@ public class Course extends AuditingTimeEntity {
     @Column(nullable = false)
     private String image;
 
-    @ColumnDefault("false")
     @Column(name = "is_private", nullable = false)
     private Boolean isPrivate;
 
     @Column(nullable = false)
-    private Object path;
+    private PGpath path;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
-    private List<PublicCourse> publicCourses = new ArrayList<>();
+    @OneToOne(mappedBy = "course", cascade = CascadeType.REMOVE)
+    private PublicCourse publicCourse;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
     private List<Record> records = new ArrayList<>();
 
     @Builder
-    public Course(User user, String departureRegion, String departureCity, String departureTown, String departureDetail, String departureName, Float distance, String image, Object path) {
-        this.user = user;
+    public Course(RunnectUser runnectUser, String departureRegion, String departureCity, String departureTown, String departureDetail, String departureName, Float distance, String image, PGpath path) {
+        this.runnectUser = runnectUser;
         this.departureRegion = departureRegion;
         this.departureCity = departureCity;
         this.departureTown = departureTown;
@@ -74,6 +71,7 @@ public class Course extends AuditingTimeEntity {
         this.distance = distance;
         this.image = image;
         this.path = path;
+        this.isPrivate = true;
     }
 
 }

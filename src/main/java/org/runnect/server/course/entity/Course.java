@@ -51,7 +51,7 @@ public class Course extends AuditingTimeEntity {
     @Column(name = "is_private", nullable = false)
     private Boolean isPrivate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "path")
     private PGpath path;
 
     @OneToOne(mappedBy = "course", cascade = CascadeType.REMOVE)

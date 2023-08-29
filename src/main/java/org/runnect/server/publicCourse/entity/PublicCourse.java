@@ -6,8 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.course.entity.Course;
+import org.runnect.server.scrap.entity.Scrap;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -27,6 +30,9 @@ public class PublicCourse extends AuditingTimeEntity {
 
     @Column(nullable = false)
     private String description;
+
+    @OneToMany(mappedBy = "publicCourse", cascade = CascadeType.REMOVE)
+    private List<Scrap> scraps = new ArrayList<>();
 
     @Builder
     public PublicCourse(Course course, String title, String description) {

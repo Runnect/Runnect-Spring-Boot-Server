@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.course.entity.Course;
-import org.runnect.server.user.entity.User;
+import org.runnect.server.user.entity.RunnectUser;
 
 import javax.persistence.*;
 import java.time.LocalTime;
@@ -22,7 +22,7 @@ public class Record extends AuditingTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private RunnectUser runnectUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
@@ -38,8 +38,8 @@ public class Record extends AuditingTimeEntity {
     private LocalTime time;
 
     @Builder
-    public Record(User user, Course course, String title, LocalTime pace, LocalTime time) {
-        this.user = user;
+    public Record(RunnectUser runnectUser, Course course, String title, LocalTime pace, LocalTime time) {
+        this.runnectUser = runnectUser;
         this.course = course;
         this.title = title;
         this.pace = pace;

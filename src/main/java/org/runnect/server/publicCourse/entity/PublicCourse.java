@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.course.entity.Course;
+import org.runnect.server.scrap.entity.Scrap;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class PublicCourse extends AuditingTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
@@ -30,8 +31,8 @@ public class PublicCourse extends AuditingTimeEntity {
     @Column(nullable = false)
     private String description;
 
-    @OneToMany(mappedBy = "public_course", cascade = CascadeType.REMOVE)
-    private List<PublicCourse> publicCourses = new ArrayList<>();
+    @OneToMany(mappedBy = "publicCourse", cascade = CascadeType.REMOVE)
+    private List<Scrap> scraps = new ArrayList<>();
 
     @Builder
     public PublicCourse(Course course, String title, String description) {

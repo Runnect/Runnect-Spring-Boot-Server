@@ -23,12 +23,12 @@ public class UserStamp extends AuditingTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private RunnectUser runnectUser;
 
     @Builder
-    public UserStamp(StampType stampId, User user) {
+    public UserStamp(StampType stampId, RunnectUser runnectUser) {
         this.stampId = stampId;
-        this.user = user;
+        this.runnectUser = runnectUser;
     }
 
 }

@@ -4,14 +4,15 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalTime;
 import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RecordRequestDto {
-    private Integer courseId;
+public class CreateRecordRequestDto {
+    private Long courseId;
     private Optional<Integer> publicCourseId;
     private String title;
-    private String time;
-    private String pace;
+    private LocalTime time;
+    private LocalTime pace;
 }

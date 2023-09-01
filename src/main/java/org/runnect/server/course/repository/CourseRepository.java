@@ -9,7 +9,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Course save(Course course);
 
     // READ
-    Course getCourseById(Long courseId);
 
     // DELETE
 }

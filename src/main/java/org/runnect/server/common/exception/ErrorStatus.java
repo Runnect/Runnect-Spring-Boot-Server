@@ -17,6 +17,7 @@ public enum ErrorStatus {
     VALIDATION_REQUEST_HEADER_MISSING_EXCEPTION(HttpStatus.BAD_REQUEST, "요청 헤더값이 입력되지 않았습니다."),
     VALIDATION_REQUEST_PARAMETER_MISSING_EXCEPTION(HttpStatus.BAD_REQUEST, "요청 파라미터값이 입력되지 않았습니다."),
     NULL_ACCESS_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST, "토큰 값이 없습니다."),
+    VALIDATION_COURSE_PATH_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 path 값이 입력되었습니다."),
 
     /**
      * 401 UNAUTHORIZED
@@ -41,6 +42,7 @@ public enum ErrorStatus {
      * 500 INTERNAL SERVER ERROR
      */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 서버 에러가 발생했습니다"),
+    PATH_CONVERT_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "path 변환 과정에서 오류가 발생했습니다."),
     ;
 
     private final HttpStatus httpStatus;

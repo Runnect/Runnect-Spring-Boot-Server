@@ -4,15 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.exception.BasicException;
 import org.runnect.server.common.exception.ErrorStatus;
 import org.runnect.server.course.entity.Course;
-import org.runnect.server.course.infrastructure.CourseRepository;
+import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.record.dto.request.CreateRecordRequestDto;
 import org.runnect.server.record.dto.response.CreateRecordDto;
 import org.runnect.server.record.dto.response.CreateRecordResponseDto;
 import org.runnect.server.record.entity.Record;
-import org.runnect.server.record.infrastructure.RecordRepository;
+import org.runnect.server.record.repository.RecordRepository;
 import org.runnect.server.user.entity.RunnectUser;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
-import org.runnect.server.user.infrastructure.UserRepository;
+import org.runnect.server.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

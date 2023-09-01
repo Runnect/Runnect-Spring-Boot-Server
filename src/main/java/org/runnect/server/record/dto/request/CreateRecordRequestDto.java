@@ -13,6 +13,6 @@ public class CreateRecordRequestDto {
     private Long courseId;
     private Optional<Integer> publicCourseId;
     private String title;
-    private LocalTime time;
-    private LocalTime pace;
+    private String time;
+    private String pace;
 }

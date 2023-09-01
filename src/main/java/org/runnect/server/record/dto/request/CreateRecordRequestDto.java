@@ -11,7 +11,7 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateRecordRequestDto {
     private Long courseId;
-    private Optional<Integer> publicCourseId;
+    private Long publicCourseId;
     private String title;
     private String time;
     private String pace;

@@ -21,6 +21,7 @@ public enum ErrorStatus {
     NO_RECORD_TITLE(HttpStatus.BAD_REQUEST, "경로 타이틀 없음"),
     NO_RECORD_TIME(HttpStatus.BAD_REQUEST, "경로 뛴 시간 없음"),
     NO_RECORD_PACE(HttpStatus.BAD_REQUEST, "경로 뛴 페이스 없음"),
+    VALIDATION_COURSE_PATH_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 path 값이 입력되었습니다."),
 
     /**
      * 401 UNAUTHORIZED
@@ -45,6 +46,7 @@ public enum ErrorStatus {
      * 500 INTERNAL SERVER ERROR
      */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 서버 에러가 발생했습니다"),
+    PATH_CONVERT_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "path 변환 과정에서 오류가 발생했습니다."),
     ;
 
     private final HttpStatus httpStatus;

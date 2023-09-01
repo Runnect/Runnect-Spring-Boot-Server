@@ -20,6 +20,7 @@ public enum SuccessStatus {
      */
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입이 완료됐습니다."),
     CREATE_RECORD_SUCCESS(HttpStatus.CREATED, "경로기록하기 성공")
+    CREATE_COURSE_SUCCESS(HttpStatus.CREATED, "코스 생성에 성공했습니다."),
     ;
 
     private final HttpStatus httpStatus;

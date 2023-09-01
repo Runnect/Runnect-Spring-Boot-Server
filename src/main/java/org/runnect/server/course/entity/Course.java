@@ -8,7 +8,6 @@ import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.record.entity.Record;
 import org.runnect.server.user.entity.RunnectUser;
-import org.postgresql.geometric.PGpath;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -36,10 +35,10 @@ public class Course extends AuditingTimeEntity {
     @Column(nullable = false, length = 10)
     private String departureTown;
 
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private String departureDetail;
 
-    @Column(nullable = false)
+    @Column
     private String departureName;
 
     @Column(nullable = false)
@@ -51,8 +50,8 @@ public class Course extends AuditingTimeEntity {
     @Column(name = "is_private", nullable = false)
     private Boolean isPrivate;
 
-    @Column(nullable = false, columnDefinition = "path")
-    private PGpath path;
+    @Column(nullable = false)
+    private String path;
 
     @OneToOne(mappedBy = "course", cascade = CascadeType.REMOVE)
     private PublicCourse publicCourse;
@@ -61,7 +60,7 @@ public class Course extends AuditingTimeEntity {
     private List<Record> records = new ArrayList<>();
 
     @Builder
-    public Course(RunnectUser runnectUser, String departureRegion, String departureCity, String departureTown, String departureDetail, String departureName, Float distance, String image, PGpath path) {
+    public Course(RunnectUser runnectUser, String departureRegion, String departureCity, String departureTown, String departureDetail, String departureName, Float distance, String image, String path) {
         this.runnectUser = runnectUser;
         this.departureRegion = departureRegion;
         this.departureCity = departureCity;

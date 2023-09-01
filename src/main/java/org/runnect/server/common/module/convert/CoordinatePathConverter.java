@@ -3,55 +3,46 @@ package org.runnect.server.common.module.convert;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.runnect.server.common.exception.BadRequestException;
+import org.runnect.server.common.exception.BasicException;
+import org.runnect.server.common.exception.ErrorStatus;
+import org.springframework.jdbc.BadSqlGrammarException;
 
 public class CoordinatePathConverter {
-    public static String coorConvertPath(List<Coordinate> coor) {
-        List<Coordinate> pathArray = new ArrayList<>();
 
-        for (Coordinate element : coor) {
-            double lat = Double.parseDouble(String.valueOf(element.getLat()));
-            double lon = Double.parseDouble(String.valueOf(element.getLong()));
-            pathArray.add(new Coordinate(lat, lon));
-        }
+    public static String coorConvertPath(String path) {
 
-        StringBuilder pathBuilder = new StringBuilder("[");
-        for (int i = 0; i < pathArray.size(); i++) {
-            Coordinate element = pathArray.get(i);
-            pathBuilder.append("(").append(element.getLat()).append(",").append(element.getLong()).append(")");
-            if (i < pathArray.size() - 1) {
-                pathBuilder.append(",");
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(path);
+
+            List<String> formattedCoordinates = new ArrayList<>();
+
+            for (JsonNode node : jsonNode) {
+                String lat = node.get("lat").asText();
+                String lon = node.get("long").asText();
+                formattedCoordinates.add("[" + lat + ", " + lon + "]");
             }
+
+            return "[" + String.join(", ", formattedCoordinates) + "]";
+
+        } catch (Exception e) {
+            throw new BadRequestException(ErrorStatus.VALIDATION_COURSE_PATH_EXCEPTION, ErrorStatus.VALIDATION_COURSE_PATH_EXCEPTION.getMessage());
         }
-        pathBuilder.append("]");
-
-        return pathBuilder.toString();
     }
 
-    public static List<List<Double>> pathConvertCoor(String path) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<List<Double>> coordinates = objectMapper.readValue(path, List.class);
-        return coordinates;
+    public static List<List<Double>> pathConvertCoor(String path) {
+        try {
+            System.out.println(path);
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<List<Double>> coordinates = objectMapper.readValue(path, List.class);
+            return coordinates;
+        } catch (Exception e) {
+            throw new BasicException(ErrorStatus.PATH_CONVERT_FAIL, ErrorStatus.PATH_CONVERT_FAIL.getMessage());
+        }
     }
 
-}
-
-class Coordinate {
-    private double lat;
-    private double lon;
-
-    public Coordinate(double lat, double lon) {
-        this.lat = lat;
-        this.lon = lon;
-    }
-
-    public double getLat() {
-        return lat;
-    }
-
-    public double getLong() {
-        return lon;
-    }
 }
 

@@ -1,9 +1,11 @@
 package org.runnect.server.course.service;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.postgresql.geometric.PGpath;
 import org.postgresql.util.PGobject;
@@ -14,6 +16,10 @@ import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.common.module.convert.DepartureConverter;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
 import org.runnect.server.course.dto.response.CourseCreateResponseDto;
+import org.runnect.server.course.dto.response.CourseGetByUserResponseDto;
+import org.runnect.server.course.dto.response.CourseGetByUserResponseDto.CourseResponse;
+import org.runnect.server.course.dto.response.CourseGetByUserResponseDto.Departure;
+import org.runnect.server.course.dto.response.CourseGetByUserResponseDto.UserResponse;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.user.entity.RunnectUser;
@@ -53,6 +59,34 @@ public class CourseService {
         Course saved = courseRepository.save(course);
 
         return CourseCreateResponseDto.of(saved.getId(), saved.getCreatedAt());
+    }
+
+    @Transactional(readOnly = true)
+    public CourseGetByUserResponseDto getCourseByUser(Long userId, Boolean includePublic) {
+//        RunnectUser user = userRepository.findById(userId)
+//            .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION, ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+
+        List<Course> courses = new ArrayList<>();
+        if (includePublic) { // 업로드 코스 포함
+            courses = courseRepository.findByRunnectUserOrderByCreatedAtDesc(userId);
+        } else {
+            courses = courseRepository.findByRunnectUserAndIsPrivateTrueOrderByCreatedAtDesc(userId);
+        }
+
+        UserResponse userResponse = UserResponse.of(userId);
+
+        List<CourseResponse> courseResponses = courses.stream()
+                .map(course -> CourseResponse.of(
+                    course.getId(),
+                    course.getImage(),
+                    course.getCreatedAt(),
+                    Departure.of(
+                        course.getDepartureRegion(),
+                        course.getDepartureCity()
+                    )
+                )).collect(Collectors.toList());
+
+        return CourseGetByUserResponseDto.of(userResponse, courseResponses);
     }
 
 }

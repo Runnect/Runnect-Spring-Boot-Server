@@ -32,26 +32,32 @@ public class RecordService {
 
     @Transactional
     public CreateRecordResponseDto createRecord(Long userId, CreateRecordRequestDto request) {
-        if (request.getTitle() == null) {
-            throw new BasicException(ErrorStatus.NO_RECORD_TITLE, ErrorStatus.NO_RECORD_TITLE.getMessage());
-        }
-        if (request.getTime() == null) {
-            throw new BasicException(ErrorStatus.NO_RECORD_TIME, ErrorStatus.NO_RECORD_TIME.getMessage());
-        }
-        if (request.getPace() == null) {
-            throw new BasicException(ErrorStatus.NO_RECORD_PACE, ErrorStatus.NO_RECORD_PACE.getMessage());
-        }
+//        if (request.getTitle() == null) {
+//            throw new BasicException(ErrorStatus.NO_RECORD_TITLE, ErrorStatus.NO_RECORD_TITLE.getMessage());
+//        }
+//        if (request.getTime() == null) {
+//            throw new BasicException(ErrorStatus.NO_RECORD_TIME, ErrorStatus.NO_RECORD_TIME.getMessage());
+//        }
+//        if (request.getPace() == null) {
+//            throw new BasicException(ErrorStatus.NO_RECORD_PACE, ErrorStatus.NO_RECORD_PACE.getMessage());
+//        }
 
         //publicCourseId가 request로 들어왔을 때
         PublicCourse publicCourse = null;
+        Course course = null;
         if (request.getPublicCourseId() != null) {
-            publicCourse = publicCourseRepository.findById(request.getPublicCourseId()).orElse(null);
+            // fetch join으로 course 정보 가져옴
+            publicCourse = publicCourseRepository.findById(request.getPublicCourseId())
+                    .orElseThrow(() -> new BasicException(ErrorStatus.NOT_FOUND_COURSE_EXCEPTION, ErrorStatus.NOT_FOUND_COURSE_EXCEPTION.getMessage()));
+            course = publicCourse.getCourse();
+        } else {
+            // public course id가 들어오지 않으면 fetch join을 사용할 수 없으므로 따로 쿼리로 조회
+            course = courseRepository.findById(request.getCourseId())
+                    .orElseThrow(() -> new BasicException(ErrorStatus.NOT_FOUND_COURSE_EXCEPTION, ErrorStatus.NOT_FOUND_COURSE_EXCEPTION.getMessage()));
         }
 
         RunnectUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION, ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
-        Course course = courseRepository.findById(request.getCourseId())
-                .orElseThrow(() -> new BasicException(ErrorStatus.NOT_FOUND_COURSE_EXCEPTION, ErrorStatus.NOT_FOUND_COURSE_EXCEPTION.getMessage()));
 
         Time pace = Time.valueOf(request.getPace());
         Time time = Time.valueOf(request.getTime());

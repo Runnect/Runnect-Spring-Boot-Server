@@ -12,7 +12,6 @@ import org.runnect.server.course.dto.request.CourseCreateRequestDto;
 import org.runnect.server.course.dto.response.CourseCreateResponseDto;
 import org.runnect.server.course.dto.response.CourseGetByUserResponseDto;
 import org.runnect.server.course.dto.response.CourseResponse;
-import org.runnect.server.course.dto.response.CourseListDepartureResponse;
 import org.runnect.server.course.dto.response.UserResponse;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;

@@ -53,10 +53,7 @@ public class Course extends AuditingTimeEntity {
     @Column(nullable = false)
     private String path;
 
-    @OneToOne(mappedBy = "course", cascade = CascadeType.REMOVE)
-    private PublicCourse publicCourse;
-
-    @OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Record> records = new ArrayList<>();
 
     @Builder

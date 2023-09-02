@@ -55,7 +55,7 @@ public class ControllerExceptionAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     protected ApiResponseDto<Object> handleException(final Exception error, final HttpServletRequest request) throws IOException {
-//        slackApi.sendAlert(error, request);
+        slackApi.sendAlert(error, request);
         return ApiResponseDto.error(ErrorStatus.INTERNAL_SERVER_ERROR);
     }
 

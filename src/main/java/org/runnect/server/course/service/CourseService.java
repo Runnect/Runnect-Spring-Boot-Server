@@ -57,14 +57,9 @@ public class CourseService {
     }
 
     @Transactional(readOnly = true)
-    public CourseGetByUserResponseDto getCourseByUser(Long userId, Boolean includePublic) {
+    public CourseGetByUserResponseDto getCourseByUser(Long userId) {
 
-        List<Course> courses = new ArrayList<>();
-        if (includePublic) { // 업로드 코스 포함
-            courses = courseRepository.findCourseByUserId(userId);
-        } else {
-            courses = courseRepository.findCourseByUserIdOnlyPrivate(userId);
-        }
+        List<Course> courses = courseRepository.findCourseByUserId(userId);
 
         UserResponse userResponse = UserResponse.of(userId);
 

@@ -3,6 +3,7 @@ package org.runnect.server.record.service;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.exception.BasicException;
 import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.publicCourse.entity.PublicCourse;
@@ -48,12 +49,12 @@ public class RecordService {
         if (request.getPublicCourseId() != null) {
             // fetch join으로 course 정보 가져옴
             publicCourse = publicCourseRepository.findById(request.getPublicCourseId())
-                    .orElseThrow(() -> new BasicException(ErrorStatus.NOT_FOUND_COURSE_EXCEPTION, ErrorStatus.NOT_FOUND_COURSE_EXCEPTION.getMessage()));
+                    .orElseThrow(() -> new NotFoundException(ErrorStatus.NOT_FOUND_COURSE_EXCEPTION, ErrorStatus.NOT_FOUND_COURSE_EXCEPTION.getMessage()));
             course = publicCourse.getCourse();
         } else {
             // public course id가 들어오지 않으면 fetch join을 사용할 수 없으므로 따로 쿼리로 조회
             course = courseRepository.findById(request.getCourseId())
-                    .orElseThrow(() -> new BasicException(ErrorStatus.NOT_FOUND_COURSE_EXCEPTION, ErrorStatus.NOT_FOUND_COURSE_EXCEPTION.getMessage()));
+                    .orElseThrow(() -> new NotFoundException(ErrorStatus.NOT_FOUND_COURSE_EXCEPTION, ErrorStatus.NOT_FOUND_COURSE_EXCEPTION.getMessage()));
         }
 
         RunnectUser user = userRepository.findById(userId)

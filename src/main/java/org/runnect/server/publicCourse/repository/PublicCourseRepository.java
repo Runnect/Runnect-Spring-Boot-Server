@@ -11,7 +11,7 @@ public interface PublicCourseRepository  extends JpaRepository<PublicCourse, Lon
     // CREATE
 
     // READ
-    @Query("select p from PublicCourse p join fetch p.course")
+    @Query("SELECT pc FROM PublicCourse pc JOIN FETCH pc.course WHERE pc.id = :publicCourseId")
     Optional<PublicCourse> findById(Long publicCourseId);
 
     // DELETE

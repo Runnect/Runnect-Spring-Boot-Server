@@ -80,4 +80,28 @@ public class CourseService {
         return CourseGetByUserResponseDto.of(userResponse, courseResponses);
     }
 
+    @Transactional(readOnly = true)
+    public CourseGetByUserResponseDto getPrivateCourseByUser(Long userId) {
+
+        List<Course> courses = courseRepository.findCourseByUserIdOnlyPrivate(userId);
+
+        UserResponse userResponse = UserResponse.of(userId);
+
+        List<CourseResponse> courseResponses = courses.stream()
+            .map(course -> CourseResponse.of(
+                course.getId(),
+                course.getImage(),
+                course.getCreatedAt(),
+                new DepartureResponse(
+                    course.getDepartureRegion(),
+                    course.getDepartureCity(),
+                    course.getDepartureTown(),
+                    course.getDepartureDetail(),
+                    course.getDepartureName()
+                )
+            )).collect(Collectors.toList());
+
+        return CourseGetByUserResponseDto.of(userResponse, courseResponses);
+    }
+
 }

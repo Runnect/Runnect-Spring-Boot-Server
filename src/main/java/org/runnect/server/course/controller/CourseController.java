@@ -47,4 +47,10 @@ public class CourseController {
         return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER, courseService.getCourseByUser(userId));
     }
 
+    @GetMapping("/private/user")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<CourseGetByUserResponseDto> getPrivateCourseByUser(@RequestHeader Long userId) {
+        return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER, courseService.getPrivateCourseByUser(userId));
+    }
+
 }

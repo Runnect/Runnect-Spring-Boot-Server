@@ -9,8 +9,7 @@ import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.record.dto.request.CreateRecordRequestDto;
-import org.runnect.server.record.dto.response.CreateRecordDto;
-import org.runnect.server.record.dto.response.CreateRecordResponseDto;
+import org.runnect.server.record.dto.response.*;
 import org.runnect.server.record.entity.Record;
 import org.runnect.server.record.repository.RecordRepository;
 import org.runnect.server.user.entity.RunnectUser;
@@ -21,6 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Time;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,15 +35,6 @@ public class RecordService {
 
     @Transactional
     public CreateRecordResponseDto createRecord(Long userId, CreateRecordRequestDto request) {
-//        if (request.getTitle() == null) {
-//            throw new BasicException(ErrorStatus.NO_RECORD_TITLE, ErrorStatus.NO_RECORD_TITLE.getMessage());
-//        }
-//        if (request.getTime() == null) {
-//            throw new BasicException(ErrorStatus.NO_RECORD_TIME, ErrorStatus.NO_RECORD_TIME.getMessage());
-//        }
-//        if (request.getPace() == null) {
-//            throw new BasicException(ErrorStatus.NO_RECORD_PACE, ErrorStatus.NO_RECORD_PACE.getMessage());
-//        }
 
         //publicCourseId가 request로 들어왔을 때
         PublicCourse publicCourse = null;
@@ -79,6 +72,37 @@ public class RecordService {
         CreateRecordResponseDto response = new CreateRecordResponseDto(recordDto);
 
         return response;
+
+    }
+
+    public GetRecordResponseDto getRecordByUser(Long userId) {
+        UserResponse user = UserResponse.of(userId);
+
+        List<Record> records = recordRepository.findAllByUserId(userId);
+        List<RecordResponse> recordResponses  = new ArrayList<RecordResponse>();
+
+        for (Record record: records) {
+            Course course = record.getCourse();
+
+            // public course id가 없는 record일 때
+            Long publicCourseId = null;
+            if (record.getPublicCourse() != null) {
+                publicCourseId = record.getPublicCourse().getId();
+            }
+
+            DepartureResponse departure = DepartureResponse.of(course.getDepartureRegion(), course.getDepartureCity());
+
+            RecordResponse recordResponse = RecordResponse.of(record.getId(), course.getId(), publicCourseId, userId,
+                    record.getTitle(), course.getImage(), record.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")), course.getDistance(), record.getTime().toString(),
+                    record.getPace().toString(), departure);
+
+            recordResponses.add(recordResponse);
+
+        }
+
+        return GetRecordResponseDto.of(user, recordResponses);
+
+
 
     }
 

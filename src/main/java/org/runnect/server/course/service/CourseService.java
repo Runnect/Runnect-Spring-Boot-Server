@@ -74,9 +74,12 @@ public class CourseService {
                 course.getId(),
                 course.getImage(),
                 course.getCreatedAt(),
-                CourseListDepartureResponse.of(
+                new DepartureResponse(
                     course.getDepartureRegion(),
-                    course.getDepartureCity()
+                    course.getDepartureCity(),
+                    course.getDepartureTown(),
+                    course.getDepartureDetail(),
+                    course.getDepartureName()
                 )
             )).collect(Collectors.toList());
 

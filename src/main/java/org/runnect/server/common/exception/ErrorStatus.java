@@ -17,6 +17,10 @@ public enum ErrorStatus {
     VALIDATION_REQUEST_HEADER_MISSING_EXCEPTION(HttpStatus.BAD_REQUEST, "요청 헤더값이 입력되지 않았습니다."),
     VALIDATION_REQUEST_PARAMETER_MISSING_EXCEPTION(HttpStatus.BAD_REQUEST, "요청 파라미터값이 입력되지 않았습니다."),
     NULL_ACCESS_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST, "토큰 값이 없습니다."),
+    NOT_FOUND_COURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "유효하지 않은 코스 아이디"),
+    NO_RECORD_TITLE(HttpStatus.BAD_REQUEST, "경로 타이틀 없음"),
+    NO_RECORD_TIME(HttpStatus.BAD_REQUEST, "경로 뛴 시간 없음"),
+    NO_RECORD_PACE(HttpStatus.BAD_REQUEST, "경로 뛴 페이스 없음"),
     VALIDATION_COURSE_PATH_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 path 값이 입력되었습니다."),
 
     /**

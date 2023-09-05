@@ -16,6 +16,7 @@ public enum SuccessStatus {
     CREATE_SCRAP_SUCCESS(HttpStatus.OK, "코스 스크랩 성공"),
     DELETE_SCRAP_SUCCESS(HttpStatus.OK, "코스 스크랩 취소 성공"),
     READ_RECORD_SUCCESS(HttpStatus.OK, "활동 기록 조회 성공"),
+    GET_SCRAP_COURSE_BY_USER_SUCCESS(HttpStatus.OK, "스크랩한 코스 조회 성공"),
 
     /**
      * 201 CREATED

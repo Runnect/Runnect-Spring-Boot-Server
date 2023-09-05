@@ -6,6 +6,10 @@ import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.scrap.dto.request.CreateAndDeleteScrapRequestDto;
+import org.runnect.server.scrap.dto.response.DepartureResponse;
+import org.runnect.server.scrap.dto.response.GetScrapCourseResponseDto;
+import org.runnect.server.scrap.dto.response.ScrapResponse;
+import org.runnect.server.scrap.dto.response.UserResponse;
 import org.runnect.server.scrap.entity.Scrap;
 import org.runnect.server.scrap.repository.ScrapRepository;
 import org.runnect.server.user.entity.RunnectUser;
@@ -14,7 +18,9 @@ import org.runnect.server.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +53,24 @@ public class ScrapService {
         else {
             scrap.updateScrapTF(false);
         }
+    }
+
+    public GetScrapCourseResponseDto getScrapCourseByUser(Long userId) {
+        List<Scrap> scraps = scrapRepository.findAllByUserIdAndScrapTF(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorStatus.NOT_FOUND_SCRAP_EXCEPTION, ErrorStatus.NOT_FOUND_SCRAP_EXCEPTION.getMessage()));
+
+        List<ScrapResponse> scrapResponses = scraps.stream()
+                .map(scrap -> ScrapResponse.of(
+                        scrap.getId(),
+                        scrap.getPublicCourse().getId(),
+                        scrap.getPublicCourse().getCourse().getId(),
+                        scrap.getPublicCourse().getTitle(),
+                        scrap.getPublicCourse().getCourse().getImage(),
+                        DepartureResponse.of(
+                                scrap.getPublicCourse().getCourse().getDepartureRegion(),
+                                scrap.getPublicCourse().getCourse().getDepartureCity())
+                )).collect(Collectors.toList());
+
+        return GetScrapCourseResponseDto.of(UserResponse.of(userId), scrapResponses);
     }
 }

@@ -9,6 +9,7 @@ import org.runnect.server.scrap.dto.request.CreateAndDeleteScrapRequestDto;
 import org.runnect.server.scrap.entity.Scrap;
 import org.runnect.server.scrap.repository.ScrapRepository;
 import org.runnect.server.user.entity.RunnectUser;
+import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +25,7 @@ public class ScrapService {
     @Transactional
     public void createAndDeleteScrap(Long userId, CreateAndDeleteScrapRequestDto request) {
         Scrap scrap = scrapRepository.findByUserIdAndPublicCourseId(userId, request.getPublicCourseId()).orElse(null);
-        RunnectUser user = userRepository.findById(userId).orElse(null);
+        RunnectUser user = userRepository.findById(userId).orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION, ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
         // 스크랩 생성
         if (request.getScrapTF() == true) {
             if (scrap == null) {

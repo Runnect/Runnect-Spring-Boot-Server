@@ -13,6 +13,7 @@ public enum SuccessStatus {
      */
     LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다."),
     NEW_TOKEN_SUCCESS(HttpStatus.OK, "토큰 재발급에 성공했습니다."),
+    READ_RECORD_SUCCESS(HttpStatus.OK, "활동 기록 조회 성공"),
 
 
     /**

@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.user.entity.RunnectUser;
@@ -18,6 +19,7 @@ import javax.persistence.*;
                 columnNames = {"user_id", "public_course_id"}
         )
 })
+@DynamicUpdate
 public class Scrap extends AuditingTimeEntity {
 
     @Id
@@ -39,6 +41,10 @@ public class Scrap extends AuditingTimeEntity {
     public Scrap(RunnectUser runnectUser, PublicCourse publicCourse, Boolean scrapTF) {
         this.runnectUser = runnectUser;
         this.publicCourse = publicCourse;
+        this.scrapTF = scrapTF;
+    }
+
+    public void updateScrapTF(Boolean scrapTF) {
         this.scrapTF = scrapTF;
     }
 

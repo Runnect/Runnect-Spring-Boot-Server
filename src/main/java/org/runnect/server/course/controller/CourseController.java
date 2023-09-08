@@ -8,6 +8,7 @@ import org.runnect.server.common.exception.SuccessStatus;
 import org.runnect.server.common.resolver.userId.UserId;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
 import org.runnect.server.course.dto.response.CourseCreateResponseDto;
+import org.runnect.server.course.dto.response.CourseGetByUserResponseDto;
 import org.runnect.server.course.service.CourseService;
 import org.runnect.server.external.aws.S3Service;
 import org.springframework.http.HttpStatus;
@@ -39,4 +40,17 @@ public class CourseController {
         return ApiResponseDto.success(SuccessStatus.CREATE_COURSE_SUCCESS,
             courseService.createCourse(userId, courseCreateRequestDto, imageUrl));
     }
+
+    @GetMapping("/user")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<CourseGetByUserResponseDto> getCourseByUser(@RequestHeader Long userId) {
+        return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER, courseService.getCourseByUser(userId));
+    }
+
+    @GetMapping("/private/user")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<CourseGetByUserResponseDto> getPrivateCourseByUser(@RequestHeader Long userId) {
+        return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER, courseService.getPrivateCourseByUser(userId));
+    }
+
 }

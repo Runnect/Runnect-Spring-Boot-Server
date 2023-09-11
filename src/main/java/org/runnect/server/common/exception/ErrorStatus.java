@@ -22,6 +22,7 @@ public enum ErrorStatus {
     NO_RECORD_TIME(HttpStatus.BAD_REQUEST, "경로 뛴 시간 없음"),
     NO_RECORD_PACE(HttpStatus.BAD_REQUEST, "경로 뛴 페이스 없음"),
     VALIDATION_COURSE_PATH_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 path 값이 입력되었습니다."),
+    NOT_FOUND_RECORD_EXCEPTION(HttpStatus.BAD_REQUEST, "존재하지 않는 레코드 아이디입니다."),
 
     /**
      * 401 UNAUTHORIZED

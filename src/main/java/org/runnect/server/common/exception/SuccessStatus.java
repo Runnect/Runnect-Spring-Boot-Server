@@ -18,6 +18,7 @@ public enum SuccessStatus {
     READ_RECORD_SUCCESS(HttpStatus.OK, "활동 기록 조회 성공"),
     GET_COURSE_LIST_BY_USER(HttpStatus.OK, "내가 그린 코스 리스트 조회에 성공했습니다."),
     GET_SCRAP_COURSE_BY_USER_SUCCESS(HttpStatus.OK, "스크랩한 코스 조회 성공"),
+    UPDATE_RECORD_SUCCESS(HttpStatus.OK, "활동 기록 수정 성공"),
 
     /**
      * 201 CREATED

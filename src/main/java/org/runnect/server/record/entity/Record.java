@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.publicCourse.entity.PublicCourse;
@@ -16,6 +17,7 @@ import java.time.LocalTime;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicUpdate
 public class Record extends AuditingTimeEntity {
 
     @Id
@@ -51,6 +53,10 @@ public class Record extends AuditingTimeEntity {
         this.title = title;
         this.pace = pace;
         this.time = time;
+    }
+
+    public void updateRecord(String title) {
+        this.title = title;
     }
 
 }

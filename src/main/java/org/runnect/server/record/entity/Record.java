@@ -17,7 +17,6 @@ import java.time.LocalTime;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DynamicUpdate
 public class Record extends AuditingTimeEntity {
 
     @Id

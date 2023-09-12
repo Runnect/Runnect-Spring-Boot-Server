@@ -9,6 +9,7 @@ import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.record.dto.request.CreateRecordRequestDto;
+import org.runnect.server.record.dto.request.UpdateRecordRequestDto;
 import org.runnect.server.record.dto.response.*;
 import org.runnect.server.record.entity.Record;
 import org.runnect.server.record.repository.RecordRepository;
@@ -102,8 +103,16 @@ public class RecordService {
 
         return GetRecordResponseDto.of(user, recordResponses);
 
+    }
 
+    @Transactional
+    public UpdateRecordResponseDto updateRecord(Long userId, Long recordId, UpdateRecordRequestDto request) {
+        Record record = recordRepository.findById(recordId)
+                .orElseThrow(()->new NotFoundException(ErrorStatus.NOT_FOUND_RECORD_EXCEPTION, ErrorStatus.NOT_FOUND_RECORD_EXCEPTION.getMessage()));
 
+        record.updateRecord(request.getTitle());
+
+        return UpdateRecordResponseDto.of(UpdateRecordResponse.of(record.getId(), request.getTitle()));
     }
 
 

@@ -57,7 +57,7 @@ public class CourseController {
     @GetMapping("/detail/{courseId}")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<GetCourseDetailResponseDto> getCourseDetail(@RequestHeader Long userId, @PathVariable Long courseId) {
-        return ApiResponseDto.success(SuccessStatus.GET_COURSE_DETAIL_SUCCESS, courseService.getCourseDetail(userId, courseId));
+        return ApiResponseDto.success(SuccessStatus.GET_COURSE_DETAIL_SUCCESS, courseService.getCourseDetail(courseId));
     }
 
 }

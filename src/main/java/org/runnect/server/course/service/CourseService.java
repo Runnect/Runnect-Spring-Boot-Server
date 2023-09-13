@@ -6,12 +6,14 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.DepartureResponse;
 import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.common.module.convert.DepartureConverter;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
 import org.runnect.server.course.dto.response.CourseCreateResponseDto;
 import org.runnect.server.course.dto.response.CourseGetByUserResponseDto;
 import org.runnect.server.course.dto.response.CourseResponse;
+import org.runnect.server.course.dto.response.GetCourseDetailResponseDto;
 import org.runnect.server.course.dto.response.UserResponse;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
@@ -102,6 +104,19 @@ public class CourseService {
             )).collect(Collectors.toList());
 
         return CourseGetByUserResponseDto.of(userResponse, courseResponses);
+    }
+
+    @Transactional(readOnly = true)
+    public GetCourseDetailResponseDto getCourseDetail(Long userId, Long courseId) {
+        RunnectUser user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
+                ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+
+        Course course = courseRepository.findById(courseId)
+            .orElseThrow(() -> new NotFoundException(ErrorStatus.NOT_FOUND_COURSE_EXCEPTION,
+                ErrorStatus.NOT_FOUND_COURSE_EXCEPTION.getMessage()));
+
+        return GetCourseDetailResponseDto.of(user, course);
     }
 
 }

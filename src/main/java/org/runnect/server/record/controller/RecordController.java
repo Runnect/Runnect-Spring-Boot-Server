@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.ApiResponseDto;
 import org.runnect.server.common.exception.SuccessStatus;
 import org.runnect.server.record.dto.request.CreateRecordRequestDto;
+import org.runnect.server.record.dto.request.UpdateRecordRequestDto;
 import org.runnect.server.record.dto.response.CreateRecordDto;
 import org.runnect.server.record.dto.response.CreateRecordResponseDto;
 import org.runnect.server.record.dto.response.GetRecordResponseDto;
+import org.runnect.server.record.dto.response.UpdateRecordResponseDto;
 import org.runnect.server.record.service.RecordService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +32,12 @@ public class RecordController {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<GetRecordResponseDto> getRecordByUser(@RequestHeader Long userId) {
         return ApiResponseDto.success(SuccessStatus.READ_RECORD_SUCCESS, recordService.getRecordByUser(userId));
+    }
+
+    @PatchMapping("record/{recordId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<UpdateRecordResponseDto> updateRecord(@RequestHeader Long userId, @PathVariable(name = "recordId") Long recordId, @RequestBody @Valid final UpdateRecordRequestDto request) {
+        return ApiResponseDto.success(SuccessStatus.UPDATE_RECORD_SUCCESS, recordService.updateRecord(userId, recordId, request));
     }
 
 }

@@ -24,14 +24,12 @@ public class UserStampService {
 
     @Transactional
     public void createStampByUser(RunnectUser user, StampType stampType) {
-        // 1. stampType에 해당하는 활동 횟수 가져옴! -> 예를 들면 C : 해당 유저가 그린 코스 횟수 가져옴
         Long activityCount = getActivityCount(user, stampType);
-        // 2. 횟수 0이면 바로 return
         if (activityCount == 0) return;
-        // 3. 스탬프 추가할지 말지, 한다면 어떤 스탬프인지 확인
+
         StampType newStamp = checkStampQualificationAndType(stampType, activityCount);
         if (newStamp == null) return;
-        // 4. 스탬프 추가 & 추가 했으면 레벨업 체크
+
         createUserStamp(user, newStamp);
         userLevelUpdate(user);
     }
@@ -75,7 +73,7 @@ public class UserStampService {
                 activityCount = recordRepository.countByRunnectUser(user);
                 break;
             case U:
-                activityCount = publicCourseRepository.countPublicCOurseByUser(user);
+                activityCount = publicCourseRepository.countPublicCourseByUser(user);
                 break;
         }
         return activityCount;

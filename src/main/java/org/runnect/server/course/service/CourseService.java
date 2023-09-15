@@ -1,6 +1,5 @@
 package org.runnect.server.course.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +17,10 @@ import org.runnect.server.course.dto.response.UserResponse;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.user.entity.RunnectUser;
+import org.runnect.server.user.entity.StampType;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
+import org.runnect.server.user.service.UserStampService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final UserStampService userStampService;
 
     @Transactional
     public CourseCreateResponseDto createCourse(Long userId, CourseCreateRequestDto requestDto,
@@ -54,6 +56,7 @@ public class CourseService {
             .build();
 
         Course saved = courseRepository.save(course);
+        userStampService.createStampByUser(user, StampType.C);
 
         return CourseCreateResponseDto.of(saved.getId(), saved.getCreatedAt());
     }

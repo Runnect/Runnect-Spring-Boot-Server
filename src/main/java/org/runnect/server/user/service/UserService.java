@@ -20,7 +20,7 @@ public class UserService {
         RunnectUser user = userRepository.findUserByIdWithUserStamps(userId)
             .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
                 ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
-        System.out.println("sldkfj");
+
         return MyPageResponseDto.of(user, calculateUserLevelPercent(user));
     }
 

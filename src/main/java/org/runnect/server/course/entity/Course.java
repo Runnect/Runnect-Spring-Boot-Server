@@ -26,6 +26,9 @@ public class Course extends AuditingTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private RunnectUser runnectUser;
 
+    @Column(length = 40)
+    private String title;
+
     @Column(nullable = false, length = 10)
     private String departureRegion;
 

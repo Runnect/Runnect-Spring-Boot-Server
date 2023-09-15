@@ -1,27 +1,34 @@
 package org.runnect.server.user.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.record.entity.Record;
 import org.runnect.server.scrap.entity.Scrap;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = {
-        @UniqueConstraint(
-                columnNames = {"email", "provider"}
-        )
+    @UniqueConstraint(
+        columnNames = {"email", "provider"}
+    )
 })
 public class RunnectUser extends AuditingTimeEntity {
 
@@ -91,4 +98,7 @@ public class RunnectUser extends AuditingTimeEntity {
         this.createdScrap = 0L;
     }
 
+    public void updateUserLevel(int level) {
+        this.level = level;
+    }
 }

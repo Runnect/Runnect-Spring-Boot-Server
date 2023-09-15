@@ -1,6 +1,7 @@
 package org.runnect.server.scrap.repository;
 
 import org.runnect.server.scrap.entity.Scrap;
+import org.runnect.server.user.entity.RunnectUser;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
@@ -17,6 +18,8 @@ public interface ScrapRepository extends Repository<Scrap, Long> {
 
     @Query("SELECT s FROM Scrap s JOIN FETCH s.publicCourse pc JOIN FETCH pc.course c WHERE s.runnectUser.id = :userId AND s.scrapTF = true")
     Optional<List<Scrap>> findAllByUserIdAndScrapTF(Long userId);
+
+    long countByRunnectUser(RunnectUser runnectUser);
 
     // DELETE
 }

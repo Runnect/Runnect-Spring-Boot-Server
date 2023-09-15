@@ -20,6 +20,7 @@ public enum SuccessStatus {
     GET_SCRAP_COURSE_BY_USER_SUCCESS(HttpStatus.OK, "스크랩한 코스 조회 성공"),
     UPDATE_RECORD_SUCCESS(HttpStatus.OK, "활동 기록 수정 성공"),
     GET_COURSE_DETAIL_SUCCESS(HttpStatus.OK, "코스 상세 조회에 성공했습니다."),
+    GET_MY_PAGE_SUCCESS(HttpStatus.OK, "마이페이지 조회에 성공했습니다."),
 
     /**
      * 201 CREATED

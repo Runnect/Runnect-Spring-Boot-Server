@@ -14,5 +14,7 @@ public interface UserRepository extends Repository<RunnectUser, Long> {
     @Query("select u from RunnectUser u join fetch u.userStamps where u.id = :userId")
     Optional<RunnectUser> findUserByIdWithUserStamps(Long userId);
 
+    boolean existsByNickname(String nickname);
+
     // DELETE
 }

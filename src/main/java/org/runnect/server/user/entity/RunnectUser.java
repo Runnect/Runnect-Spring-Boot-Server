@@ -101,4 +101,8 @@ public class RunnectUser extends AuditingTimeEntity {
     public void updateUserLevel(int level) {
         this.level = level;
     }
+
+    public void updateUserNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

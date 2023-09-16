@@ -1,5 +1,6 @@
 package org.runnect.server.scrap.repository;
 
+import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.scrap.entity.Scrap;
 import org.runnect.server.user.entity.RunnectUser;
 import org.springframework.data.jpa.repository.Query;
@@ -20,6 +21,10 @@ public interface ScrapRepository extends Repository<Scrap, Long> {
     Optional<List<Scrap>> findAllByUserIdAndScrapTF(Long userId);
 
     long countByRunnectUser(RunnectUser runnectUser);
+
+    Boolean existsByPublicCourseAndRunnectUser(PublicCourse publicCourse, RunnectUser runnectUser);
+
+
 
     // DELETE
 }

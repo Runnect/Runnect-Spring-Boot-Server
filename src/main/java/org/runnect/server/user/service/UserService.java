@@ -4,14 +4,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.user.dto.request.UpdateUserNicknameRequestDto;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.scrap.repository.ScrapRepository;
 import org.runnect.server.user.dto.response.MyPageResponseDto;
+import org.runnect.server.user.dto.response.UpdateUserNicknameResponseDto;
 import org.runnect.server.user.dto.response.UserProfileResponseDto;
 import org.runnect.server.user.dto.response.UserProfileResponseDto.PublicCourseResponse;
 import org.runnect.server.user.dto.response.UserProfileResponseDto.UserProfile;
 import org.runnect.server.user.entity.RunnectUser;
+import org.runnect.server.user.exception.userException.DuplicateNicknameException;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,23 @@ public class UserService {
                 ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         return MyPageResponseDto.of(user, calculateUserLevelPercent(user));
+    }
+
+    @Transactional
+    public UpdateUserNicknameResponseDto updateUserNickname(
+        Long userId, UpdateUserNicknameRequestDto updateUserNicknameRequestDto
+    ) {
+        if (userRepository.existsByNickname(updateUserNicknameRequestDto.getNickname())) {
+            throw new DuplicateNicknameException(ErrorStatus.ALREADY_EXIST_NICKNAME_EXCEPTION, ErrorStatus.ALREADY_EXIST_NICKNAME_EXCEPTION.getMessage());
+        }
+
+        RunnectUser user = userRepository.findUserByIdWithUserStamps(userId)
+            .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
+                ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+
+        user.updateUserNickname(updateUserNicknameRequestDto.getNickname());
+
+        return UpdateUserNicknameResponseDto.of(user, calculateUserLevelPercent(user));
     }
 
     @Transactional(readOnly = true)

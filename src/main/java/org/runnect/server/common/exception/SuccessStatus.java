@@ -21,6 +21,7 @@ public enum SuccessStatus {
     UPDATE_RECORD_SUCCESS(HttpStatus.OK, "활동 기록 수정 성공"),
     GET_COURSE_DETAIL_SUCCESS(HttpStatus.OK, "코스 상세 조회에 성공했습니다."),
     GET_MY_PAGE_SUCCESS(HttpStatus.OK, "마이페이지 조회에 성공했습니다."),
+    UPDATE_USER_NICKNAME_SUCCESS(HttpStatus.OK, "닉네임 변경에 성공했습니다."),
     GET_USER_PROFILE_SUCCESS(HttpStatus.OK, "유저 프로필 조회에 성공했습니다."),
 
     /**

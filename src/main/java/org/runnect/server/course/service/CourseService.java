@@ -9,11 +9,7 @@ import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.common.module.convert.DepartureConverter;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
-import org.runnect.server.course.dto.response.CourseCreateResponseDto;
-import org.runnect.server.course.dto.response.CourseGetByUserResponseDto;
-import org.runnect.server.course.dto.response.CourseResponse;
-import org.runnect.server.course.dto.response.GetCourseDetailResponseDto;
-import org.runnect.server.course.dto.response.UserResponse;
+import org.runnect.server.course.dto.response.*;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.user.entity.RunnectUser;
@@ -117,6 +113,16 @@ public class CourseService {
                 ErrorStatus.NOT_FOUND_COURSE_EXCEPTION.getMessage()));
 
         return GetCourseDetailResponseDto.of(course.getRunnectUser(), course);
+    }
+
+    @Transactional
+    public UpdateCourseResponseDto updateCourse(Long userId, Long courseId, String title) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(()->new NotFoundException(ErrorStatus.NOT_FOUND_COURSE_EXCEPTION, ErrorStatus.NOT_FOUND_COURSE_EXCEPTION.getMessage()));
+
+        course.updateCourse(title);
+
+        return UpdateCourseResponseDto.of(course);
     }
 
 }

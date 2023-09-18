@@ -73,4 +73,8 @@ public class Course extends AuditingTimeEntity {
         this.isPrivate = true;
     }
 
+    public void updateCourse(String title) {
+        this.title = title;
+    }
+
 }

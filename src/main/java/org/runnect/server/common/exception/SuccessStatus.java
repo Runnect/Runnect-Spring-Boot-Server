@@ -22,6 +22,7 @@ public enum SuccessStatus {
     GET_COURSE_DETAIL_SUCCESS(HttpStatus.OK, "코스 상세 조회에 성공했습니다."),
     GET_MY_PAGE_SUCCESS(HttpStatus.OK, "마이페이지 조회에 성공했습니다."),
     UPDATE_USER_NICKNAME_SUCCESS(HttpStatus.OK, "닉네임 변경에 성공했습니다."),
+    UPDATE_COURSE_SUCCESS(HttpStatus.OK, "내가 그린 코스 제목 수정 성공"),
 
     /**
      * 201 CREATED

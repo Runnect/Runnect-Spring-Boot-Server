@@ -1,8 +1,12 @@
 package org.runnect.server.common.dto;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.runnect.server.course.entity.Course;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DepartureResponse {
     private String region;
     private String city;
@@ -23,5 +27,15 @@ public class DepartureResponse {
         this.town = town;
         this.detail = detail;
         this.name = name;
+    }
+
+    public static DepartureResponse from(Course course) {
+        return new DepartureResponse(
+            course.getDepartureRegion(),
+            course.getDepartureCity(),
+            course.getDepartureTown(),
+            course.getDepartureDetail(),
+            course.getDepartureName()
+        );
     }
 }

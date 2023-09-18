@@ -6,10 +6,12 @@ import org.runnect.server.common.dto.ApiResponseDto;
 import org.runnect.server.common.exception.SuccessStatus;
 import org.runnect.server.user.dto.request.UpdateUserNicknameRequestDto;
 import org.runnect.server.user.dto.response.MyPageResponseDto;
+import org.runnect.server.user.dto.response.UserProfileResponseDto;
 import org.runnect.server.user.dto.response.UpdateUserNicknameResponseDto;
 import org.runnect.server.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -39,5 +41,15 @@ public class UserController {
     ) {
         return ApiResponseDto.success(SuccessStatus.UPDATE_USER_NICKNAME_SUCCESS,
             userService.updateUserNickname(userId, updateUserNicknameRequestDto));
+    }
+
+    @GetMapping("/{profileUserId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<UserProfileResponseDto> getUserProfile(
+        @RequestHeader Long userId,
+        @PathVariable Long profileUserId
+    ) {
+        return ApiResponseDto.success(SuccessStatus.GET_USER_PROFILE_SUCCESS,
+            userService.getUserProfile(profileUserId, userId));
     }
 }

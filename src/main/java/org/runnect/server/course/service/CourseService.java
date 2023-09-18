@@ -73,13 +73,7 @@ public class CourseService {
                 course.getId(),
                 course.getImage(),
                 course.getCreatedAt(),
-                new DepartureResponse(
-                    course.getDepartureRegion(),
-                    course.getDepartureCity(),
-                    course.getDepartureTown(),
-                    course.getDepartureDetail(),
-                    course.getDepartureName()
-                )
+                DepartureResponse.from(course)
             )).collect(Collectors.toList());
 
         return CourseGetByUserResponseDto.of(userResponse, courseResponses);
@@ -97,13 +91,7 @@ public class CourseService {
                 course.getId(),
                 course.getImage(),
                 course.getCreatedAt(),
-                new DepartureResponse(
-                    course.getDepartureRegion(),
-                    course.getDepartureCity(),
-                    course.getDepartureTown(),
-                    course.getDepartureDetail(),
-                    course.getDepartureName()
-                )
+                DepartureResponse.from(course)
             )).collect(Collectors.toList());
 
         return CourseGetByUserResponseDto.of(userResponse, courseResponses);

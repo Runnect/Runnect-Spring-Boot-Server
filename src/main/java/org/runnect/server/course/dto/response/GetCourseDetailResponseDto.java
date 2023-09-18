@@ -57,9 +57,7 @@ public class GetCourseDetailResponseDto {
                 CoordinatePathConverter.pathConvertCoor(course.getPath()),
                 course.getDistance(),
                 course.getImage(),
-                new DepartureResponse(course.getDepartureRegion(), course.getDepartureCity(),
-                    course.getDepartureTown(), course.getDepartureDetail(),
-                    course.getDepartureName())
+                DepartureResponse.from(course)
             );
         }
     }

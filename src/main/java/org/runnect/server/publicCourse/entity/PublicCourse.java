@@ -12,6 +12,7 @@ import org.runnect.server.scrap.entity.Scrap;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.runnect.server.user.entity.RunnectUser;
 
 @Getter
 @Entity
@@ -21,6 +22,10 @@ public class PublicCourse extends AuditingTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private RunnectUser runnectUser;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
@@ -39,10 +44,10 @@ public class PublicCourse extends AuditingTimeEntity {
     private List<Record> records = new ArrayList<>();
 
     @Builder
-    public PublicCourse(Course course, String title, String description) {
+    public PublicCourse(Course course, RunnectUser user, String title, String description) {
         this.course = course;
+        this.runnectUser = user;
         this.title = title;
         this.description = description;
     }
-
 }

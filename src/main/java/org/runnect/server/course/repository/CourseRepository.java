@@ -26,5 +26,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     long countByRunnectUser(RunnectUser runnectUser);
 
+    Optional<Course> findById(Long courseId);
+
     // DELETE
 }

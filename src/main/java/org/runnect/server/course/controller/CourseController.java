@@ -7,9 +7,11 @@ import org.runnect.server.common.exception.ErrorStatus;
 import org.runnect.server.common.exception.SuccessStatus;
 import org.runnect.server.common.resolver.userId.UserId;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
+import org.runnect.server.course.dto.request.UpdateCourseRequestDto;
 import org.runnect.server.course.dto.response.CourseCreateResponseDto;
 import org.runnect.server.course.dto.response.CourseGetByUserResponseDto;
 import org.runnect.server.course.dto.response.GetCourseDetailResponseDto;
+import org.runnect.server.course.dto.response.UpdateCourseResponseDto;
 import org.runnect.server.course.service.CourseService;
 import org.runnect.server.external.aws.S3Service;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,5 +63,13 @@ public class CourseController {
     public ApiResponseDto<GetCourseDetailResponseDto> getCourseDetail(@RequestHeader Long userId, @PathVariable Long courseId) {
         return ApiResponseDto.success(SuccessStatus.GET_COURSE_DETAIL_SUCCESS, courseService.getCourseDetail(courseId));
     }
+
+    @PatchMapping("/{courseId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<UpdateCourseResponseDto> updateCourse(@RequestHeader Long userId, @PathVariable(name = "courseId") Long courseId,
+                                                                @RequestBody @Valid final UpdateCourseRequestDto request) {
+        return ApiResponseDto.success(SuccessStatus.UPDATE_COURSE_SUCCESS, courseService.updateCourse(userId, courseId, request.getTitle()));
+    }
+
 
 }

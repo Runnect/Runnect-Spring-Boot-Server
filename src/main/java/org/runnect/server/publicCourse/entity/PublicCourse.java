@@ -37,10 +37,10 @@ public class PublicCourse extends AuditingTimeEntity {
     @Column(nullable = false)
     private String description;
 
-    @OneToMany(mappedBy = "publicCourse", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "publicCourse")
     private List<Scrap> scraps = new ArrayList<>();
 
-    @OneToMany(mappedBy = "publicCourse", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "publicCourse")
     private List<Record> records = new ArrayList<>();
 
     @Builder

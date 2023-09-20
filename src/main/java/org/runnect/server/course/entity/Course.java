@@ -2,7 +2,6 @@ package org.runnect.server.course.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -63,7 +62,7 @@ public class Course extends AuditingTimeEntity {
     @Column(nullable = false)
     private String path;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "course")
     private List<Record> records = new ArrayList<>();
 
     @Builder

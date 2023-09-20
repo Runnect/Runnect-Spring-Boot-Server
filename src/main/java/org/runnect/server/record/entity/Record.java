@@ -62,4 +62,7 @@ public class Record extends AuditingTimeEntity {
         this.title = title;
     }
 
+    public void setPublicCourseNull() {
+        this.publicCourse = null;
+    }
 }

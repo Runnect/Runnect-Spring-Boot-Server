@@ -1,13 +1,13 @@
 package org.runnect.server.scrap.repository;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.scrap.entity.Scrap;
 import org.runnect.server.user.entity.RunnectUser;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface ScrapRepository extends Repository<Scrap, Long> {
     // CREATE
@@ -24,7 +24,7 @@ public interface ScrapRepository extends Repository<Scrap, Long> {
 
     Boolean existsByPublicCourseAndRunnectUser(PublicCourse publicCourse, RunnectUser runnectUser);
 
-
-
     // DELETE
+    Long deleteByPublicCourseIn(Collection<PublicCourse> publicCourses);
+
 }

@@ -24,7 +24,7 @@ public class PublicCourse extends AuditingTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private RunnectUser runnectUser;
 
     @OneToOne(fetch = FetchType.LAZY)

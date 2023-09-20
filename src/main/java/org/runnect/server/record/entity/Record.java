@@ -1,18 +1,22 @@
 package org.runnect.server.record.entity;
 
+import java.sql.Time;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
 import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.user.entity.RunnectUser;
-
-import javax.persistence.*;
-import java.sql.Time;
-import java.time.LocalTime;
 
 @Getter
 @Entity
@@ -28,7 +32,7 @@ public class Record extends AuditingTimeEntity {
     private RunnectUser runnectUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id", nullable = false)
+    @JoinColumn(name = "course_id")
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)

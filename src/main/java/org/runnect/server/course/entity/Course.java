@@ -1,17 +1,24 @@
 package org.runnect.server.course.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.runnect.server.common.entity.AuditingTimeEntity;
-import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.record.entity.Record;
 import org.runnect.server.user.entity.RunnectUser;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -23,7 +30,7 @@ public class Course extends AuditingTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private RunnectUser runnectUser;
 
     @Column(length = 40)

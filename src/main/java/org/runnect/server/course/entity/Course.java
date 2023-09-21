@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.runnect.server.common.entity.AuditingTimeEntity;
-import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.record.entity.Record;
 import org.runnect.server.user.entity.RunnectUser;
 

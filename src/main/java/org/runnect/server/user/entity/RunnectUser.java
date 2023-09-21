@@ -2,7 +2,6 @@ package org.runnect.server.user.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -71,16 +70,16 @@ public class RunnectUser extends AuditingTimeEntity {
     @Column(nullable = false)
     private Long createdScrap;
 
-    @OneToMany(mappedBy = "runnectUser", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "runnectUser")
     private List<Course> courses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "runnectUser", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "runnectUser")
     private List<Record> records = new ArrayList<>();
 
-    @OneToMany(mappedBy = "runnectUser", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "runnectUser")
     private List<Scrap> scraps = new ArrayList<>();
 
-    @OneToMany(mappedBy = "runnectUser", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "runnectUser")
     private List<UserStamp> userStamps = new ArrayList<>();
 
     @Builder

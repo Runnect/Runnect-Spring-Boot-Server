@@ -24,6 +24,7 @@ public enum SuccessStatus {
     UPDATE_USER_NICKNAME_SUCCESS(HttpStatus.OK, "닉네임 변경에 성공했습니다."),
     UPDATE_COURSE_SUCCESS(HttpStatus.OK, "내가 그린 코스 제목 수정 성공"),
     GET_USER_PROFILE_SUCCESS(HttpStatus.OK, "유저 프로필 조회에 성공했습니다."),
+    DELETE_PUBLIC_COURSE_SUCCESS(HttpStatus.OK, "퍼블릭 코스 삭제에 성공했습니다."),
 
     /**
      * 201 CREATED

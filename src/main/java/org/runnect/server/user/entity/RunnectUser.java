@@ -104,4 +104,20 @@ public class RunnectUser extends AuditingTimeEntity {
     public void updateUserNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public void updateCreatedCourse() {
+        this.createdCourse++;
+    }
+
+    public void updateCreatedRecord() {
+        this.createdRecord++;
+    }
+
+    public void updateCreatedScrap() {
+        this.createdScrap++;
+    }
+
+    public void updateCreatedPublicCourse() {
+        this.createdPublicCourse++;
+    }
 }

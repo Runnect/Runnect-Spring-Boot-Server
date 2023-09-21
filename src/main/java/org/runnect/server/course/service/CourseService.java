@@ -52,6 +52,7 @@ public class CourseService {
             .build();
 
         Course saved = courseRepository.save(course);
+        user.updateCreatedCourse();
         userStampService.createStampByUser(user, StampType.C);
 
         return CourseCreateResponseDto.of(saved.getId(), saved.getCreatedAt());

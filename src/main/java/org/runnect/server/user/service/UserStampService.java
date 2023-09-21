@@ -1,10 +1,6 @@
 package org.runnect.server.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.runnect.server.course.repository.CourseRepository;
-import org.runnect.server.publicCourse.repository.PublicCourseRepository;
-import org.runnect.server.record.repository.RecordRepository;
-import org.runnect.server.scrap.repository.ScrapRepository;
 import org.runnect.server.user.entity.RunnectUser;
 import org.runnect.server.user.entity.StampType;
 import org.runnect.server.user.entity.UserStamp;
@@ -17,10 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserStampService {
 
     private final UserStampRepository userStampRepository;
-    private final CourseRepository courseRepository;
-    private final ScrapRepository scrapRepository;
-    private final RecordRepository recordRepository;
-    private final PublicCourseRepository publicCourseRepository;
 
     @Transactional
     public void createStampByUser(RunnectUser user, StampType stampType) {
@@ -64,16 +56,16 @@ public class UserStampService {
         Long activityCount = 0L;
         switch (stampType) {
             case C:
-                activityCount = courseRepository.countByRunnectUser(user);
+                activityCount = user.getCreatedCourse();
                 break;
             case S:
-                activityCount = scrapRepository.countByRunnectUser(user);
+                activityCount = user.getCreatedScrap();
                 break;
             case R:
-                activityCount = recordRepository.countByRunnectUser(user);
+                activityCount = user.getCreatedRecord();
                 break;
             case U:
-                activityCount = publicCourseRepository.countPublicCourseByUser(user);
+                activityCount = user.getCreatedPublicCourse();
                 break;
         }
         return activityCount;

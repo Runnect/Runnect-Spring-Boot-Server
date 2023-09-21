@@ -1,7 +1,10 @@
 package org.runnect.server.record.service;
 
+import java.sql.Time;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.runnect.server.common.exception.BasicException;
 import org.runnect.server.common.exception.ErrorStatus;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.course.entity.Course;
@@ -10,20 +13,23 @@ import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.record.dto.request.CreateRecordRequestDto;
 import org.runnect.server.record.dto.request.UpdateRecordRequestDto;
-import org.runnect.server.record.dto.response.*;
+import org.runnect.server.record.dto.response.CreateRecordDto;
+import org.runnect.server.record.dto.response.CreateRecordResponseDto;
+import org.runnect.server.record.dto.response.DepartureResponse;
+import org.runnect.server.record.dto.response.GetRecordResponseDto;
+import org.runnect.server.record.dto.response.RecordResponse;
+import org.runnect.server.record.dto.response.UpdateRecordResponse;
+import org.runnect.server.record.dto.response.UpdateRecordResponseDto;
+import org.runnect.server.record.dto.response.UserResponse;
 import org.runnect.server.record.entity.Record;
 import org.runnect.server.record.repository.RecordRepository;
 import org.runnect.server.user.entity.RunnectUser;
+import org.runnect.server.user.entity.StampType;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
+import org.runnect.server.user.service.UserStampService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Time;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +39,7 @@ public class RecordService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final PublicCourseRepository publicCourseRepository;
+    private final UserStampService userStampService;
 
     @Transactional
     public CreateRecordResponseDto createRecord(Long userId, CreateRecordRequestDto request) {
@@ -67,6 +74,9 @@ public class RecordService {
                 .build();
 
         recordRepository.save(record);
+
+        user.updateCreatedRecord();
+        userStampService.createStampByUser(user, StampType.R);
 
         CreateRecordDto recordDto = new CreateRecordDto(record.getId(), record.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
 

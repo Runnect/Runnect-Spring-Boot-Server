@@ -24,7 +24,7 @@ public class PublicCourse extends AuditingTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private RunnectUser runnectUser;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -37,10 +37,10 @@ public class PublicCourse extends AuditingTimeEntity {
     @Column(nullable = false)
     private String description;
 
-    @OneToMany(mappedBy = "publicCourse", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "publicCourse")
     private List<Scrap> scraps = new ArrayList<>();
 
-    @OneToMany(mappedBy = "publicCourse", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "publicCourse")
     private List<Record> records = new ArrayList<>();
 
     @Builder

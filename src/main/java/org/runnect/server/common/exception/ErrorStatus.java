@@ -31,6 +31,10 @@ public enum ErrorStatus {
     INVALID_REFRESH_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
     INVALID_ACCESS_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 엑세스 토큰입니다."),
 
+    /**
+     * 403 FORBIDDEN
+     */
+    PERMISSION_DENIED_PUBLIC_COURSE_DELETE_EXCEPTION(HttpStatus.FORBIDDEN, "퍼블릭 코스를 삭제할 권한이 존재하지 않습니다."),
 
     /**
      * 404 NOT FOUND

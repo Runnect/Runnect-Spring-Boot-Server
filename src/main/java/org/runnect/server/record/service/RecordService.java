@@ -7,14 +7,17 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.exception.ErrorStatus;
 import org.runnect.server.common.exception.NotFoundException;
+import org.runnect.server.common.exception.PermissionDeniedException;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.record.dto.request.CreateRecordRequestDto;
+import org.runnect.server.record.dto.request.DeleteRecordsRequestDto;
 import org.runnect.server.record.dto.request.UpdateRecordRequestDto;
 import org.runnect.server.record.dto.response.CreateRecordDto;
 import org.runnect.server.record.dto.response.CreateRecordResponseDto;
+import org.runnect.server.record.dto.response.DeleteRecordsResponseDto;
 import org.runnect.server.record.dto.response.DepartureResponse;
 import org.runnect.server.record.dto.response.GetRecordResponseDto;
 import org.runnect.server.record.dto.response.RecordResponse;
@@ -125,5 +128,33 @@ public class RecordService {
         return UpdateRecordResponseDto.of(UpdateRecordResponse.of(record.getId(), request.getTitle()));
     }
 
+    @Transactional
+    public DeleteRecordsResponseDto deleteRecords(
+        Long userId,
+        DeleteRecordsRequestDto requestDto
+    ) {
+        RunnectUser user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
+                ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+
+        List<Record> records = recordRepository.findByIdIn(requestDto.getRecordIdList());
+
+        if (records.size() != requestDto.getRecordIdList().size()) {
+            throw new NotFoundException(ErrorStatus.NOT_FOUND_RECORD_EXCEPTION, ErrorStatus.NOT_FOUND_RECORD_EXCEPTION.getMessage());
+        }
+
+        records.stream()
+            .filter(record -> !record.getRunnectUser().equals(user))
+            .findAny()
+            .ifPresent(record -> {
+                throw new PermissionDeniedException(
+                    ErrorStatus.PERMISSION_DENIED_RECORD_DELETE_EXCEPTION,
+                    ErrorStatus.PERMISSION_DENIED_RECORD_DELETE_EXCEPTION.getMessage()
+                );
+            });
+
+        Long deletedCount = recordRepository.deleteByIdIn(requestDto.getRecordIdList());
+        return DeleteRecordsResponseDto.from(deletedCount);
+    }
 
 }

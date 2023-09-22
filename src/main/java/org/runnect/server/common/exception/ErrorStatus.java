@@ -35,6 +35,7 @@ public enum ErrorStatus {
      * 403 FORBIDDEN
      */
     PERMISSION_DENIED_PUBLIC_COURSE_DELETE_EXCEPTION(HttpStatus.FORBIDDEN, "퍼블릭 코스를 삭제할 권한이 존재하지 않습니다."),
+    PERMISSION_DENIED_RECORD_DELETE_EXCEPTION(HttpStatus.FORBIDDEN, "기록을 삭제할 권한이 존재하지 않습니다."),
 
     /**
      * 404 NOT FOUND

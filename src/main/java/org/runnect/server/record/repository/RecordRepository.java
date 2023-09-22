@@ -1,5 +1,6 @@
 package org.runnect.server.record.repository;
 
+import java.util.Collection;
 import org.runnect.server.record.entity.Record;
 import org.runnect.server.user.entity.RunnectUser;
 import org.springframework.data.jpa.repository.Query;
@@ -23,5 +24,8 @@ public interface RecordRepository extends Repository<Record, Long> {
 
     long countByRunnectUser(RunnectUser runnectUser);
 
+    List<Record> findByIdIn(Collection<Long> ids);
+
     // DELETE
+    long deleteByIdIn(Collection<Long> ids);
 }

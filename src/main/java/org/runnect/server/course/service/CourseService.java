@@ -61,38 +61,42 @@ public class CourseService {
 
     @Transactional(readOnly = true)
     public CourseGetByUserResponseDto getCourseByUser(Long userId) {
+        RunnectUser user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
+                ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         List<Course> courses = courseRepository.findCourseByUserId(userId);
-
-        UserResponse userResponse = UserResponse.of(userId);
 
         List<CourseResponse> courseResponses = courses.stream()
             .map(course -> CourseResponse.of(
                 course.getId(),
                 course.getImage(),
                 course.getCreatedAt(),
+                course.getTitle(),
                 DepartureResponse.from(course)
             )).collect(Collectors.toList());
 
-        return CourseGetByUserResponseDto.of(userResponse, courseResponses);
+        return CourseGetByUserResponseDto.of(UserResponse.of(user.getId()), courseResponses);
     }
 
     @Transactional(readOnly = true)
     public CourseGetByUserResponseDto getPrivateCourseByUser(Long userId) {
+        RunnectUser user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
+                ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         List<Course> courses = courseRepository.findCourseByUserIdOnlyPrivate(userId);
-
-        UserResponse userResponse = UserResponse.of(userId);
 
         List<CourseResponse> courseResponses = courses.stream()
             .map(course -> CourseResponse.of(
                 course.getId(),
                 course.getImage(),
                 course.getCreatedAt(),
+                course.getTitle(),
                 DepartureResponse.from(course)
             )).collect(Collectors.toList());
 
-        return CourseGetByUserResponseDto.of(userResponse, courseResponses);
+        return CourseGetByUserResponseDto.of(UserResponse.of(user.getId()), courseResponses);
     }
 
     @Transactional(readOnly = true)

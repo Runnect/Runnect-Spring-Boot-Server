@@ -41,6 +41,7 @@ public class CourseService {
 
         Course course = Course.builder()
             .runnectUser(user)
+            .title(requestDto.getTitle())
             .departureRegion(departureResponse.getRegion())
             .departureCity(departureResponse.getCity())
             .departureTown(departureResponse.getTown())

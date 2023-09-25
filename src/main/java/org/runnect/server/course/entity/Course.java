@@ -32,7 +32,7 @@ public class Course extends AuditingTimeEntity {
     @JoinColumn(name = "user_id")
     private RunnectUser runnectUser;
 
-    @Column(length = 40)
+    @Column(nullable = false)
     private String title;
 
     @Column(nullable = false, length = 10)
@@ -44,7 +44,7 @@ public class Course extends AuditingTimeEntity {
     @Column(nullable = false, length = 10)
     private String departureTown;
 
-    @Column(length = 20)
+    @Column
     private String departureDetail;
 
     @Column
@@ -66,8 +66,9 @@ public class Course extends AuditingTimeEntity {
     private List<Record> records = new ArrayList<>();
 
     @Builder
-    public Course(RunnectUser runnectUser, String departureRegion, String departureCity, String departureTown, String departureDetail, String departureName, Float distance, String image, String path) {
+    public Course(RunnectUser runnectUser, String title, String departureRegion, String departureCity, String departureTown, String departureDetail, String departureName, Float distance, String image, String path) {
         this.runnectUser = runnectUser;
+        this.title = title;
         this.departureRegion = departureRegion;
         this.departureCity = departureCity;
         this.departureTown = departureTown;

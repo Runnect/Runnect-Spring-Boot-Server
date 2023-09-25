@@ -1,12 +1,11 @@
 package org.runnect.server.course.dto.request;
 
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.constraints.NotNull;
 
 @Getter
 @AllArgsConstructor
@@ -14,6 +13,9 @@ import javax.validation.constraints.NotNull;
 public class CourseCreateRequestDto {
     @NotNull
     private String path;
+
+    @NotNull
+    private String title;
 
     @NotNull
     private MultipartFile image;

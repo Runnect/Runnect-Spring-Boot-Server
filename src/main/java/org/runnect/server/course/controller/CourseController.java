@@ -1,11 +1,11 @@
 package org.runnect.server.course.controller;
 
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.ApiResponseDto;
 import org.runnect.server.common.exception.BadRequestException;
 import org.runnect.server.common.exception.ErrorStatus;
 import org.runnect.server.common.exception.SuccessStatus;
-import org.runnect.server.common.resolver.userId.UserId;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
 import org.runnect.server.course.dto.request.UpdateCourseRequestDto;
 import org.runnect.server.course.dto.response.CourseCreateResponseDto;
@@ -16,11 +16,16 @@ import org.runnect.server.course.service.CourseService;
 import org.runnect.server.external.aws.S3Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor

@@ -11,13 +11,16 @@ import org.runnect.server.common.dto.DepartureResponse;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CourseResponse {
+
     private Long id;
     private String image;
     private LocalDateTime createdAt;
+    private String title;
     private DepartureResponse departure;
 
-    public static CourseResponse of(Long id, String image, LocalDateTime createdAt, DepartureResponse departure) {
-        return new CourseResponse(id, image, createdAt, departure);
+    public static CourseResponse of(Long id, String image, LocalDateTime createdAt, String title,
+        DepartureResponse departure) {
+        return new CourseResponse(id, image, createdAt, title, departure);
     }
 
 }

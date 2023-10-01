@@ -48,6 +48,7 @@ public class GetCourseDetailResponseDto {
         private List<List<Double>> path;
         private Float distance;
         private String image;
+        private String title;
         private DepartureResponse departure;
 
         public static CourseDetailResponse of(Course course) {
@@ -57,6 +58,7 @@ public class GetCourseDetailResponseDto {
                 CoordinatePathConverter.pathConvertCoor(course.getPath()),
                 course.getDistance(),
                 course.getImage(),
+                course.getTitle(),
                 DepartureResponse.from(course)
             );
         }

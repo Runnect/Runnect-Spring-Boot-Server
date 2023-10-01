@@ -1,28 +1,30 @@
 package org.runnect.server.course.dto.request;
 
+import javax.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.NotNull;
-
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CourseCreateRequestDto {
-    @NotNull
+    @NotBlank(message = "path는 필수 입력 항목입니다.")
     private String path;
 
-    @NotNull
+    @NotBlank(message = "title은 필수 입력 항목입니다.")
+    private String title;
+
+    @NotBlank(message = "image는 필수 입력 항목입니다.")
     private MultipartFile image;
 
-    @NotNull
+    @NotBlank(message = "distance는 필수 입력 항목입니다.")
     private Float distance;
 
     private String departureName;
 
-    @NotNull
+    @NotBlank(message = "departureAddress는 필수 입력 항목입니다.")
     private String departureAddress;
 }

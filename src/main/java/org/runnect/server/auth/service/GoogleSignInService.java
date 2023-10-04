@@ -1,4 +1,4 @@
-package org.runnect.server.auth.google;
+package org.runnect.server.auth.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;

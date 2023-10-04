@@ -2,6 +2,7 @@ package org.runnect.server.auth.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
+import org.runnect.server.auth.dto.response.SocialInfoResponseDto;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -14,10 +15,13 @@ public class GoogleSignInService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public String getSocialInfo(String accessToken) {
+    public SocialInfoResponseDto getSocialInfo(String accessToken) {
         JsonNode userResourceNode = getUserResource(accessToken);
 
-        return userResourceNode.get("email").asText();
+        return SocialInfoResponseDto.of(
+            userResourceNode.get("email").asText(),
+            userResourceNode.get("id").asText()
+        );
     }
 
     private JsonNode getUserResource(String accessToken) {

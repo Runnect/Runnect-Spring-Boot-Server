@@ -56,6 +56,9 @@ dependencies {
 
 	// cache
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// google login
+	implementation group: 'com.google.api-client', name: 'google-api-client', version: '1.30.0'
 }
 
 tasks.named('test') {

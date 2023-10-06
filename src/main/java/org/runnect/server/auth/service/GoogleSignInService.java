@@ -1,34 +1,50 @@
 package org.runnect.server.auth.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.auth.dto.response.SocialInfoResponseDto;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.exception.UnauthorizedException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
 public class GoogleSignInService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Value("${google.client-id-1}")
+    private String CLIENT_ID_1;
 
-    public SocialInfoResponseDto getSocialInfo(String accessToken) {
-        JsonNode userResourceNode = getUserResource(accessToken);
+    @Value("${google.client-id-2}")
+    private String CLIENT_ID_2;
 
-        return SocialInfoResponseDto.of(
-            userResourceNode.get("email").asText(),
-            userResourceNode.get("id").asText()
-        );
-    }
 
-    private JsonNode getUserResource(String accessToken) {
-        String resourceUri = "https://www.googleapis.com/oauth2/v2/userinfo";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
-        HttpEntity entity = new HttpEntity(headers);
-        return restTemplate.exchange(resourceUri, HttpMethod.GET, entity, JsonNode.class).getBody();
+    public SocialInfoResponseDto getSocialInfo(String token) {
+        HttpTransport transport = new NetHttpTransport();
+        JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
+            .setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2))
+            .build();
+
+        String userId = null;
+        String email = null;
+        try {
+            GoogleIdToken idToken = verifier.verify(token);
+
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            userId = payload.getSubject();
+            email = payload.getEmail();
+        } catch (Exception e) {
+            throw new UnauthorizedException(ErrorStatus.INVALID_GOOGLE_ID_TOKEN_EXCEPTION,
+                ErrorStatus.INVALID_GOOGLE_ID_TOKEN_EXCEPTION.getMessage());
+        }
+        return SocialInfoResponseDto.of(email, userId);
     }
 }

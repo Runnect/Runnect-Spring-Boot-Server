@@ -26,6 +26,7 @@ public enum SuccessStatus {
     GET_USER_PROFILE_SUCCESS(HttpStatus.OK, "유저 프로필 조회에 성공했습니다."),
     DELETE_PUBLIC_COURSE_SUCCESS(HttpStatus.OK, "퍼블릭 코스 삭제에 성공했습니다."),
     DELETE_RECORD_SUCCESS(HttpStatus.OK, "기록 삭제에 성공했습니다."),
+    UPDATE_PUBLIC_COURSE_SUCCESS(HttpStatus.OK, "업로드한 코스 수정 성공"),
 
     /**
      * 201 CREATED

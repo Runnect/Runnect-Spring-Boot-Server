@@ -24,7 +24,6 @@ public class GoogleSignInService {
     @Value("${google.client-id-2}")
     private String CLIENT_ID_2;
 
-
     public SocialInfoResponseDto getSocialInfo(String token) {
         HttpTransport transport = new NetHttpTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();

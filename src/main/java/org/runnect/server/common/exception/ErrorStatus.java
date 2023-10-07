@@ -23,10 +23,11 @@ public enum ErrorStatus {
     NO_RECORD_PACE(HttpStatus.BAD_REQUEST, "경로 뛴 페이스 없음"),
     VALIDATION_COURSE_PATH_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 path 값이 입력되었습니다."),
     NOT_FOUND_RECORD_EXCEPTION(HttpStatus.BAD_REQUEST, "존재하지 않는 레코드 아이디입니다."),
+    NOT_FOUND_PUBLIC_COURSE_EXCEPTION(HttpStatus.BAD_REQUEST,"유효하지 않은 퍼블릭 코스 아이디입니다."),
 
-    /**
-     * 401 UNAUTHORIZED
-     */
+            /**
+             * 401 UNAUTHORIZED
+             */
     TOKEN_TIME_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
     INVALID_REFRESH_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
     INVALID_ACCESS_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 엑세스 토큰입니다."),

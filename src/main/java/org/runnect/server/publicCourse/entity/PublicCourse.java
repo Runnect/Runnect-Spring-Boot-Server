@@ -50,4 +50,9 @@ public class PublicCourse extends AuditingTimeEntity {
         this.title = title;
         this.description = description;
     }
+
+    public void updatePublicCourse(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
 }

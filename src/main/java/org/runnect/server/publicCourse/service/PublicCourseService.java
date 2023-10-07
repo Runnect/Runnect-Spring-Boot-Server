@@ -6,7 +6,9 @@ import org.runnect.server.common.exception.ErrorStatus;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
+import org.runnect.server.publicCourse.dto.request.UpdatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;
+import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.record.entity.Record;
@@ -57,5 +59,15 @@ public class PublicCourseService {
         publicCourses.forEach(PublicCourse::updateDeletedAt);
 
         return DeletePublicCoursesResponseDto.from(publicCourses.size());
+    }
+
+    @Transactional
+    public UpdatePublicCourseResponseDto updatePublicCourse(Long userId, Long publicCourseId, String title, String description) {
+        PublicCourse publicCourse = publicCourseRepository.findById(publicCourseId)
+                .orElseThrow(()->new NotFoundException(ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION, ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION.getMessage()));
+
+        publicCourse.updatePublicCourse(title, description);
+
+        return UpdatePublicCourseResponseDto.of(publicCourse);
     }
 }

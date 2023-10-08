@@ -8,5 +8,4 @@ public class NicknameGenerator {
         String alphanumeric = Long.toString(Math.abs(random.nextLong()), 36);
         return "임시" + alphanumeric.substring(0, 9);
     }
-
 }

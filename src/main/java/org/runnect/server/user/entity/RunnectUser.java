@@ -55,9 +55,6 @@ public class RunnectUser extends AuditingTimeEntity {
     @Column(nullable = false)
     private int level;
 
-    @Column
-    private String refreshToken;
-
     @Column(nullable = false)
     private Long createdCourse;
 
@@ -83,12 +80,11 @@ public class RunnectUser extends AuditingTimeEntity {
     private List<UserStamp> userStamps = new ArrayList<>();
 
     @Builder
-    public RunnectUser(String nickname, String socialId, String email, SocialType provider, String refreshToken) {
+    public RunnectUser(String nickname, String socialId, String email, SocialType provider) {
         this.nickname = nickname;
         this.socialId = socialId;
         this.email = email;
         this.provider = provider;
-        this.refreshToken = refreshToken;
         this.latestStamp = StampType.CSPR0;
         this.level = 1;
         this.createdCourse = 0L;

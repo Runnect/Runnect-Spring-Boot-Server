@@ -1,19 +1,22 @@
 package org.runnect.server.config.jwt;
 
-import org.runnect.server.common.exception.BasicException;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.runnect.server.common.exception.ErrorStatus;
-
-import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
+import javax.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.runnect.server.common.exception.BasicException;
+import org.runnect.server.common.exception.ErrorStatus;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
 
 @Service
@@ -25,9 +28,9 @@ public class JwtService {
 
     private final long accessTokenExpiryTime = 1000L * 60 * 60 * 2; // 2시간
     private final long refreshTokenExpiryTime = 1000L * 60 * 60 * 24 * 14; // 2주
-    private final String CLAIM_NAME = "userIdx";
+    private final String CLAIM_NAME = "userId";
 
-//    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @PostConstruct
     protected void init() {
@@ -36,19 +39,19 @@ public class JwtService {
     }
 
     // Access Token 발급
-    public String issuedAccessToken(String userIdx) {
-        return issuedToken("access_token", accessTokenExpiryTime, userIdx);
+    public String issuedAccessToken(Long userId) {
+        return issuedToken("access_token", accessTokenExpiryTime, userId.toString());
     }
 
     // Refresh Token 발급
-    public String issuedRefreshToken(String userIdx) {
-        String refreshToken = issuedToken("refresh_token", refreshTokenExpiryTime, userIdx);
-//        redisTemplate.opsForValue().set(String.valueOf(userIdx), refreshToken, Duration.ofMillis(refreshTokenExpiryTime));
+    public String issuedRefreshToken(Long userId) {
+        String refreshToken = issuedToken("refresh_token", refreshTokenExpiryTime, userId.toString());
+        redisTemplate.opsForValue().set(String.valueOf(userId), refreshToken, Duration.ofMillis(refreshTokenExpiryTime));
         return refreshToken;
     }
 
     // JWT 토큰 발급
-    public String issuedToken(String tokenName, long expiryTime, String userIdx) {
+    public String issuedToken(String tokenName, long expiryTime, String userId) {
         final Date now = new Date();
 
         final Claims claims = Jwts.claims()
@@ -56,7 +59,7 @@ public class JwtService {
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + expiryTime));
 
-        claims.put(CLAIM_NAME, userIdx);
+        claims.put(CLAIM_NAME, userId);
 
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)

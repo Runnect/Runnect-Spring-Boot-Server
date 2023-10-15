@@ -59,6 +59,10 @@ dependencies {
 
 	// google login
 	implementation group: 'com.google.api-client', name: 'google-api-client', version: '1.30.0'
+
+	// hibernate-spatial
+	implementation 'org.hibernate:hibernate-spatial:5.6.11.Final'
+
 }
 
 tasks.named('test') {

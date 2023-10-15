@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.runnect.server.common.dto.DepartureResponse;
+import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.user.entity.RunnectUser;
 
@@ -54,7 +55,7 @@ public class GetCourseDetailResponseDto {
             return new CourseDetailResponse(
                 course.getId(),
                 course.getCreatedAt(),
-                null,
+                CoordinatePathConverter.pathConvertCoor(course.getPath()),
                 course.getDistance(),
                 course.getImage(),
                 course.getTitle(),

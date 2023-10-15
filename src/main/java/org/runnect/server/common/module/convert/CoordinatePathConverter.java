@@ -41,11 +41,25 @@ public class CoordinatePathConverter {
         }
     }
 
-    public static List<List<Double>> pathConvertCoor(String path) {
+    public static List<List<Double>> pathConvertCoor(LineString path) {
         try {
             System.out.println(path);
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<List<Double>> coordinates = objectMapper.readValue(path, List.class);
+//            WKTWriter wktWriter = new WKTWriter();
+//            String wktString = wktWriter.write(path);
+//            System.out.println(wktString);
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            List<List<Double>> coordinates = objectMapper.readValue(wktString, List.class);
+
+            List<List<Double>> coordinates = new ArrayList<>();
+
+            for (int i = 0; i < path.getNumPoints(); i++) {
+//                Point pointN = path.getPointN(i).getX();
+                List<Double> temp = new ArrayList<>();
+                temp.add(path.getPointN(i).getX());
+                temp.add(path.getPointN(i).getX());
+                coordinates.add(temp);
+            }
+
             return coordinates;
         } catch (Exception e) {
             throw new BasicException(ErrorStatus.PATH_CONVERT_FAIL, ErrorStatus.PATH_CONVERT_FAIL.getMessage());

@@ -1,6 +1,7 @@
 package org.runnect.server.course.dto.request;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,10 +18,10 @@ public class CourseCreateRequestDto {
     @NotBlank(message = "title은 필수 입력 항목입니다.")
     private String title;
 
-    @NotBlank(message = "image는 필수 입력 항목입니다.")
+    @NotNull(message = "image는 필수 입력 항목입니다.")
     private MultipartFile image;
 
-    @NotBlank(message = "distance는 필수 입력 항목입니다.")
+    @NotNull(message = "distance는 필수 입력 항목입니다.")
     private Float distance;
 
     private String departureName;

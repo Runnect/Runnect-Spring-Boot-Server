@@ -56,7 +56,7 @@ public class CoordinatePathConverter {
 //                Point pointN = path.getPointN(i).getX();
                 List<Double> temp = new ArrayList<>();
                 temp.add(path.getPointN(i).getX());
-                temp.add(path.getPointN(i).getX());
+                temp.add(path.getPointN(i).getY());
                 coordinates.add(temp);
             }
 

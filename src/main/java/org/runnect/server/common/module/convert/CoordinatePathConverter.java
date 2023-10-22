@@ -25,9 +25,9 @@ public class CoordinatePathConverter {
             JsonNode jsonNode = objectMapper.readTree(path);
 
             for (JsonNode node : jsonNode) {
-                Double lat = node.get("lat").asDouble();
-                Double lon = node.get("long").asDouble();
-                coordinateDtos.add(new CoordinateDto(lat, lon));
+                Double latitude = node.get("lat").asDouble();
+                Double longitude = node.get("long").asDouble();
+                coordinateDtos.add(new CoordinateDto(latitude, longitude));
             }
 
             return getLineString(coordinateDtos);
@@ -54,7 +54,6 @@ public class CoordinatePathConverter {
         }
     }
 
-
     private static LineString getLineString(List<CoordinateDto> coordinateDtos) {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         Coordinate[] coordinates = new Coordinate[coordinateDtos.size()];
@@ -67,7 +66,7 @@ public class CoordinatePathConverter {
 
     @Getter
     @AllArgsConstructor
-    static class CoordinateDto {
+    private static class CoordinateDto {
         private double latitude;
         private double longitude;
     }

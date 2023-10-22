@@ -18,22 +18,17 @@ public class CoordinatePathConverter {
 
     public static LineString coorConvertPath(String path) {
 
-        List<CoordinateDto2> coordinateDtos = new ArrayList<>();
+        List<CoordinateDto> coordinateDtos = new ArrayList<>();
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(path);
 
-            List<String> formattedCoordinates = new ArrayList<>();
-
             for (JsonNode node : jsonNode) {
                 Double lat = node.get("lat").asDouble();
                 Double lon = node.get("long").asDouble();
-                coordinateDtos.add(new CoordinateDto2(lat, lon));
-//                formattedCoordinates.add("[" + lat + ", " + lon + "]");
+                coordinateDtos.add(new CoordinateDto(lat, lon));
             }
-
-//            return "[" + String.join(", ", formattedCoordinates) + "]";
 
             return getLineString(coordinateDtos);
         } catch (Exception e) {
@@ -43,17 +38,10 @@ public class CoordinatePathConverter {
 
     public static List<List<Double>> pathConvertCoor(LineString path) {
         try {
-            System.out.println(path);
-//            WKTWriter wktWriter = new WKTWriter();
-//            String wktString = wktWriter.write(path);
-//            System.out.println(wktString);
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            List<List<Double>> coordinates = objectMapper.readValue(wktString, List.class);
 
             List<List<Double>> coordinates = new ArrayList<>();
 
             for (int i = 0; i < path.getNumPoints(); i++) {
-//                Point pointN = path.getPointN(i).getX();
                 List<Double> temp = new ArrayList<>();
                 temp.add(path.getPointN(i).getX());
                 temp.add(path.getPointN(i).getY());
@@ -67,7 +55,7 @@ public class CoordinatePathConverter {
     }
 
 
-    private static LineString getLineString(List<CoordinateDto2> coordinateDtos) {
+    private static LineString getLineString(List<CoordinateDto> coordinateDtos) {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         Coordinate[] coordinates = new Coordinate[coordinateDtos.size()];
         for (int i = 0; i < coordinateDtos.size(); i++) {
@@ -77,10 +65,9 @@ public class CoordinatePathConverter {
         return lineString;
     }
 
-
     @Getter
     @AllArgsConstructor
-    static class CoordinateDto2 {
+    static class CoordinateDto {
         private double latitude;
         private double longitude;
     }

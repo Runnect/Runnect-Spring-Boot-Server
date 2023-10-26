@@ -35,6 +35,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.27'
 	runtimeOnly 'org.postgresql:postgresql'
+	// hibernate-spatial
+	implementation 'org.hibernate:hibernate-spatial:5.6.11.Final'
+
 
 	//JWT
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'

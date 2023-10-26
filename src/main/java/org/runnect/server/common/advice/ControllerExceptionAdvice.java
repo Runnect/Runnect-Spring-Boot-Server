@@ -51,13 +51,14 @@ public class ControllerExceptionAdvice {
 
     /**
      * 500 Internal Server Error
+     * TODO 배포시 주석풀기
      */
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    protected ApiResponseDto<Object> handleException(final Exception error, final HttpServletRequest request) throws IOException {
-        slackApi.sendAlert(error, request);
-        return ApiResponseDto.error(ErrorStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    @ExceptionHandler(Exception.class)
+//    protected ApiResponseDto<Object> handleException(final Exception error, final HttpServletRequest request) throws IOException {
+//        slackApi.sendAlert(error, request);
+//        return ApiResponseDto.error(ErrorStatus.INTERNAL_SERVER_ERROR);
+//    }
 
     /**
      * custom error

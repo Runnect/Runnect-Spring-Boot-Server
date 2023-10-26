@@ -6,6 +6,7 @@ import org.runnect.server.common.constant.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.user.exception.authException.InvalidAccessTokenException;
 import org.runnect.server.user.exception.authException.NullAccessTokenException;
+import org.runnect.server.user.exception.authException.TimeExpiredAccessTokenException;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;

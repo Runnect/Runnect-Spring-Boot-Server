@@ -1,6 +1,7 @@
 package org.runnect.server.common.advice;
 
 import lombok.RequiredArgsConstructor;
+import javax.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -39,6 +40,13 @@ public class ControllerExceptionAdvice {
     @ExceptionHandler(MissingRequestHeaderException.class)
     protected ApiResponseDto handleMissingRequestHeaderException(final MissingRequestHeaderException e) {
         return ApiResponseDto.error(ErrorStatus.VALIDATION_REQUEST_HEADER_MISSING_EXCEPTION, String.format("%s. (%s)", ErrorStatus.VALIDATION_REQUEST_HEADER_MISSING_EXCEPTION.getMessage(), e.getHeaderName()));
+    }
+
+    // validation 실패시 커스텀 에러 response
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ApiResponseDto handleConstraintViolationException(final ConstraintViolationException e) {
+        return ApiResponseDto.error(ErrorStatus.VALIDATION_REQUEST_HEADER_MISSING_EXCEPTION, String.format("%s. (%s)", ErrorStatus.VALIDATION_REQUEST_HEADER_MISSING_EXCEPTION.getMessage(), e.getConstraintViolations()));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -74,15 +74,15 @@ public class JwtService {
     }
 
     // JWT 토큰 검증
-    public boolean verifyToken(String token) {
+    public long verifyToken(String token) {
         try {
             final Claims claims = getBody(token);
-            return true;
+            return TokenStatus.TOKEN_VALID;
         } catch (RuntimeException e) {
             if (e instanceof ExpiredJwtException) {
-                throw new BasicException(ErrorStatus.TOKEN_TIME_EXPIRED_EXCEPTION, ErrorStatus.TOKEN_TIME_EXPIRED_EXCEPTION.getMessage());
+                return TokenStatus.TOKEN_EXPIRED;
             }
-            return false;
+            return TokenStatus.TOKEN_INVALID;
         }
     }
 
@@ -99,5 +99,6 @@ public class JwtService {
         final Claims claims = getBody(token);
         return (String) claims.get(CLAIM_NAME);
     }
+
 
 }

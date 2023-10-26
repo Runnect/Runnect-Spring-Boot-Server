@@ -2,11 +2,10 @@ package org.runnect.server.publicCourse.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
-import org.runnect.server.publicCourse.dto.request.UpdatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;
 import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.entity.PublicCourse;

@@ -7,8 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.runnect.server.common.exception.BadRequestException;
 import org.runnect.server.common.exception.BasicException;
-import org.runnect.server.common.exception.ErrorStatus;
-import org.springframework.jdbc.BadSqlGrammarException;
+import org.runnect.server.common.constant.ErrorStatus;
 
 public class CoordinatePathConverter {
 

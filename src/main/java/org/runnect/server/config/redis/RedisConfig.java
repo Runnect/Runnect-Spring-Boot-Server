@@ -1,4 +1,4 @@
-package org.runnect.server.config;
+package org.runnect.server.config.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;

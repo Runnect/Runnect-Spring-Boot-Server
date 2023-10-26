@@ -1,6 +1,8 @@
 package org.runnect.server.common.resolver.userId;
 
-import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.constant.TokenStatus;
+import org.runnect.server.common.exception.BasicException;
+import org.runnect.server.common.constant.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.user.exception.authException.InvalidAccessTokenException;
 import org.runnect.server.user.exception.authException.NullAccessTokenException;

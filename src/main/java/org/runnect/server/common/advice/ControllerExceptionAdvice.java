@@ -12,12 +12,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.runnect.server.common.dto.ApiResponseDto;
-import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.BasicException;
 import org.runnect.server.config.slack.SlackApi;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.Objects;
 
 @RestControllerAdvice

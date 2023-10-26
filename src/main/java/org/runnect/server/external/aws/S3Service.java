@@ -14,7 +14,7 @@ import org.runnect.server.common.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.constant.ErrorStatus;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;

@@ -30,7 +30,11 @@ public class JwtService {
     private final long refreshTokenExpiryTime = 1000L * 60 * 60 * 24 * 14; // 2주
     private final String CLAIM_NAME = "userId";
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisService redisService;
+
+
+
+
 
     @PostConstruct
     protected void init() {
@@ -46,7 +50,7 @@ public class JwtService {
     // Refresh Token 발급
     public String issuedRefreshToken(Long userId) {
         String refreshToken = issuedToken("refresh_token", refreshTokenExpiryTime, userId.toString());
-        redisTemplate.opsForValue().set(String.valueOf(userId), refreshToken, Duration.ofMillis(refreshTokenExpiryTime));
+        redisService.setValues(String.valueOf(userId), refreshToken,refreshTokenExpiryTime);
         return refreshToken;
     }
 
@@ -99,6 +103,7 @@ public class JwtService {
         final Claims claims = getBody(token);
         return (String) claims.get(CLAIM_NAME);
     }
+
 
 
 }

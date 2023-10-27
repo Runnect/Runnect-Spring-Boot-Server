@@ -3,7 +3,7 @@ package org.runnect.server.record.controller;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.ApiResponseDto;
-import org.runnect.server.common.exception.SuccessStatus;
+import org.runnect.server.common.constant.SuccessStatus;
 import org.runnect.server.record.dto.request.CreateRecordRequestDto;
 import org.runnect.server.record.dto.request.DeleteRecordsRequestDto;
 import org.runnect.server.record.dto.request.UpdateRecordRequestDto;

@@ -3,7 +3,7 @@ package org.runnect.server.scrap.service;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;

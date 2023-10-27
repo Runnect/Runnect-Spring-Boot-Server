@@ -12,8 +12,8 @@ import java.util.Base64;
 import java.util.Date;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.runnect.server.common.exception.BasicException;
-import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.constant.TokenStatus;
+import org.runnect.server.config.redis.RedisService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,11 @@ public class JwtService {
     private final long refreshTokenExpiryTime = 1000L * 60 * 60 * 24 * 14; // 2주
     private final String CLAIM_NAME = "userId";
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisService redisService;
+
+
+
+
 
     @PostConstruct
     protected void init() {
@@ -46,7 +50,7 @@ public class JwtService {
     // Refresh Token 발급
     public String issuedRefreshToken(Long userId) {
         String refreshToken = issuedToken("refresh_token", refreshTokenExpiryTime, userId.toString());
-        redisTemplate.opsForValue().set(String.valueOf(userId), refreshToken, Duration.ofMillis(refreshTokenExpiryTime));
+        redisService.setValues(String.valueOf(userId), refreshToken,refreshTokenExpiryTime);
         return refreshToken;
     }
 
@@ -74,15 +78,15 @@ public class JwtService {
     }
 
     // JWT 토큰 검증
-    public boolean verifyToken(String token) {
+    public long verifyToken(String token) {
         try {
             final Claims claims = getBody(token);
-            return true;
+            return TokenStatus.TOKEN_VALID;
         } catch (RuntimeException e) {
             if (e instanceof ExpiredJwtException) {
-                throw new BasicException(ErrorStatus.TOKEN_TIME_EXPIRED_EXCEPTION, ErrorStatus.TOKEN_TIME_EXPIRED_EXCEPTION.getMessage());
+                return TokenStatus.TOKEN_EXPIRED;
             }
-            return false;
+            return TokenStatus.TOKEN_INVALID;
         }
     }
 
@@ -99,5 +103,7 @@ public class JwtService {
         final Claims claims = getBody(token);
         return (String) claims.get(CLAIM_NAME);
     }
+
+
 
 }

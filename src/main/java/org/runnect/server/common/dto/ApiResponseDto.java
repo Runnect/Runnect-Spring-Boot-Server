@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.runnect.server.common.exception.ErrorStatus;
-import org.runnect.server.common.exception.SuccessStatus;
+import org.runnect.server.common.constant.ErrorStatus;
+import org.runnect.server.common.constant.SuccessStatus;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

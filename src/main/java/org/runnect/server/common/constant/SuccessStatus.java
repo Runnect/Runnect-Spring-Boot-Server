@@ -1,4 +1,4 @@
-package org.runnect.server.common.exception;
+package org.runnect.server.common.constant;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

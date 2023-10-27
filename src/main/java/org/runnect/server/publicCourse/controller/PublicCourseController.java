@@ -3,7 +3,7 @@ package org.runnect.server.publicCourse.controller;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.ApiResponseDto;
-import org.runnect.server.common.exception.SuccessStatus;
+import org.runnect.server.common.constant.SuccessStatus;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
 import org.runnect.server.publicCourse.dto.request.UpdatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;

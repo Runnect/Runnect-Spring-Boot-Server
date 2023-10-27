@@ -1,6 +1,7 @@
 package org.runnect.server.common.advice;
 
 import lombok.RequiredArgsConstructor;
+import javax.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -12,12 +13,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.runnect.server.common.dto.ApiResponseDto;
-import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.BasicException;
 import org.runnect.server.config.slack.SlackApi;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.Objects;
 
 @RestControllerAdvice
@@ -43,6 +42,13 @@ public class ControllerExceptionAdvice {
         return ApiResponseDto.error(ErrorStatus.VALIDATION_REQUEST_HEADER_MISSING_EXCEPTION, String.format("%s. (%s)", ErrorStatus.VALIDATION_REQUEST_HEADER_MISSING_EXCEPTION.getMessage(), e.getHeaderName()));
     }
 
+    // validation 실패시 커스텀 에러 response
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ApiResponseDto handleConstraintViolationException(final ConstraintViolationException e) {
+        return ApiResponseDto.error(ErrorStatus.VALIDATION_REQUEST_HEADER_MISSING_EXCEPTION, String.format("%s. (%s)", ErrorStatus.VALIDATION_REQUEST_HEADER_MISSING_EXCEPTION.getMessage(), e.getConstraintViolations()));
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingServletRequestParameterException.class)
     protected ApiResponseDto handleMissingRequestParameterException(final MissingServletRequestParameterException e) {
@@ -51,13 +57,14 @@ public class ControllerExceptionAdvice {
 
     /**
      * 500 Internal Server Error
+     * TODO 배포시 주석풀기
      */
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    protected ApiResponseDto<Object> handleException(final Exception error, final HttpServletRequest request) throws IOException {
-        slackApi.sendAlert(error, request);
-        return ApiResponseDto.error(ErrorStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    @ExceptionHandler(Exception.class)
+//    protected ApiResponseDto<Object> handleException(final Exception error, final HttpServletRequest request) throws IOException {
+//        slackApi.sendAlert(error, request);
+//        return ApiResponseDto.error(ErrorStatus.INTERNAL_SERVER_ERROR);
+//    }
 
     /**
      * custom error

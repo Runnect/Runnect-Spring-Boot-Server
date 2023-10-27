@@ -1,4 +1,4 @@
-package org.runnect.server.common.exception;
+package org.runnect.server.common.constant;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,8 @@ public enum ErrorStatus {
             /**
              * 401 UNAUTHORIZED
              */
-    TOKEN_TIME_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
+    ACCESS_TOKEN_TIME_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
+    REFRESH_TOKEN_TIME_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
     INVALID_REFRESH_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
     INVALID_ACCESS_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 엑세스 토큰입니다."),
     INVALID_GOOGLE_ID_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 구글 아이디 토큰입니다."),

@@ -1,9 +1,12 @@
 package org.runnect.server.common.resolver.userId;
 
-import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.constant.TokenStatus;
+import org.runnect.server.common.exception.BasicException;
+import org.runnect.server.common.constant.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.user.exception.authException.InvalidAccessTokenException;
 import org.runnect.server.user.exception.authException.NullAccessTokenException;
+import org.runnect.server.user.exception.authException.TimeExpiredAccessTokenException;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -40,9 +43,12 @@ public class UserIdResolver implements HandlerMethodArgumentResolver {
         final String token = header.substring(7);        //배리어 타입으로 토큰을 받기때문에 앞의 'Bearer ' 없애기
 
         // 토큰 검증
-        if (!jwtService.verifyToken(token)) {
+        if (jwtService.verifyToken(token)== TokenStatus.TOKEN_EXPIRED) {
+            throw new TimeExpiredAccessTokenException(ErrorStatus.ACCESS_TOKEN_TIME_EXPIRED_EXCEPTION, ErrorStatus.ACCESS_TOKEN_TIME_EXPIRED_EXCEPTION.getMessage());
+        } else if (jwtService.verifyToken(token)== TokenStatus.TOKEN_INVALID) {
             throw new InvalidAccessTokenException(ErrorStatus.INVALID_ACCESS_TOKEN_EXCEPTION, ErrorStatus.INVALID_ACCESS_TOKEN_EXCEPTION.getMessage());
         }
+
 
         // 유저 아이디 반환
         final String tokenContents = jwtService.getJwtContents(token);

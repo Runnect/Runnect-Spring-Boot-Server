@@ -1,9 +1,8 @@
 package org.runnect.server.scrap.controller;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.ApiResponseDto;
-import org.runnect.server.common.exception.SuccessStatus;
+import org.runnect.server.common.constant.SuccessStatus;
 import org.runnect.server.scrap.dto.request.CreateAndDeleteScrapRequestDto;
 import org.runnect.server.scrap.dto.response.GetScrapCourseResponseDto;
 import org.runnect.server.scrap.service.ScrapService;

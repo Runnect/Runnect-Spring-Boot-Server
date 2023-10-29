@@ -3,7 +3,7 @@ package org.runnect.server.user.controller;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.ApiResponseDto;
-import org.runnect.server.common.exception.SuccessStatus;
+import org.runnect.server.common.constant.SuccessStatus;
 import org.runnect.server.user.dto.request.UpdateUserNicknameRequestDto;
 import org.runnect.server.user.dto.response.MyPageResponseDto;
 import org.runnect.server.user.dto.response.UserProfileResponseDto;

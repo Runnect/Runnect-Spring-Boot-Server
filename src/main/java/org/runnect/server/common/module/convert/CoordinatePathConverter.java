@@ -12,7 +12,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.runnect.server.common.exception.BadRequestException;
 import org.runnect.server.common.exception.BasicException;
-import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.constant.ErrorStatus;
 
 public class CoordinatePathConverter {
 

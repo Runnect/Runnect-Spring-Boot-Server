@@ -9,7 +9,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.auth.dto.response.SocialInfoResponseDto;
-import org.runnect.server.common.exception.ErrorStatus;
+import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

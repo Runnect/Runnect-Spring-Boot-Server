@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.LineString;
 import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.record.entity.Record;
 import org.runnect.server.user.entity.RunnectUser;
@@ -59,14 +60,14 @@ public class Course extends AuditingTimeEntity {
     @Column(name = "is_private", nullable = false)
     private Boolean isPrivate;
 
-    @Column(nullable = false)
-    private String path;
+    @Column(nullable = false, columnDefinition = "geometry(LineString, 4326)")
+    private LineString path;
 
     @OneToMany(mappedBy = "course")
     private List<Record> records = new ArrayList<>();
 
     @Builder
-    public Course(RunnectUser runnectUser, String title, String departureRegion, String departureCity, String departureTown, String departureDetail, String departureName, Float distance, String image, String path) {
+    public Course(RunnectUser runnectUser, String title, String departureRegion, String departureCity, String departureTown, String departureDetail, String departureName, Float distance, String image, LineString path) {
         this.runnectUser = runnectUser;
         this.title = title;
         this.departureRegion = departureRegion;

@@ -3,6 +3,7 @@ package org.runnect.server.course.service;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.LineString;
 import org.runnect.server.common.dto.DepartureResponse;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.NotFoundException;
@@ -35,7 +36,7 @@ public class CourseService {
             .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
                 ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
-        String path = CoordinatePathConverter.coorConvertPath(requestDto.getPath());
+        LineString path = CoordinatePathConverter.coorConvertPath(requestDto.getPath());
         DepartureResponse departureResponse = DepartureConverter.requestConvertDeparture(
             requestDto.getDepartureAddress(), requestDto.getDepartureName());
 

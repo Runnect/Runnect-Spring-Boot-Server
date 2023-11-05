@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.runnect.server.user.entity.RunnectUser;
+import org.runnect.server.user.entity.StampType;
 import org.runnect.server.user.entity.UserStamp;
 
 @Getter
@@ -42,10 +43,10 @@ public class FindUserStampsResponseDto {
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     private static class StampInfo {
 
-        private Long id;
+        private StampType id;
 
         private static StampInfo from(UserStamp stamp) {
-            return new StampInfo(stamp.getId());
+            return new StampInfo(stamp.getStampId());
         }
     }
 }

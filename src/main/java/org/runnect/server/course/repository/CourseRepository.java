@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
+import org.springframework.data.repository.query.Param;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
@@ -27,6 +28,9 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     long countByRunnectUser(RunnectUser runnectUser);
 
     Optional<Course> findById(Long courseId);
+
+    @Query("select c from Course c where c.id = :courseId and c.runnectUser.id = :userId")
+    Optional<Course> findByCourseIdAndUserId(@Param("courseId") Long courseId,  @Param("userId") Long userId);
 
     // DELETE
 }

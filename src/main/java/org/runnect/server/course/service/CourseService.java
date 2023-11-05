@@ -1,16 +1,24 @@
 package org.runnect.server.course.service;
 
+import static org.runnect.server.common.constant.ErrorStatus.NOT_FOUND_COURSE_EXCEPTION;
+import static org.runnect.server.common.constant.ErrorStatus.NOT_FOUND_USER_EXCEPTION;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.LineString;
 import org.runnect.server.common.dto.DepartureResponse;
-import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.common.module.convert.DepartureConverter;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
-import org.runnect.server.course.dto.response.*;
+import org.runnect.server.course.dto.response.CourseCreateResponseDto;
+import org.runnect.server.course.dto.response.CourseGetByUserResponseDto;
+import org.runnect.server.course.dto.response.CourseResponse;
+import org.runnect.server.course.dto.response.DeleteCoursesResponseDto;
+import org.runnect.server.course.dto.response.GetCourseDetailResponseDto;
+import org.runnect.server.course.dto.response.UpdateCourseResponseDto;
+import org.runnect.server.course.dto.response.UserResponse;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.user.entity.RunnectUser;
@@ -33,8 +41,8 @@ public class CourseService {
     public CourseCreateResponseDto createCourse(Long userId, CourseCreateRequestDto requestDto,
         String image) {
         RunnectUser user = userRepository.findById(userId)
-            .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
-                ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+            .orElseThrow(() -> new NotFoundUserException(NOT_FOUND_USER_EXCEPTION,
+                NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         LineString path = CoordinatePathConverter.coorConvertPath(requestDto.getPath());
         DepartureResponse departureResponse = DepartureConverter.requestConvertDeparture(
@@ -63,8 +71,8 @@ public class CourseService {
     @Transactional(readOnly = true)
     public CourseGetByUserResponseDto getCourseByUser(Long userId) {
         RunnectUser user = userRepository.findById(userId)
-            .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
-                ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+            .orElseThrow(() -> new NotFoundUserException(NOT_FOUND_USER_EXCEPTION,
+                NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         List<Course> courses = courseRepository.findCourseByUserId(userId);
 
@@ -83,8 +91,8 @@ public class CourseService {
     @Transactional(readOnly = true)
     public CourseGetByUserResponseDto getPrivateCourseByUser(Long userId) {
         RunnectUser user = userRepository.findById(userId)
-            .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
-                ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+            .orElseThrow(() -> new NotFoundUserException(NOT_FOUND_USER_EXCEPTION,
+                NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         List<Course> courses = courseRepository.findCourseByUserIdOnlyPrivate(userId);
 
@@ -104,8 +112,8 @@ public class CourseService {
     public GetCourseDetailResponseDto getCourseDetail(Long courseId) {
 
         Course course = courseRepository.findCourseByIdFetchUser(courseId)
-            .orElseThrow(() -> new NotFoundException(ErrorStatus.NOT_FOUND_COURSE_EXCEPTION,
-                ErrorStatus.NOT_FOUND_COURSE_EXCEPTION.getMessage()));
+            .orElseThrow(() -> new NotFoundException(NOT_FOUND_COURSE_EXCEPTION,
+                NOT_FOUND_COURSE_EXCEPTION.getMessage()));
 
         return GetCourseDetailResponseDto.of(course.getRunnectUser(), course);
     }
@@ -113,11 +121,22 @@ public class CourseService {
     @Transactional
     public UpdateCourseResponseDto updateCourse(Long userId, Long courseId, String title) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(()->new NotFoundException(ErrorStatus.NOT_FOUND_COURSE_EXCEPTION, ErrorStatus.NOT_FOUND_COURSE_EXCEPTION.getMessage()));
+                .orElseThrow(()->new NotFoundException(NOT_FOUND_COURSE_EXCEPTION, NOT_FOUND_COURSE_EXCEPTION.getMessage()));
 
         course.updateCourse(title);
 
         return UpdateCourseResponseDto.of(course);
     }
 
+    @Transactional
+    public DeleteCoursesResponseDto deleteCourses(List<Long> courseIdList, Long userId) {
+        courseIdList.forEach(courseId -> {
+            Course course = courseRepository.findByCourseIdAndUserId(courseId, userId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_COURSE_EXCEPTION,
+                    NOT_FOUND_COURSE_EXCEPTION.getMessage()));
+
+            course.updateDeletedAt();
+        });
+        return DeleteCoursesResponseDto.from(courseIdList.size());
+    }
 }

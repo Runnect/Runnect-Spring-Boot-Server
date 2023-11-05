@@ -84,5 +84,4 @@ public class Course extends AuditingTimeEntity {
     public void updateCourse(String title) {
         this.title = title;
     }
-
 }

@@ -29,7 +29,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     Optional<Course> findById(Long courseId);
 
-    @Query("select c from Course c where c.id = :courseId and c.runnectUser.id = :userId")
+    @Query("select c from Course c where c.id = :courseId and c.runnectUser.id = :userId and c.deletedAt = null")
     Optional<Course> findByCourseIdAndUserId(@Param("courseId") Long courseId,  @Param("userId") Long userId);
 
     // DELETE

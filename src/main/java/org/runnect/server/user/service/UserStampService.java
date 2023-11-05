@@ -1,9 +1,14 @@
 package org.runnect.server.user.service;
 
+import static org.runnect.server.common.constant.ErrorStatus.NOT_FOUND_USER_EXCEPTION;
+
 import lombok.RequiredArgsConstructor;
+import org.runnect.server.user.dto.response.FindUserStampsResponseDto;
 import org.runnect.server.user.entity.RunnectUser;
 import org.runnect.server.user.entity.StampType;
 import org.runnect.server.user.entity.UserStamp;
+import org.runnect.server.user.exception.userException.NotFoundUserException;
+import org.runnect.server.user.repository.UserRepository;
 import org.runnect.server.user.repository.UserStampRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,17 +18,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserStampService {
 
     private final UserStampRepository userStampRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public void createStampByUser(RunnectUser user, StampType stampType) {
         Long activityCount = getActivityCount(user, stampType);
-        if (activityCount == 0) return;
+        if (activityCount == 0) {
+            return;
+        }
 
         StampType newStamp = checkStampQualificationAndType(stampType, activityCount);
-        if (newStamp == null) return;
+        if (newStamp == null) {
+            return;
+        }
 
         createUserStamp(user, newStamp);
         userLevelUpdate(user);
+    }
+
+    @Transactional(readOnly = true)
+    public FindUserStampsResponseDto findUserStamps(Long userId) {
+        return FindUserStampsResponseDto.from(userRepository.findUserByIdWithUserStamps(userId)
+            .orElseThrow(() -> new NotFoundUserException(NOT_FOUND_USER_EXCEPTION,
+                NOT_FOUND_USER_EXCEPTION.getMessage())));
     }
 
     private void createUserStamp(RunnectUser user, StampType stampType) {

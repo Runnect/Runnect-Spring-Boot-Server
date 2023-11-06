@@ -82,4 +82,12 @@ public class Course extends AuditingTimeEntity {
         this.title = title;
     }
 
+    public Boolean isMatchedUser(RunnectUser user) {
+        return getRunnectUser().equals(user);
+    }
+
+    public void uploadCourse() {
+        this.isPrivate = false;
+    }
+
 }

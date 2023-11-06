@@ -3,7 +3,7 @@ package org.runnect.server.user.service;
 import static org.runnect.server.common.constant.ErrorStatus.NOT_FOUND_USER_EXCEPTION;
 
 import lombok.RequiredArgsConstructor;
-import org.runnect.server.user.dto.response.FindUserStampsResponseDto;
+import org.runnect.server.user.dto.response.GetUserStampsResponseDto;
 import org.runnect.server.user.entity.RunnectUser;
 import org.runnect.server.user.entity.StampType;
 import org.runnect.server.user.entity.UserStamp;
@@ -37,8 +37,8 @@ public class UserStampService {
     }
 
     @Transactional(readOnly = true)
-    public FindUserStampsResponseDto findUserStamps(Long userId) {
-        return FindUserStampsResponseDto.from(userRepository.findUserByIdWithUserStamps(userId)
+    public GetUserStampsResponseDto findUserStamps(Long userId) {
+        return GetUserStampsResponseDto.from(userRepository.findUserByIdWithUserStamps(userId)
             .orElseThrow(() -> new NotFoundUserException(NOT_FOUND_USER_EXCEPTION,
                 NOT_FOUND_USER_EXCEPTION.getMessage())));
     }

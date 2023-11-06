@@ -5,7 +5,7 @@ import static org.runnect.server.common.constant.SuccessStatus.GET_USER_STAMPS_S
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.ApiResponseDto;
 import org.runnect.server.common.resolver.userId.UserId;
-import org.runnect.server.user.dto.response.FindUserStampsResponseDto;
+import org.runnect.server.user.dto.response.GetUserStampsResponseDto;
 import org.runnect.server.user.service.UserStampService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +22,7 @@ public class UserStampController {
 
     @GetMapping("/user")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponseDto<FindUserStampsResponseDto> getUserStamps(
+    public ApiResponseDto<GetUserStampsResponseDto> getUserStamps(
         @UserId Long userId
     ) {
         return ApiResponseDto.success(GET_USER_STAMPS_SUCCESS,

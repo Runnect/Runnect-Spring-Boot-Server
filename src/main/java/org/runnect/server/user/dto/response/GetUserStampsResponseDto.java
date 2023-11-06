@@ -13,13 +13,13 @@ import org.runnect.server.user.entity.UserStamp;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class FindUserStampsResponseDto {
+public class GetUserStampsResponseDto {
 
     private UserInfo user;
     private List<StampInfo> stamps;
 
-    public static FindUserStampsResponseDto from(RunnectUser user) {
-        return new FindUserStampsResponseDto(
+    public static GetUserStampsResponseDto from(RunnectUser user) {
+        return new GetUserStampsResponseDto(
             UserInfo.from(user),
             user.getUserStamps().stream()
                 .map(StampInfo::from)

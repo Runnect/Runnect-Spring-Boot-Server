@@ -2,11 +2,10 @@ package org.runnect.server.auth.service;
 
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.auth.dto.request.SignInRequestDto;
-import org.runnect.server.auth.dto.response.GetNewTokenResponseDto;
-import org.runnect.server.auth.dto.response.SignInResponseDto;
-import org.runnect.server.auth.dto.response.SocialInfoResponseDto;
+import org.runnect.server.auth.dto.response.*;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.constant.TokenStatus;
+import org.runnect.server.common.exception.UnauthorizedException;
 import org.runnect.server.common.module.convert.NicknameGenerator;
 import org.runnect.server.config.jwt.JwtService;
 import org.runnect.server.config.redis.RedisService;
@@ -74,7 +73,7 @@ public class AuthService {
 
 
     @Transactional
-    public SignInResponseDto signIn(SignInRequestDto signInRequestDto) {
+    public AuthResponseDto signIn(SignInRequestDto signInRequestDto) {
         SocialType socialType = SocialType.valueOf(signInRequestDto.getProvider());
 
         SocialInfoResponseDto socialInfo = getSocialInfo(socialType, signInRequestDto.getToken());
@@ -98,8 +97,13 @@ public class AuthService {
         String accessToken = jwtService.issuedAccessToken(user.getId());
         String refreshToken = jwtService.issuedRefreshToken(user.getId());
 
-        String type = isRegistered ? "Login" : "Signup";
-        return SignInResponseDto.of(type, socialInfo.getEmail(), accessToken, refreshToken);
+        if(isRegistered){
+            return SignInResponseDto.of("Login", socialInfo.getEmail(), accessToken, refreshToken);
+        }
+        else{
+            return SignUpResponseDto.of("Signup",socialInfo.getEmail(), user.getNickname(), accessToken, refreshToken);
+        }
+
     }
 
     private SocialInfoResponseDto getSocialInfo(SocialType socialType, String socialAccessToken) {
@@ -115,6 +119,7 @@ public class AuthService {
                 //카카오 소셜정보 해독
                 break;
         }
+
 
         return socialInfoResponseDto;
     }

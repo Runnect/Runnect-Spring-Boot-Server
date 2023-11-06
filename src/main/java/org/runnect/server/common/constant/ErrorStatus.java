@@ -35,6 +35,7 @@ public enum ErrorStatus {
     INVALID_ACCESS_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 엑세스 토큰입니다."),
     INVALID_GOOGLE_ID_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 구글 아이디 토큰입니다."),
     INVALID_APPLE_ID_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED,"유효하지 않은 애플 아이디 토큰입니다."),
+    APPLE_ID_TOKEN_TIME_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED,"만료된 애플 아이디 토큰입니다."),
 
     /**
      * 403 FORBIDDEN

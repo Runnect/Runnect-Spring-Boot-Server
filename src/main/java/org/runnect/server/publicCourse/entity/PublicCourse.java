@@ -23,6 +23,7 @@ public class PublicCourse extends AuditingTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private RunnectUser runnectUser;
@@ -37,11 +38,17 @@ public class PublicCourse extends AuditingTimeEntity {
     @Column(nullable = false)
     private String description;
 
-    @OneToMany(mappedBy = "publicCourse")
-    private List<Scrap> scraps = new ArrayList<>();
+    // 아래 코드 주석이유 -> 유저가 현재 스크랩한 코스는 scraptf가 treu인 경우만임
+//    @OneToMany(mappedBy = "publicCourse")
+//    private List<Scrap> scraps = new ArrayList<>();
 
     @OneToMany(mappedBy = "publicCourse")
     private List<Record> records = new ArrayList<>();
+
+    @Transient
+    private Boolean isScrap=false; //현재 사용자가 스크랩한지 아닌지 여부
+
+    public void setIsScrap(Boolean flag){ isScrap=flag;}
 
     @Builder
     public PublicCourse(Course course, RunnectUser user, String title, String description) {

@@ -26,6 +26,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final GoogleSignInService googleSignInService;
+    private final AppleSignInService appleSignInService;
     private final JwtService jwtService;
     private final RedisService redisService;
 
@@ -106,7 +107,15 @@ public class AuthService {
         switch (socialType) {
             case GOOGLE:
                 socialInfoResponseDto = googleSignInService.getSocialInfo(socialAccessToken);
+                break;
+            case APPLE:
+                socialInfoResponseDto = appleSignInService.getSocialInfo(socialAccessToken);
+                break;
+            case KAKAO:
+                //카카오 소셜정보 해독
+                break;
         }
+
         return socialInfoResponseDto;
     }
 

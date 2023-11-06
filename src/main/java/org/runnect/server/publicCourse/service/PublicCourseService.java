@@ -10,8 +10,6 @@ import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
-import org.runnect.server.course.entity.Course;
-import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.publicCourse.dto.request.CreatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
 import org.runnect.server.publicCourse.dto.response.CreatePublicCourseResponseDto;

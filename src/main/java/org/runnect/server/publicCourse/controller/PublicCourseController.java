@@ -39,8 +39,9 @@ public class PublicCourseController {
     @GetMapping("/user")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<GetPublicCourseByUserResponseDto> getPublicCourseByUser(
-            // TODO : 테스트 후 @UserId final Long userId 로 변경
-            @RequestHeader final Long userId
+            // TODO : 테스트 후
+            @UserId final Long userId
+            //@RequestHeader final Long userId
     ){
 
         return ApiResponseDto.success(SuccessStatus.GET_PUBLIC_COURSE_BY_USER_SUCCESS,

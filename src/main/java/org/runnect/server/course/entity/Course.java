@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -84,4 +85,13 @@ public class Course extends AuditingTimeEntity {
     public void updateCourse(String title) {
         this.title = title;
     }
+
+    public Boolean isMatchedUser(RunnectUser user) {
+        return getRunnectUser().equals(user);
+    }
+
+    public void uploadCourse() {
+        this.isPrivate = false;
+    }
+
 }

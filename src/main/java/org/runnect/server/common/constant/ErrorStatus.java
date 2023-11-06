@@ -24,10 +24,11 @@ public enum ErrorStatus {
     VALIDATION_COURSE_PATH_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 path 값이 입력되었습니다."),
     NOT_FOUND_RECORD_EXCEPTION(HttpStatus.BAD_REQUEST, "존재하지 않는 레코드 아이디입니다."),
     NOT_FOUND_PUBLIC_COURSE_EXCEPTION(HttpStatus.BAD_REQUEST,"유효하지 않은 퍼블릭 코스 아이디입니다."),
+    UNMATCHED_COURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "로그인된 유저가 그린 코스가 아닙니다."),
 
-            /**
-             * 401 UNAUTHORIZED
-             */
+    /**
+     * 401 UNAUTHORIZED
+     */
     ACCESS_TOKEN_TIME_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
     REFRESH_TOKEN_TIME_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
     INVALID_REFRESH_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
@@ -53,6 +54,7 @@ public enum ErrorStatus {
      */
     ALREADY_EXIST_USER_EXCEPTION(HttpStatus.CONFLICT, "이미 존재하는 유저입니다"),
     ALREADY_EXIST_NICKNAME_EXCEPTION(HttpStatus.CONFLICT, "중복된 닉네임입니다."),
+    ALREADY_UPLOAD_COURSE_EXCEPTION(HttpStatus.CONFLICT, "이미 업로드된 코스입니다."),
 
     /**
      * 500 INTERNAL SERVER ERROR

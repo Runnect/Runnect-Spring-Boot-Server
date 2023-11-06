@@ -7,6 +7,7 @@ import org.runnect.server.common.constant.SuccessStatus;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
 import org.runnect.server.publicCourse.dto.request.UpdatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;
+import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserResponseDto;
 import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.service.PublicCourseService;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,19 @@ import org.springframework.web.bind.annotation.*;
 public class PublicCourseController {
 
     private final PublicCourseService publicCourseService;
+
+    @GetMapping("/user")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<GetPublicCourseByUserResponseDto> getPublicCourseByUser(
+            // TODO : 테스트 후 @UserId final Long userId 로 변경
+            @RequestHeader final Long userId
+    ){
+
+        return ApiResponseDto.success(SuccessStatus.GET_PUBLIC_COURSE_BY_USER_SUCCESS,
+                publicCourseService.getPublicCourseByUser(userId));
+
+    }
+
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)

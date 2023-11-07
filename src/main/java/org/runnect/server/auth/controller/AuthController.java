@@ -37,7 +37,7 @@ public class AuthController {
 
     @GetMapping("/getNewToken")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponseDto<GetNewTokenResponseDto> getNewToken(@RequestHeader() @NotBlank String accessToken,
+    public ApiResponseDto<GetNewTokenResponseDto> getNewToken(@RequestHeader @NotBlank String accessToken,
                                                               @RequestHeader @NotBlank String refreshToken){
 
         return ApiResponseDto.success(SuccessStatus.NEW_TOKEN_SUCCESS, authService.getNewToken(accessToken, refreshToken));

@@ -52,4 +52,5 @@ public class UserController {
         return ApiResponseDto.success(SuccessStatus.GET_USER_PROFILE_SUCCESS,
             userService.getUserProfile(profileUserId, userId));
     }
+
 }

@@ -5,6 +5,7 @@ import javax.validation.constraints.NotBlank;
 
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.auth.dto.request.SignInRequestDto;
+import org.runnect.server.auth.dto.response.AuthResponseDto;
 import org.runnect.server.auth.dto.response.GetNewTokenResponseDto;
 import org.runnect.server.auth.dto.response.SignInResponseDto;
 import org.runnect.server.auth.service.AuthService;
@@ -24,8 +25,14 @@ public class AuthController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponseDto<SignInResponseDto> signIn(@Valid @RequestBody SignInRequestDto requestDto) {
-        return ApiResponseDto.success(SuccessStatus.LOGIN_SUCCESS, authService.signIn(requestDto));
+    public ApiResponseDto<AuthResponseDto> signIn(@Valid @RequestBody SignInRequestDto requestDto) {
+        AuthResponseDto result = authService.signIn(requestDto);
+        if(result.getClass().equals(SignInResponseDto.class)){
+            return ApiResponseDto.success(SuccessStatus.LOGIN_SUCCESS, result);
+        }
+        else{
+            return ApiResponseDto.success(SuccessStatus.SIGNUP_SUCCESS, result);
+        }
     }
 
     @GetMapping("/getNewToken")

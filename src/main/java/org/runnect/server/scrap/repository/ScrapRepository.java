@@ -8,6 +8,7 @@ import org.runnect.server.scrap.entity.Scrap;
 import org.runnect.server.user.entity.RunnectUser;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.query.Param;
 
 public interface ScrapRepository extends Repository<Scrap, Long> {
     // CREATE
@@ -18,7 +19,7 @@ public interface ScrapRepository extends Repository<Scrap, Long> {
     Optional<Scrap> findByUserIdAndPublicCourseId(Long userId, Long publicCourseId);
 
     @Query("SELECT s FROM Scrap s JOIN FETCH s.publicCourse pc JOIN FETCH pc.course c WHERE s.runnectUser.id = :userId AND s.scrapTF = true")
-    Optional<List<Scrap>> findAllByUserIdAndScrapTF(Long userId);
+    Optional<List<Scrap>> findAllByUserIdAndScrapTF(@Param("userId") Long userId);
 
     long countByRunnectUser(RunnectUser runnectUser);
 

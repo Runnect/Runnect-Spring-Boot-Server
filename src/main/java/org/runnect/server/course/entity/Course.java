@@ -2,15 +2,7 @@ package org.runnect.server.course.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.LineString;
 import org.runnect.server.common.entity.AuditingTimeEntity;
+import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.record.entity.Record;
 import org.runnect.server.user.entity.RunnectUser;
 
@@ -63,6 +56,9 @@ public class Course extends AuditingTimeEntity {
 
     @Column(nullable = false, columnDefinition = "geometry(LineString, 4326)")
     private LineString path;
+
+    @OneToOne(mappedBy = "course")
+    private PublicCourse publicCourse;
 
     @OneToMany(mappedBy = "course")
     private List<Record> records = new ArrayList<>();

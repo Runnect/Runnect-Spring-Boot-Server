@@ -7,12 +7,14 @@ import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.ConflictException;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
+import org.runnect.server.course.dto.response.GetCourseDetailResponseDto;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.publicCourse.dto.request.CreatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
 import org.runnect.server.publicCourse.dto.response.CreatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;
+import org.runnect.server.publicCourse.dto.response.GetPublicCourseDetailResponseDto;
 import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
@@ -32,6 +34,29 @@ public class PublicCourseService {
     private final UserRepository userRepository;
     private final ScrapRepository scrapRepository;
     private final CourseRepository courseRepository;
+
+    public GetPublicCourseDetailResponseDto getPublicCourseDetail(final Long userId, final Long publicCourseId){
+        //0. 유저가 존재하는지
+        RunnectUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
+                        ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+
+        //1. publicCourse가 존재하는지
+        PublicCourse publicCourse = publicCourseRepository.findById(publicCourseId).orElseThrow(()->new NotFoundException(ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION,
+                ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION.getMessage()));
+
+        //2. 이미 삭제된 코스인지
+        if(publicCourse.getCourse().getDeletedAt()==null){
+            new NotFoundException(ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION,
+                    ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION.getMessage());
+        }
+
+        return GetPublicCourseDetailResponseDto.of(user.getNickname(),user.getLevel(),user.getLatestStamp().name(),publicCourse.getCourse().getRunnectUser().equals(user),
+                publicCourse.getId(), publicCourse.getCourse().getId(),)
+
+
+
+    }
 
     @Transactional
     public CreatePublicCourseResponseDto createPublicCourse(

@@ -27,6 +27,7 @@ public enum SuccessStatus {
     DELETE_PUBLIC_COURSE_SUCCESS(HttpStatus.OK, "퍼블릭 코스 삭제에 성공했습니다."),
     DELETE_RECORD_SUCCESS(HttpStatus.OK, "기록 삭제에 성공했습니다."),
     UPDATE_PUBLIC_COURSE_SUCCESS(HttpStatus.OK, "업로드한 코스 수정 성공"),
+    GET_PUBLIC_COURSE_BY_USER_SUCCESS(HttpStatus.OK,"유저가 업로드한 코스 조회 성공"),
     DELETE_COURSES_SUCCESS(HttpStatus.OK, "코스 삭제 성공"),
     GET_USER_STAMPS_SUCCESS(HttpStatus.OK, "유저 스탬프 조회 성공"),
 

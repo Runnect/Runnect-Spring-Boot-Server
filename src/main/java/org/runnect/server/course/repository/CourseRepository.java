@@ -25,6 +25,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("select c from Course c join fetch c.runnectUser where c.runnectUser.id = :userId and c.isPrivate = true and c.deletedAt = null order by c.createdAt desc")
     List<Course> findCourseByUserIdOnlyPrivate(Long userId);
 
+    List<Course> findCoursesByRunnectUserAndIsPrivateIsFalse(RunnectUser runnectUser);
     long countByRunnectUser(RunnectUser runnectUser);
 
     Optional<Course> findById(Long courseId);

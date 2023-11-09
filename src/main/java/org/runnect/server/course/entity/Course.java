@@ -90,4 +90,8 @@ public class Course extends AuditingTimeEntity {
         this.isPrivate = false;
     }
 
+    public void retrieveCourse() {
+        isPrivate = true;
+    }
+
 }

@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class PublicCourseService {
+    private static final Integer PAGE_SIZE = 10;
 
     private final PublicCourseRepository publicCourseRepository;
     private final UserRepository userRepository;
@@ -59,12 +60,12 @@ public class PublicCourseService {
         Page<PublicCourse> publicCourses = null;
         if(SortStatus.SCRAP_DESC.getVlaue().equals(sort)){
             publicCourses = publicCourseRepository.findAll(
-                    PageRequest.of(pageNo-1, 10,
+                    PageRequest.of(pageNo-1, PAGE_SIZE,
                             Sort.by(Sort.Direction.DESC,SortStatus.SCRAP_DESC.getProperty())));
 
         } else if (SortStatus.DATE_DESC.getVlaue().equals(sort)) {
             publicCourses = publicCourseRepository.findAll(
-                    PageRequest.of(pageNo-1, 10,
+                    PageRequest.of(pageNo-1, PAGE_SIZE,
                             Sort.by(Sort.Direction.DESC,SortStatus.DATE_DESC.getProperty())));
         }
 

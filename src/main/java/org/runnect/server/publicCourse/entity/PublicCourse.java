@@ -10,6 +10,7 @@ import org.runnect.server.record.entity.Record;
 import org.runnect.server.scrap.entity.Scrap;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.runnect.server.user.entity.RunnectUser;
@@ -57,5 +58,10 @@ public class PublicCourse extends AuditingTimeEntity {
     public void updatePublicCourse(String title, String description) {
         this.title = title;
         this.description = description;
+    }
+
+    @Override
+    public void updateDeletedAt() {
+        throw new RuntimeException("Course를 제외한 테이블은 정상적으로 삭제됩니다.");
     }
 }

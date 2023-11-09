@@ -48,4 +48,9 @@ public class Scrap extends AuditingTimeEntity {
         this.scrapTF = scrapTF;
     }
 
+    @Override
+    public void updateDeletedAt() {
+        throw new RuntimeException("Course를 제외한 테이블은 정상적으로 삭제됩니다.");
+    }
+
 }

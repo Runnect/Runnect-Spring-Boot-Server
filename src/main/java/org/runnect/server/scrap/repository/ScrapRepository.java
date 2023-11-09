@@ -28,4 +28,5 @@ public interface ScrapRepository extends Repository<Scrap, Long> {
     // DELETE
     Long deleteByPublicCourseIn(Collection<PublicCourse> publicCourses);
 
+    Long countByPublicCourseAndScrapTFIsTrue(PublicCourse publicCourse);
 }

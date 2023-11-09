@@ -8,6 +8,7 @@ import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.ConflictException;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
+import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.course.dto.response.GetCourseDetailResponseDto;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
@@ -40,7 +41,7 @@ public class PublicCourseService {
     private final CourseRepository courseRepository;
 
 
-    public GetPublicCourseByUserResponseDto getPublicCourseByUser(Long userId){
+    public GetPublicCourseByUserResponseDto getPublicCourseByUser(Long userId) {
         List<GetPublicCourseByUserPublicCourse> getPublicCourseByUserPublicCourses = new ArrayList<>();
 
         //1. 받은 userId가 유저가 존재하는지 확인
@@ -54,11 +55,11 @@ public class PublicCourseService {
         //3. 유저가 스크랩한 코스들 가져오기
         List<Scrap> scraps = scrapRepository.findAllByUserIdAndScrapTF(userId).get();
 
-        courses.forEach(course->{
+        courses.forEach(course -> {
             PublicCourse publicCourse = course.getPublicCourse();
 
             //4. 각 코스들의 publicCourse와 scrap 여부 파악
-            scraps.forEach(scrap->
+            scraps.forEach(scrap ->
                     publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
 
             //5. responseDto 만듬
@@ -74,30 +75,40 @@ public class PublicCourseService {
         });
 
 
-
         return GetPublicCourseByUserResponseDto.of(userId, getPublicCourseByUserPublicCourses);
     }
 
 
-    public GetPublicCourseDetailResponseDto getPublicCourseDetail(final Long userId, final Long publicCourseId){
+    public GetPublicCourseDetailResponseDto getPublicCourseDetail(final Long userId, final Long publicCourseId) {
         //0. 유저가 존재하는지
         RunnectUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
                         ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         //1. publicCourse가 존재하는지
-        PublicCourse publicCourse = publicCourseRepository.findById(publicCourseId).orElseThrow(()->new NotFoundException(ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION,
+        PublicCourse publicCourse = publicCourseRepository.findById(publicCourseId)
+                .orElseThrow(() -> new NotFoundException(ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION,
                 ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION.getMessage()));
 
+        Course course = publicCourse.getCourse();
+
         //2. 이미 삭제된 코스인지
-        if(publicCourse.getCourse().getDeletedAt()==null){
+        if (course.getDeletedAt() == null) {
             new NotFoundException(ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION,
                     ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION.getMessage());
         }
 
-        return GetPublicCourseDetailResponseDto.of(user.getNickname(),user.getLevel(),user.getLatestStamp().name(),publicCourse.getCourse().getRunnectUser().equals(user),
-                publicCourse.getId(), publicCourse.getCourse().getId(),)
+        // 3. 유저가 해당 공개코스 스크랩했는지 여부
+        //3.1 유저가 스크랩한 코스들 가져오기
+        List<Scrap> scraps = scrapRepository.findAllByUserIdAndScrapTF(userId).get();
+        scraps.forEach(scrap -> publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
 
+        //4. 해당 공개코스가 얼마나 스크랩되었는지 가져오기
+        Long scrapCount = scrapRepository.countByPublicCourseAndScrapTFIsTrue(publicCourse);
+
+        return GetPublicCourseDetailResponseDto.of(user.getNickname(), user.getLevel(), user.getLatestStamp().toString(), course.getRunnectUser().equals(user),
+                publicCourse.getId(), course.getId(), publicCourse.getIsScrap(), scrapCount, course.getImage(), publicCourse.getTitle(), publicCourse.getDescription(),
+                CoordinatePathConverter.pathConvertCoor(course.getPath()), course.getDistance(), course.getDepartureRegion(), course.getDepartureCity(), course.getDepartureTown(), course.getDepartureName());
 
 
     }
@@ -143,7 +154,7 @@ public class PublicCourseService {
 
         //7. publicCourse와 만든 날짜를 response
         return CreatePublicCourseResponseDto.of(
-                publicCourse.getId(),publicCourse.getCreatedAt().toString());
+                publicCourse.getId(), publicCourse.getCreatedAt().toString());
 
     }
 

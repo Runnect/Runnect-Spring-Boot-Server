@@ -32,7 +32,7 @@ public class Record extends AuditingTimeEntity {
     private RunnectUser runnectUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id")
+    @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)

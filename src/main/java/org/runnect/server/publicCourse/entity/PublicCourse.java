@@ -24,9 +24,6 @@ public class PublicCourse extends AuditingTimeEntity {
     private Long id;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private RunnectUser runnectUser;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
@@ -51,9 +48,8 @@ public class PublicCourse extends AuditingTimeEntity {
     public void setIsScrap(Boolean flag){ isScrap=flag;}
 
     @Builder
-    public PublicCourse(Course course, RunnectUser user, String title, String description) {
+    public PublicCourse(Course course, String title, String description) {
         this.course = course;
-        this.runnectUser = user;
         this.title = title;
         this.description = description;
     }

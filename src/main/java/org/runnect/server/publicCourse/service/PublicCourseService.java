@@ -107,7 +107,6 @@ public class PublicCourseService {
         //5. pulblicCourse를 생성후 저장
         PublicCourse publicCourse = PublicCourse.builder()
                 .course(course)
-                .user(user)
                 .title(createPublicCourseRequestDto.getTitle())
                 .description(createPublicCourseRequestDto.getDescription())
                 .build();
@@ -140,7 +139,7 @@ public class PublicCourseService {
         }
 
         publicCourses.stream()
-                .filter(pc -> !pc.getRunnectUser().equals(user))
+                .filter(pc -> !pc.getCourse().getRunnectUser().equals(user))
                 .findAny()
                 .ifPresent(pc -> {
                     throw new PermissionDeniedException(

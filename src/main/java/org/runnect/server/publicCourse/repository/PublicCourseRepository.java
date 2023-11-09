@@ -15,11 +15,9 @@ public interface PublicCourseRepository  extends JpaRepository<PublicCourse, Lon
     @Query("SELECT pc FROM PublicCourse pc JOIN FETCH pc.course WHERE pc.id = :publicCourseId")
     Optional<PublicCourse> findById(Long publicCourseId);
 
-    @Query("select count(pc.id) from PublicCourse pc where pc.runnectUser = :user")
-    Long countPublicCourseByUser(RunnectUser user);
-
-    @Query("select pc from PublicCourse pc join fetch pc.course where pc.runnectUser = :user")
-    List<PublicCourse> findPublicCoursesByRunnectUser(RunnectUser user);
+//    @Query("select count(pc.id) from PublicCourse pc where pc.runnectUser = :user")
+//    Long countPublicCourseByUser(RunnectUser user);
+// 어디서쓰이지? 안쓰는 거면 삭제할예정
 
     List<PublicCourse> findByIdIn(Collection<Long> ids);
 

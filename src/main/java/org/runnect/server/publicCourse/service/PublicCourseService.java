@@ -14,6 +14,7 @@ import org.runnect.server.publicCourse.dto.request.CreatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
 import org.runnect.server.publicCourse.dto.response.CreatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;
+import org.runnect.server.publicCourse.dto.response.GetPublicCourseTotalPageCountResponseDto;
 import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserPublicCourse;
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserResponseDto;
@@ -31,12 +32,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class PublicCourseService {
+    private static final Integer PAGE_SIZE = 10;
+
 
     private final PublicCourseRepository publicCourseRepository;
     private final UserRepository userRepository;
     private final ScrapRepository scrapRepository;
     private final CourseRepository courseRepository;
 
+    public GetPublicCourseTotalPageCountResponseDto getPublicCourseTotalPageCount(){
+        Long totalPublicCourseCount = publicCourseRepository.countBy();
+        if(totalPublicCourseCount%PAGE_SIZE!=0){
+            return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount/PAGE_SIZE+1);
+        }
+        return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount/PAGE_SIZE);
+    }
 
     public GetPublicCourseByUserResponseDto getPublicCourseByUser(Long userId){
         List<GetPublicCourseByUserPublicCourse> getPublicCourseByUserPublicCourses = new ArrayList<>();

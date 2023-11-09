@@ -23,5 +23,7 @@ public interface PublicCourseRepository  extends JpaRepository<PublicCourse, Lon
 
     List<PublicCourse> findByIdIn(Collection<Long> ids);
 
+    Long countBy();
+
     // DELETE
 }

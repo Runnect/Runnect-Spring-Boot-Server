@@ -147,10 +147,7 @@ public class PublicCourseService {
                             ErrorStatus.PERMISSION_DENIED_PUBLIC_COURSE_DELETE_EXCEPTION.getMessage());
                 });
 
-
-        scrapRepository.deleteByPublicCourseIn(publicCourses);
-        publicCourses.forEach(publicCourse -> publicCourse.getRecords().forEach(Record::setPublicCourseNull));
-        publicCourses.forEach(PublicCourse::updateDeletedAt);
+        publicCourseRepository.deleteAllInBatch(publicCourses);
 
         return DeletePublicCoursesResponseDto.from(publicCourses.size());
     }

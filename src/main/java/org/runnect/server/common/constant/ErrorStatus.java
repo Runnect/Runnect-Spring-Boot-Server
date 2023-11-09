@@ -26,6 +26,7 @@ public enum ErrorStatus {
     NOT_FOUND_PUBLIC_COURSE_EXCEPTION(HttpStatus.BAD_REQUEST,"유효하지 않은 퍼블릭 코스 아이디입니다."),
     UNMATCHED_COURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "로그인된 유저가 그린 코스가 아닙니다."),
     INVALID_SORT_PARAMETER_EXCEPTION(HttpStatus.BAD_REQUEST, "sort 파라미터에 올바른 값이 입력되지 않았습니다."),
+    INVALID_PARAMETER_EXCEPTION(HttpStatus.BAD_REQUEST, "파라미터에 올바른 값이 입력되지 않았습니다."),
 
     /**
      * 401 UNAUTHORIZED

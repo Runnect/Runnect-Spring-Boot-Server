@@ -1,9 +1,12 @@
 package org.runnect.server.publicCourse.controller;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.ApiResponseDto;
 import org.runnect.server.common.constant.SuccessStatus;
+import org.runnect.server.common.resolver.sort.SortStatusId;
 import org.runnect.server.common.resolver.userId.UserId;
 import org.runnect.server.publicCourse.dto.request.CreatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
@@ -12,6 +15,7 @@ import org.runnect.server.publicCourse.dto.response.CreatePublicCourseResponseDt
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserResponseDto;
 import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
+import org.runnect.server.publicCourse.dto.response.recommendPublicCourse.RecommendPublicCourseResponseDto;
 import org.runnect.server.publicCourse.service.PublicCourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +26,21 @@ import org.springframework.web.bind.annotation.*;
 public class PublicCourseController {
 
     private final PublicCourseService publicCourseService;
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<RecommendPublicCourseResponseDto> recommendPublicCourse(
+            @UserId final Long userId,
+            @RequestParam(required = false) @Positive Integer pageNo,
+            @SortStatusId String sort
+    ){
+        if(pageNo == null){
+            pageNo = 1; //basic pageNo
+        }
+        return ApiResponseDto.success(SuccessStatus.GET_RECOMMENDED_PUBLIC_COURSE_SUCCESS, publicCourseService.recommendPublicCourse(userId, pageNo,sort));
+
+    }
+
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

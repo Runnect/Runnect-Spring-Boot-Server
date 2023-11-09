@@ -16,7 +16,7 @@ public interface ScrapRepository extends Repository<Scrap, Long> {
 
     // READ
     @Query("SELECT s FROM Scrap s JOIN FETCH s.publicCourse WHERE s.runnectUser.id = :userId AND s.publicCourse.id = :publicCourseId")
-    Optional<Scrap> findByUserIdAndPublicCourseId(Long userId, Long publicCourseId);
+    Optional<Scrap> findByUserIdAndPublicCourseId(@Param("userId") Long userId, @Param("publicCourseId") Long publicCourseId);
 
     @Query("SELECT s FROM Scrap s JOIN FETCH s.publicCourse pc JOIN FETCH pc.course c WHERE s.runnectUser.id = :userId AND s.scrapTF = true")
     Optional<List<Scrap>> findAllByUserIdAndScrapTF(@Param("userId") Long userId);

@@ -19,9 +19,9 @@ public class GetCourseDetailResponseDto {
     private UserResponseCourseDetail user;
     private CourseDetailResponse course;
 
-    public static GetCourseDetailResponseDto of(RunnectUser user, Course course) {
+    public static GetCourseDetailResponseDto from(Course course) {
         return new GetCourseDetailResponseDto(
-            UserResponseCourseDetail.from(user),
+            UserResponseCourseDetail.from(course.getRunnectUser()),
             CourseDetailResponse.of(course)
         );
     }

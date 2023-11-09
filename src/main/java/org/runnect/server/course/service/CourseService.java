@@ -111,11 +111,11 @@ public class CourseService {
     @Transactional(readOnly = true)
     public GetCourseDetailResponseDto getCourseDetail(Long courseId) {
 
-        Course course = courseRepository.findCourseByIdFetchUser(courseId)
+        Course course = courseRepository.findById(courseId)
             .orElseThrow(() -> new NotFoundException(NOT_FOUND_COURSE_EXCEPTION,
                 NOT_FOUND_COURSE_EXCEPTION.getMessage()));
 
-        return GetCourseDetailResponseDto.of(course.getRunnectUser(), course);
+        return GetCourseDetailResponseDto.from(course);
     }
 
     @Transactional

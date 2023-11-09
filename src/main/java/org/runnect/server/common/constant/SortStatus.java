@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum SortStatus {
-    SCRAP_DESC("scrap"),
-    DATE_DESC("date");
+    SCRAP_DESC("scrap","scrapCount"),
+    DATE_DESC("date","createdAt");
+
     private final String vlaue;
+    private final String property;
 }

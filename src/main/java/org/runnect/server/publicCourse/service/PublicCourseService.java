@@ -47,7 +47,7 @@ public class PublicCourseService {
                         ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         //2. userId에 연결된 course중 private이 false인 코스만 가져오기
-        List<Course> courses = courseRepository.findCoursesByRunnectUserAndIsPrivateIsFalse(user);
+        List<Course> courses = courseRepository.findCoursesByRunnectUserAndIsPrivateIsFalseAndDeletedAtIsNull(user);
 
         //3. 유저가 스크랩한 코스들 가져오기
         List<Scrap> scraps = scrapRepository.findAllByUserIdAndScrapTF(userId).get();

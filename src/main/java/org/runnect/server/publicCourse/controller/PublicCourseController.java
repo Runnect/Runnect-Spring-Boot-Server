@@ -10,6 +10,7 @@ import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto
 import org.runnect.server.publicCourse.dto.request.UpdatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.response.CreatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;
+import org.runnect.server.publicCourse.dto.response.GetPublicCourseDetailResponseDto;
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserResponseDto;
 import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.service.PublicCourseService;
@@ -33,6 +34,17 @@ public class PublicCourseController {
     ){
 
         return ApiResponseDto.success(SuccessStatus.CREATE_PUBLIC_COURSE_SUCCESS, publicCourseService.createPublicCourse(userId, createPublicCourseRequestDto));
+
+    }
+
+    @GetMapping("/detail/{publicCourseId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<GetPublicCourseDetailResponseDto> getPublicCourseDetail(
+            @UserId final Long userId,
+            @PathVariable final Long publicCourseId
+    ){
+
+        return ApiResponseDto.success(SuccessStatus.GET_PUBLIC_COURSE_DETAIL_SUCCESS, publicCourseService.getPublicCourseDetail(userId, publicCourseId));
 
     }
 

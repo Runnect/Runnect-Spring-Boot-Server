@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.record.entity.Record;
@@ -38,12 +39,12 @@ public class PublicCourse extends AuditingTimeEntity {
     @Column(nullable = false)
     private String description;
 
-    // 아래 코드 주석이유 -> 유저가 현재 스크랩한 코스는 scraptf가 treu인 경우만임
-//    @OneToMany(mappedBy = "publicCourse")
-//    private List<Scrap> scraps = new ArrayList<>();
 
     @OneToMany(mappedBy = "publicCourse")
     private List<Record> records = new ArrayList<>();
+
+    @Formula("(select count(*) from Scrap where Scrap.public_course_id=id and Scrap.scraptf=true)")
+    private Integer scrapCount;
 
     @Transient
     private Boolean isScrap=false; //현재 사용자가 스크랩한지 아닌지 여부

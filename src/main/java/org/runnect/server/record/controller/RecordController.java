@@ -40,7 +40,7 @@ public class RecordController {
     @GetMapping("record/user")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<GetRecordResponseDto> getRecordByUser(@RequestHeader Long userId) {
-        return ApiResponseDto.success(SuccessStatus.READ_RECORD_SUCCESS, recordService.getRecordByUser(userId));
+        return ApiResponseDto.success(SuccessStatus.GET_RECORD_SUCCESS, recordService.getRecordByUser(userId));
     }
 
     @PatchMapping("record/{recordId}")

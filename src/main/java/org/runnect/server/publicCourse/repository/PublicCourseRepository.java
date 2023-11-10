@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.user.entity.RunnectUser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -22,6 +24,10 @@ public interface PublicCourseRepository  extends JpaRepository<PublicCourse, Lon
     List<PublicCourse> findPublicCoursesByRunnectUser(RunnectUser user);
 
     List<PublicCourse> findByIdIn(Collection<Long> ids);
+
+    //Page<PublicCourse> findPageOrderByCreatedAt(Pageable pageable);
+    //Page<PublicCourse> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    Page<PublicCourse> findAll(Pageable pageable);
 
     // DELETE
 }

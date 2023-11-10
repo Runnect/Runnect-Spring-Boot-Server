@@ -27,6 +27,7 @@ public enum ErrorStatus {
     UNMATCHED_COURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "로그인된 유저가 그린 코스가 아닙니다."),
     INVALID_SORT_PARAMETER_EXCEPTION(HttpStatus.BAD_REQUEST, "sort 파라미터에 올바른 값이 입력되지 않았습니다."),
     INVALID_PARAMETER_EXCEPTION(HttpStatus.BAD_REQUEST, "파라미터에 올바른 값이 입력되지 않았습니다."),
+    NOT_FOUND_APPLE_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "appleAccessToken이 없습니다."),
 
     /**
      * 401 UNAUTHORIZED
@@ -38,6 +39,8 @@ public enum ErrorStatus {
     INVALID_GOOGLE_ID_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 구글 아이디 토큰입니다."),
     INVALID_APPLE_ID_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED,"유효하지 않은 애플 아이디 토큰입니다."),
     APPLE_ID_TOKEN_TIME_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED,"만료된 애플 아이디 토큰입니다."),
+    INVALID_APPLE_P8KEY_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 애플 p8키입니다."),
+    FAIL_TO_WITHDRAW_APPLE_SOCIAL_EXCEPTION(HttpStatus.UNAUTHORIZED,"애플 소셜 유저 탈퇴가 실패했습니다."),
 
     /**
      * 403 FORBIDDEN

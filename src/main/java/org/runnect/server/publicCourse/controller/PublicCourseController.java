@@ -1,6 +1,8 @@
 package org.runnect.server.publicCourse.controller;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.ApiResponseDto;
 import org.runnect.server.common.constant.SuccessStatus;
@@ -23,6 +25,21 @@ public class PublicCourseController {
 
     private final PublicCourseService publicCourseService;
 
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<SearchPublicCourseResponseDto> searchPublicCourse(
+            @UserId final Long userId,
+            @RequestParam @NotBlank String keyword
+    ){
+        return ApiResponseDto.success(SuccessStatus.SEARCH_PUBLIC_COURSE_SUCCESS,
+                publicCourseService.searchPublicCourse(userId, keyword));
+    }
+
+
+
+
+
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponseDto<CreatePublicCourseResponseDto> createPublicCourse(
@@ -31,9 +48,8 @@ public class PublicCourseController {
             //@RequestHeader final Long userId,
             @Valid @RequestBody final CreatePublicCourseRequestDto createPublicCourseRequestDto
     ){
-
-        return ApiResponseDto.success(SuccessStatus.CREATE_PUBLIC_COURSE_SUCCESS, publicCourseService.createPublicCourse(userId, createPublicCourseRequestDto));
-
+        return ApiResponseDto.success(SuccessStatus.CREATE_PUBLIC_COURSE_SUCCESS,
+                publicCourseService.createPublicCourse(userId, createPublicCourseRequestDto));
     }
 
     @GetMapping("/user")

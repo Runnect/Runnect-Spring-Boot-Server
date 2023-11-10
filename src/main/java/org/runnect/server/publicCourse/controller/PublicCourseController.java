@@ -16,6 +16,7 @@ import org.runnect.server.publicCourse.dto.request.UpdatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.response.CreatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;
 import org.runnect.server.publicCourse.dto.response.GetPublicCourseDetailResponseDto;
+import org.runnect.server.publicCourse.dto.response.getMarathonPublicCourse.GetMarathonPublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserResponseDto;
 import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.recommendPublicCourse.RecommendPublicCourseResponseDto;
@@ -58,7 +59,14 @@ public class PublicCourseController {
     }
 
 
-
+    @GetMapping("/marathon")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<GetMarathonPublicCourseResponseDto> getMarathonPublicCourse(
+            @UserId final Long userId
+    ){
+        return ApiResponseDto.success(SuccessStatus.GET_MARATHON_PUBLIC_COURSE_SUCCESS,
+                publicCourseService.getMarathonPublicCourse(userId));
+    }
 
 
 

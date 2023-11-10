@@ -20,6 +20,8 @@ import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPub
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserResponseDto;
 import org.runnect.server.publicCourse.dto.response.recommendPublicCourse.RecommendPublicCourse;
 import org.runnect.server.publicCourse.dto.response.recommendPublicCourse.RecommendPublicCourseResponseDto;
+import org.runnect.server.publicCourse.dto.response.searchPublicCourse.SearchPublicCourse;
+import org.runnect.server.publicCourse.dto.response.searchPublicCourse.SearchPublicCourseResponseDto;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.record.entity.Record;
@@ -44,6 +46,40 @@ public class PublicCourseService {
     private final ScrapRepository scrapRepository;
     private final CourseRepository courseRepository;
 
+
+    public SearchPublicCourseResponseDto searchPublicCourse(Long userId, String keyword){
+        //1. 받은 userId가 유저가 존재하는지 확인
+        RunnectUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
+                        ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+
+        //2. 유저가 스크랩한 코스들 가져오기
+        List<Scrap> scraps = scrapRepository.findAllByUserIdAndScrapTF(userId).get();
+
+        //3. keyword가 제목, 시,군,구,번지,출발지 에 포함된 목록 가져오기
+        List<SearchPublicCourse> searchPublicCourses = new ArrayList<>();
+        publicCourseRepository.searchPublicCourseByKeyword(keyword)
+                .forEach(publicCourse -> {
+                    //4. 각 코스들의 publicCourse와 scrap 여부 파악
+                    scraps.forEach(scrap->
+                            publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
+
+                    searchPublicCourses.add(SearchPublicCourse.of(
+                            publicCourse.getId(),
+                            publicCourse.getCourse().getId(),
+                            publicCourse.getTitle(),
+                            publicCourse.getCourse().getImage(),
+                            publicCourse.getIsScrap(),
+                            publicCourse.getCourse().getDepartureRegion(),
+                            publicCourse.getCourse().getDepartureCity()));
+
+        });
+
+
+        return SearchPublicCourseResponseDto.of(searchPublicCourses);
+
+
+    }
 
     public RecommendPublicCourseResponseDto recommendPublicCourse(Long userId, Integer pageNo, String sort){
         //1. 받은 userId가 유저가 존재하는지 확인

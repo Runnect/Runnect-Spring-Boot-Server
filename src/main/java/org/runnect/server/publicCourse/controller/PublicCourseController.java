@@ -18,6 +18,8 @@ import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseD
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserResponseDto;
 import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.recommendPublicCourse.RecommendPublicCourseResponseDto;
+import org.runnect.server.publicCourse.dto.response.searchPublicCourse.SearchPublicCourseResponseDto;
+
 import org.runnect.server.publicCourse.service.PublicCourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

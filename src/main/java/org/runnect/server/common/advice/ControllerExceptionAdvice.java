@@ -50,10 +50,18 @@ public class ControllerExceptionAdvice {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ApiResponseDto handleConstraintViolationException(final IllegalArgumentException e) {
+        return ApiResponseDto.error(ErrorStatus.VALIDATION_REQUEST_HEADER_MISSING_EXCEPTION, String.format("%s. (%s)", ErrorStatus.INVALID_PARAMETER_EXCEPTION.getMessage(), e.getMessage()));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingServletRequestParameterException.class)
     protected ApiResponseDto handleMissingRequestParameterException(final MissingServletRequestParameterException e) {
         return ApiResponseDto.error(ErrorStatus.VALIDATION_REQUEST_PARAMETER_MISSING_EXCEPTION, String.format("%s. (%s)", ErrorStatus.VALIDATION_REQUEST_PARAMETER_MISSING_EXCEPTION.getMessage(), e.getParameterName()));
     }
+
+
 
     /**
      * 500 Internal Server Error

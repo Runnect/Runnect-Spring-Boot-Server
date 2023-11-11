@@ -59,7 +59,7 @@ public class PublicCourseService {
     private final CourseRepository courseRepository;
 
     @Value("${runnect.marathon-public-course-id}")
-    public void setMARATHON_PUBLIC_COURSE_IDS(String MARATHON_PUBLIC_COURSE_ID) {
+    private void setMARATHON_PUBLIC_COURSE_IDS(String MARATHON_PUBLIC_COURSE_ID) {
         this.MARATHON_PUBLIC_COURSE_IDS = Stream.of(MARATHON_PUBLIC_COURSE_ID.split(","))
                 .map(Long::parseLong).collect(Collectors.toList());
     }

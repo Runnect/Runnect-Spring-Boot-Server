@@ -1,23 +1,20 @@
 package org.runnect.server.user.controller;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.ApiResponseDto;
 import org.runnect.server.common.constant.SuccessStatus;
+import org.runnect.server.common.resolver.userId.UserId;
 import org.runnect.server.user.dto.request.UpdateUserNicknameRequestDto;
+import org.runnect.server.user.dto.response.DeleteUserResponseDto;
 import org.runnect.server.user.dto.response.MyPageResponseDto;
 import org.runnect.server.user.dto.response.UserProfileResponseDto;
 import org.runnect.server.user.dto.response.UpdateUserNicknameResponseDto;
 import org.runnect.server.user.service.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -51,6 +49,15 @@ public class UserController {
     ) {
         return ApiResponseDto.success(SuccessStatus.GET_USER_PROFILE_SUCCESS,
             userService.getUserProfile(profileUserId, userId));
+    }
+
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<DeleteUserResponseDto> deleteUser(
+            @UserId Long userId,
+            @RequestHeader(required = false) @NotBlank String appleAccessToken
+    ){
+        return ApiResponseDto.success(SuccessStatus.DELETE_USER_SUCCESS, userService.deleteUser(userId,appleAccessToken));
     }
 
 }

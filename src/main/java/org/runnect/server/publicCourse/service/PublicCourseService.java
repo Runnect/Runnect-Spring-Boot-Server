@@ -240,7 +240,6 @@ public class PublicCourseService {
         //5. pulblicCourse를 생성후 저장
         PublicCourse publicCourse = PublicCourse.builder()
                 .course(course)
-                .user(user)
                 .title(createPublicCourseRequestDto.getTitle())
                 .description(createPublicCourseRequestDto.getDescription())
                 .build();
@@ -273,7 +272,7 @@ public class PublicCourseService {
         }
 
         publicCourses.stream()
-                .filter(pc -> !pc.getRunnectUser().equals(user))
+                .filter(pc -> !pc.getCourse().getRunnectUser().equals(user))
                 .findAny()
                 .ifPresent(pc -> {
                     throw new PermissionDeniedException(
@@ -281,10 +280,10 @@ public class PublicCourseService {
                             ErrorStatus.PERMISSION_DENIED_PUBLIC_COURSE_DELETE_EXCEPTION.getMessage());
                 });
 
+        //삭제전 course의 isPrivate update
+        publicCourses.forEach(publicCourse -> publicCourse.getCourse().retrieveCourse());
 
-        scrapRepository.deleteByPublicCourseIn(publicCourses);
-        publicCourses.forEach(publicCourse -> publicCourse.getRecords().forEach(Record::setPublicCourseNull));
-        publicCourses.forEach(PublicCourse::updateDeletedAt);
+        publicCourseRepository.deleteAllInBatch(publicCourses);
 
         return DeletePublicCoursesResponseDto.from(publicCourses.size());
     }

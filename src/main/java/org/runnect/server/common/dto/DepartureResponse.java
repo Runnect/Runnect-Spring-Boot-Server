@@ -14,6 +14,11 @@ public class DepartureResponse {
     private String detail;
     private String name;
 
+    public DepartureResponse(String region, String city, String town) {
+        this.region = region;
+        this.city = city;
+        this.town = town;
+    }
     public DepartureResponse(String region, String city, String town, String name) {
         this.region = region;
         this.city = city;

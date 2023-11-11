@@ -53,7 +53,6 @@ public class PublicCourseService {
     private static final Integer PAGE_SIZE = 10;
     private static List<Long> MARATHON_PUBLIC_COURSE_IDS;
 
-
     private final PublicCourseRepository publicCourseRepository;
     private final UserRepository userRepository;
     private final ScrapRepository scrapRepository;
@@ -64,6 +63,7 @@ public class PublicCourseService {
         this.MARATHON_PUBLIC_COURSE_IDS = Stream.of(MARATHON_PUBLIC_COURSE_ID.split(","))
                 .map(Long::parseLong).collect(Collectors.toList());
     }
+
     public GetPublicCourseTotalPageCountResponseDto getPublicCourseTotalPageCount(){
         Long totalPublicCourseCount = publicCourseRepository.countBy();
         if(totalPublicCourseCount%PAGE_SIZE!=0){

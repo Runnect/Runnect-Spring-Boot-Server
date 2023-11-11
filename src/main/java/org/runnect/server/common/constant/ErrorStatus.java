@@ -27,6 +27,9 @@ public enum ErrorStatus {
     UNMATCHED_COURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "로그인된 유저가 그린 코스가 아닙니다."),
     INVALID_SORT_PARAMETER_EXCEPTION(HttpStatus.BAD_REQUEST, "sort 파라미터에 올바른 값이 입력되지 않았습니다."),
     INVALID_PARAMETER_EXCEPTION(HttpStatus.BAD_REQUEST, "파라미터에 올바른 값이 입력되지 않았습니다."),
+    NOT_FOUND_SCRAP_EXCEPTION(HttpStatus.BAD_REQUEST, "스크랩한 코스가 없습니다."),
+    NOT_FOUND_IMAGE_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 이미지 파일입니다"),
+    NOT_FOUND_PUBLICCOURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "존재하지 않는 public course id입니다."),
 
     /**
      * 401 UNAUTHORIZED
@@ -49,10 +52,7 @@ public enum ErrorStatus {
      * 404 NOT FOUND
      */
     NOT_FOUND_USER_EXCEPTION(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다"),
-    NOT_FOUND_IMAGE_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 이미지 파일입니다"),
-    NOT_FOUND_PUBLICCOURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "존재하지 않는 public course id입니다."),
-    NOT_FOUND_SCRAP_EXCEPTION(HttpStatus.BAD_REQUEST, "스크랩한 코스가 없습니다."),
-
+    NOT_FOUND_MARATHON_PUBLIC_COURSE_EXCEPTION(HttpStatus.NOT_FOUND, "마라톤 코스가 존재하지 않습니다."),
     /**
      * 409 CONFLICT
      */

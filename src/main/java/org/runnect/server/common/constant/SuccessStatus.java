@@ -34,6 +34,7 @@ public enum SuccessStatus {
     GET_RECOMMENDED_PUBLIC_COURSE_SUCCESS(HttpStatus.OK, "추천 코스 조회 성공"),
     SEARCH_PUBLIC_COURSE_SUCCESS(HttpStatus.OK,"업로드된 코스 검색 성공"),
     GET_PUBLIC_COURSE_DETAIL_SUCCESS(HttpStatus.OK,"업로드 코스 상세 조회 성공"),
+    GET_MARATHON_PUBLIC_COURSE_SUCCESS(HttpStatus.OK,"마라톤 코스 조회 성공"),
 
     /**
      * 201 CREATED

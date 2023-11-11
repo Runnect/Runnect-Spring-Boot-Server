@@ -27,6 +27,8 @@ public interface PublicCourseRepository  extends JpaRepository<PublicCourse, Lon
 
     List<PublicCourse> findByIdIn(Collection<Long> ids);
 
+    Long countBy();
+
     @Query("SELECT pc " +
             "FROM PublicCourse pc JOIN FETCH pc.course c " +
             "WHERE pc.title LIKE CONCAT('%',LOWER(:keyword),'%') " +

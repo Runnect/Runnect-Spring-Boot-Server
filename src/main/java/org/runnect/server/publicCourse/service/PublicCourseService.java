@@ -17,6 +17,7 @@ import org.runnect.server.publicCourse.dto.request.CreatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
 import org.runnect.server.publicCourse.dto.response.CreatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;
+import org.runnect.server.publicCourse.dto.response.GetPublicCourseTotalPageCountResponseDto;
 import org.runnect.server.publicCourse.dto.response.GetPublicCourseDetailResponseDto;
 import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserPublicCourse;
@@ -44,11 +45,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class PublicCourseService {
     private static final Integer PAGE_SIZE = 10;
 
+
     private final PublicCourseRepository publicCourseRepository;
     private final UserRepository userRepository;
     private final ScrapRepository scrapRepository;
     private final CourseRepository courseRepository;
 
+    public GetPublicCourseTotalPageCountResponseDto getPublicCourseTotalPageCount(){
+        Long totalPublicCourseCount = publicCourseRepository.countBy();
+        if(totalPublicCourseCount%PAGE_SIZE!=0){
+            return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount/PAGE_SIZE+1);
+        }
+        return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount/PAGE_SIZE);
+    }
 
     public SearchPublicCourseResponseDto searchPublicCourse(Long userId, String keyword){
         //1. 받은 userId가 유저가 존재하는지 확인

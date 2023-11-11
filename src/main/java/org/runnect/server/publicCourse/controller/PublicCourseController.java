@@ -15,6 +15,7 @@ import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto
 import org.runnect.server.publicCourse.dto.request.UpdatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.response.CreatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;
+import org.runnect.server.publicCourse.dto.response.GetPublicCourseTotalPageCountResponseDto;
 import org.runnect.server.publicCourse.dto.response.GetPublicCourseDetailResponseDto;
 import org.runnect.server.publicCourse.dto.response.getMarathonPublicCourse.GetMarathonPublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserResponseDto;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 public class PublicCourseController {
 
     private final PublicCourseService publicCourseService;
+
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -104,6 +106,13 @@ public class PublicCourseController {
         return ApiResponseDto.success(SuccessStatus.GET_PUBLIC_COURSE_BY_USER_SUCCESS,
                 publicCourseService.getPublicCourseByUser(userId));
 
+    }
+
+    @GetMapping("/total-page-count")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponseDto<GetPublicCourseTotalPageCountResponseDto> getPublicCourseTotalPageCount(){
+        return ApiResponseDto.success(SuccessStatus.GET_PUBLIC_COURSE_TOTAL_PAGE_COUNT_SUCCESS,
+                publicCourseService.getPublicCourseTotalPageCount());
     }
 
 

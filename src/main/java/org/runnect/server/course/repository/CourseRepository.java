@@ -26,6 +26,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findCourseByUserIdOnlyPrivate(@Param("userId") Long userId);
 
     List<Course> findCoursesByRunnectUserAndIsPrivateIsFalse(RunnectUser runnectUser);
+    List<Course> findCoursesByRunnectUserAndIsPrivateIsTrue(RunnectUser runnectUser);
+
     long countByRunnectUser(RunnectUser runnectUser);
 
     Optional<Course> findById(Long courseId);

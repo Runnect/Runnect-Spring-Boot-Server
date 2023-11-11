@@ -21,6 +21,7 @@ import org.runnect.server.publicCourse.dto.request.CreatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
 import org.runnect.server.publicCourse.dto.response.CreatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;
+import org.runnect.server.publicCourse.dto.response.GetPublicCourseTotalPageCountResponseDto;
 import org.runnect.server.publicCourse.dto.response.GetPublicCourseDetailResponseDto;
 import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.getMarathonPublicCourse.GetMarathonPublicCourse;
@@ -52,6 +53,7 @@ public class PublicCourseService {
     private static final Integer PAGE_SIZE = 10;
     private static List<Long> MARATHON_PUBLIC_COURSE_IDS;
 
+
     private final PublicCourseRepository publicCourseRepository;
     private final UserRepository userRepository;
     private final ScrapRepository scrapRepository;
@@ -61,6 +63,13 @@ public class PublicCourseService {
     public void setMARATHON_PUBLIC_COURSE_IDS(String MARATHON_PUBLIC_COURSE_ID) {
         this.MARATHON_PUBLIC_COURSE_IDS = Stream.of(MARATHON_PUBLIC_COURSE_ID.split(","))
                 .map(Long::parseLong).collect(Collectors.toList());
+    }
+    public GetPublicCourseTotalPageCountResponseDto getPublicCourseTotalPageCount(){
+        Long totalPublicCourseCount = publicCourseRepository.countBy();
+        if(totalPublicCourseCount%PAGE_SIZE!=0){
+            return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount/PAGE_SIZE+1);
+        }
+        return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount/PAGE_SIZE);
     }
 
     public GetMarathonPublicCourseResponseDto getMarathonPublicCourse(Long userId){
@@ -279,7 +288,6 @@ public class PublicCourseService {
         //5. pulblicCourse를 생성후 저장
         PublicCourse publicCourse = PublicCourse.builder()
                 .course(course)
-                .user(user)
                 .title(createPublicCourseRequestDto.getTitle())
                 .description(createPublicCourseRequestDto.getDescription())
                 .build();
@@ -312,7 +320,7 @@ public class PublicCourseService {
         }
 
         publicCourses.stream()
-                .filter(pc -> !pc.getRunnectUser().equals(user))
+                .filter(pc -> !pc.getCourse().getRunnectUser().equals(user))
                 .findAny()
                 .ifPresent(pc -> {
                     throw new PermissionDeniedException(
@@ -320,10 +328,10 @@ public class PublicCourseService {
                             ErrorStatus.PERMISSION_DENIED_PUBLIC_COURSE_DELETE_EXCEPTION.getMessage());
                 });
 
+        //삭제전 course의 isPrivate update
+        publicCourses.forEach(publicCourse -> publicCourse.getCourse().retrieveCourse());
 
-        scrapRepository.deleteByPublicCourseIn(publicCourses);
-        publicCourses.forEach(publicCourse -> publicCourse.getRecords().forEach(Record::setPublicCourseNull));
-        publicCourses.forEach(PublicCourse::updateDeletedAt);
+        publicCourseRepository.deleteAllInBatch(publicCourses);
 
         return DeletePublicCoursesResponseDto.from(publicCourses.size());
     }

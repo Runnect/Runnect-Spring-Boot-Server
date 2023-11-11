@@ -57,7 +57,7 @@ public class CourseController {
     @GetMapping("/user")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<CourseGetByUserResponseDto> getCourseByUser(@RequestHeader Long userId) {
-        return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER,
+        return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER_SUCCESS,
             courseService.getCourseByUser(userId));
     }
 
@@ -65,7 +65,7 @@ public class CourseController {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<CourseGetByUserResponseDto> getPrivateCourseByUser(
         @RequestHeader Long userId) {
-        return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER,
+        return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER_SUCCESS,
             courseService.getPrivateCourseByUser(userId));
     }
 

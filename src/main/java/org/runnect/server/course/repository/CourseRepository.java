@@ -17,13 +17,13 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     // READ
     @Query("select c from Course c join fetch c.runnectUser where c.runnectUser.id = :userId and c.deletedAt = null order by c.createdAt desc")
-    List<Course> findCourseByUserId(Long userId);
+    List<Course> findCourseByUserId(@Param("userId") Long userId);
 
     @Query("select c from Course c join fetch c.runnectUser where c.id = :courseId")
-    Optional<Course> findCourseByIdFetchUser(Long courseId);
+    Optional<Course> findCourseByIdFetchUser(@Param("courseId") Long courseId);
 
     @Query("select c from Course c join fetch c.runnectUser where c.runnectUser.id = :userId and c.isPrivate = true and c.deletedAt = null order by c.createdAt desc")
-    List<Course> findCourseByUserIdOnlyPrivate(Long userId);
+    List<Course> findCourseByUserIdOnlyPrivate(@Param("userId") Long userId);
 
     List<Course> findCoursesByRunnectUserAndIsPrivateIsFalse(RunnectUser runnectUser);
     List<Course> findCoursesByRunnectUserAndIsPrivateIsTrue(RunnectUser runnectUser);

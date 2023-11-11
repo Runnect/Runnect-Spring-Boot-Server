@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.constant.ErrorStatus;
+import org.runnect.server.common.constant.SortStatus;
 import org.runnect.server.common.exception.ConflictException;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
@@ -20,6 +21,10 @@ import org.runnect.server.publicCourse.dto.response.GetPublicCourseDetailRespons
 import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserPublicCourse;
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserResponseDto;
+import org.runnect.server.publicCourse.dto.response.recommendPublicCourse.RecommendPublicCourse;
+import org.runnect.server.publicCourse.dto.response.recommendPublicCourse.RecommendPublicCourseResponseDto;
+import org.runnect.server.publicCourse.dto.response.searchPublicCourse.SearchPublicCourse;
+import org.runnect.server.publicCourse.dto.response.searchPublicCourse.SearchPublicCourseResponseDto;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.record.entity.Record;
@@ -28,12 +33,16 @@ import org.runnect.server.scrap.repository.ScrapRepository;
 import org.runnect.server.user.entity.RunnectUser;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class PublicCourseService {
+    private static final Integer PAGE_SIZE = 10;
 
     private final PublicCourseRepository publicCourseRepository;
     private final UserRepository userRepository;
@@ -41,7 +50,86 @@ public class PublicCourseService {
     private final CourseRepository courseRepository;
 
 
-    public GetPublicCourseByUserResponseDto getPublicCourseByUser(Long userId) {
+    public SearchPublicCourseResponseDto searchPublicCourse(Long userId, String keyword){
+        //1. 받은 userId가 유저가 존재하는지 확인
+        RunnectUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
+                        ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+
+        //2. 유저가 스크랩한 코스들 가져오기
+        List<Scrap> scraps = scrapRepository.findAllByUserIdAndScrapTF(userId).get();
+
+        //3. keyword가 제목, 시,군,구,번지,출발지 에 포함된 목록 가져오기
+        List<SearchPublicCourse> searchPublicCourses = new ArrayList<>();
+        publicCourseRepository.searchPublicCourseByKeyword(keyword)
+                .forEach(publicCourse -> {
+                    //4. 각 코스들의 publicCourse와 scrap 여부 파악
+                    scraps.forEach(scrap->
+                            publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
+
+                    searchPublicCourses.add(SearchPublicCourse.of(
+                            publicCourse.getId(),
+                            publicCourse.getCourse().getId(),
+                            publicCourse.getTitle(),
+                            publicCourse.getCourse().getImage(),
+                            publicCourse.getIsScrap(),
+                            publicCourse.getCourse().getDepartureRegion(),
+                            publicCourse.getCourse().getDepartureCity()));
+
+        });
+
+
+        return SearchPublicCourseResponseDto.of(searchPublicCourses);
+
+
+    }
+
+    public RecommendPublicCourseResponseDto recommendPublicCourse(Long userId, Integer pageNo, String sort){
+        //1. 받은 userId가 유저가 존재하는지 확인
+        RunnectUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
+                        ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+
+        //2. 유저가 스크랩한 코스들 가져오기
+        List<Scrap> scraps = scrapRepository.findAllByUserIdAndScrapTF(userId).get();
+
+
+        //3. page, sort 에 따라 데이터 가져오기
+        List<RecommendPublicCourse> recommendPublicCourses = new ArrayList<>();
+        Page<PublicCourse> publicCourses = null;
+        if(SortStatus.SCRAP_DESC.getVlaue().equals(sort)){
+            publicCourses = publicCourseRepository.findAll(
+                    PageRequest.of(pageNo-1, PAGE_SIZE,
+                            Sort.by(Sort.Direction.DESC,SortStatus.SCRAP_DESC.getProperty())));
+
+        } else if (SortStatus.DATE_DESC.getVlaue().equals(sort)) {
+            publicCourses = publicCourseRepository.findAll(
+                    PageRequest.of(pageNo-1, PAGE_SIZE,
+                            Sort.by(Sort.Direction.DESC,SortStatus.DATE_DESC.getProperty())));
+        }
+
+        publicCourses.forEach(publicCourse->{
+            //4. 각 코스들의 publicCourse와 scrap 여부 파악
+            scraps.forEach(scrap->
+                    publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
+
+            recommendPublicCourses.add(
+                    RecommendPublicCourse.of(
+                            publicCourse.getId(),
+                            publicCourse.getCourse().getId(),
+                            publicCourse.getTitle(),
+                            publicCourse.getCourse().getImage(),
+                            publicCourse.getIsScrap(),
+                            publicCourse.getCourse().getDepartureRegion(),
+                            publicCourse.getCourse().getDepartureCity()));
+        });
+
+
+        return RecommendPublicCourseResponseDto.of(sort,recommendPublicCourses);
+
+    }
+
+    public GetPublicCourseByUserResponseDto getPublicCourseByUser(Long userId){
         List<GetPublicCourseByUserPublicCourse> getPublicCourseByUserPublicCourses = new ArrayList<>();
 
         //1. 받은 userId가 유저가 존재하는지 확인

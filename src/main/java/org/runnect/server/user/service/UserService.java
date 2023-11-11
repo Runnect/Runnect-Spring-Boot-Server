@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.runnect.server.auth.service.AppleSignInService;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.UnauthorizedException;
+import org.runnect.server.course.entity.Course;
+import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.user.dto.request.UpdateUserNicknameRequestDto;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
@@ -30,9 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PublicCourseRepository publicCourseRepository;
     private final ScrapRepository scrapRepository;
     private final AppleSignInService appleSignInService;
+    private final CourseRepository courseRepository;
 
     @Transactional(readOnly = true)
     public MyPageResponseDto getMyPage(Long userId) {
@@ -72,8 +74,8 @@ public class UserService {
             .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
                 ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
-        List<PublicCourse> publicCourses = publicCourseRepository.findPublicCoursesByRunnectUser(
-            profileUser);
+        List<PublicCourse> publicCourses = courseRepository.findCoursesByRunnectUserAndIsPrivateIsTrue(profileUser)
+                .stream().map(course -> course.getPublicCourse()).collect(Collectors.toList());
 
         List<PublicCourseResponse> publicCourseResponses = publicCourses.stream()
             .map(publicCourse ->

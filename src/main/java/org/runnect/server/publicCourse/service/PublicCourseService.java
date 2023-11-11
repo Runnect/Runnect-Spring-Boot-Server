@@ -1,9 +1,13 @@
 package org.runnect.server.publicCourse.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
+import org.aspectj.lang.annotation.Before;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.constant.SortStatus;
 import org.runnect.server.common.exception.ConflictException;
@@ -17,8 +21,11 @@ import org.runnect.server.publicCourse.dto.request.CreatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
 import org.runnect.server.publicCourse.dto.response.CreatePublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.DeletePublicCoursesResponseDto;
+import org.runnect.server.publicCourse.dto.response.GetPublicCourseTotalPageCountResponseDto;
 import org.runnect.server.publicCourse.dto.response.GetPublicCourseDetailResponseDto;
 import org.runnect.server.publicCourse.dto.response.UpdatePublicCourseResponseDto;
+import org.runnect.server.publicCourse.dto.response.getMarathonPublicCourse.GetMarathonPublicCourse;
+import org.runnect.server.publicCourse.dto.response.getMarathonPublicCourse.GetMarathonPublicCourseResponseDto;
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserPublicCourse;
 import org.runnect.server.publicCourse.dto.response.getPublicCourseByUser.GetPublicCourseByUserResponseDto;
 import org.runnect.server.publicCourse.dto.response.recommendPublicCourse.RecommendPublicCourse;
@@ -33,6 +40,7 @@ import org.runnect.server.scrap.repository.ScrapRepository;
 import org.runnect.server.user.entity.RunnectUser;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -43,12 +51,61 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PublicCourseService {
     private static final Integer PAGE_SIZE = 10;
+    private static List<Long> MARATHON_PUBLIC_COURSE_IDS;
+
 
     private final PublicCourseRepository publicCourseRepository;
     private final UserRepository userRepository;
     private final ScrapRepository scrapRepository;
     private final CourseRepository courseRepository;
 
+    @Value("${runnect.marathon-public-course-id}")
+    public void setMARATHON_PUBLIC_COURSE_IDS(String MARATHON_PUBLIC_COURSE_ID) {
+        this.MARATHON_PUBLIC_COURSE_IDS = Stream.of(MARATHON_PUBLIC_COURSE_ID.split(","))
+                .map(Long::parseLong).collect(Collectors.toList());
+    }
+    public GetPublicCourseTotalPageCountResponseDto getPublicCourseTotalPageCount(){
+        Long totalPublicCourseCount = publicCourseRepository.countBy();
+        if(totalPublicCourseCount%PAGE_SIZE!=0){
+            return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount/PAGE_SIZE+1);
+        }
+        return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount/PAGE_SIZE);
+    }
+
+    public GetMarathonPublicCourseResponseDto getMarathonPublicCourse(Long userId){
+        //1. 받은 userId가 유저가 존재하는지 확인
+        RunnectUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
+                        ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+
+        //2. 유저가 스크랩한 코스들 가져오기
+        List<Scrap> scraps = scrapRepository.findAllByUserIdAndScrapTF(userId).get();
+
+        //3. 마라톤 코스들 가져오기
+        List<PublicCourse> marathonPublicCourses = publicCourseRepository.findByIdIn(MARATHON_PUBLIC_COURSE_IDS);
+        if(marathonPublicCourses.size() != MARATHON_PUBLIC_COURSE_IDS.size()){
+            throw new NotFoundException(ErrorStatus.NOT_FOUND_MARATHON_PUBLIC_COURSE_EXCEPTION,
+                    ErrorStatus.NOT_FOUND_MARATHON_PUBLIC_COURSE_EXCEPTION.getMessage());
+        }
+
+        List<GetMarathonPublicCourse> getMarathonPublicCourses = new ArrayList<>();
+        marathonPublicCourses.forEach(marathonPublicCourse->{
+            //4. 각 코스들의 publicCourse와 scrap 여부 파악
+            scraps.forEach(scrap-> marathonPublicCourse.setIsScrap(scrap.getPublicCourse().equals(marathonPublicCourse)));
+
+            getMarathonPublicCourses.add(GetMarathonPublicCourse.of(
+                    marathonPublicCourse.getId(),
+                    marathonPublicCourse.getCourse().getId(),
+                    marathonPublicCourse.getTitle(),
+                    marathonPublicCourse.getCourse().getImage(),
+                    marathonPublicCourse.getIsScrap(),
+                    marathonPublicCourse.getCourse().getDepartureRegion(),
+                    marathonPublicCourse.getCourse().getDepartureCity()));
+        });
+
+        return GetMarathonPublicCourseResponseDto.of(getMarathonPublicCourses);
+
+    }
 
     public SearchPublicCourseResponseDto searchPublicCourse(Long userId, String keyword){
         //1. 받은 userId가 유저가 존재하는지 확인
@@ -231,7 +288,6 @@ public class PublicCourseService {
         //5. pulblicCourse를 생성후 저장
         PublicCourse publicCourse = PublicCourse.builder()
                 .course(course)
-                .user(user)
                 .title(createPublicCourseRequestDto.getTitle())
                 .description(createPublicCourseRequestDto.getDescription())
                 .build();
@@ -264,7 +320,7 @@ public class PublicCourseService {
         }
 
         publicCourses.stream()
-                .filter(pc -> !pc.getRunnectUser().equals(user))
+                .filter(pc -> !pc.getCourse().getRunnectUser().equals(user))
                 .findAny()
                 .ifPresent(pc -> {
                     throw new PermissionDeniedException(
@@ -272,10 +328,10 @@ public class PublicCourseService {
                             ErrorStatus.PERMISSION_DENIED_PUBLIC_COURSE_DELETE_EXCEPTION.getMessage());
                 });
 
+        //삭제전 course의 isPrivate update
+        publicCourses.forEach(publicCourse -> publicCourse.getCourse().retrieveCourse());
 
-        scrapRepository.deleteByPublicCourseIn(publicCourses);
-        publicCourses.forEach(publicCourse -> publicCourse.getRecords().forEach(Record::setPublicCourseNull));
-        publicCourses.forEach(PublicCourse::updateDeletedAt);
+        publicCourseRepository.deleteAllInBatch(publicCourses);
 
         return DeletePublicCoursesResponseDto.from(publicCourses.size());
     }

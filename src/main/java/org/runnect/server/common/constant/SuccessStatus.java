@@ -22,8 +22,10 @@ public enum SuccessStatus {
     GET_USER_PROFILE_SUCCESS(HttpStatus.OK, "유저 프로필 조회에 성공했습니다."),
     GET_PUBLIC_COURSE_BY_USER_SUCCESS(HttpStatus.OK,"유저가 업로드한 코스 조회 성공"),
     GET_USER_STAMPS_SUCCESS(HttpStatus.OK, "유저 스탬프 조회 성공"),
+    GET_PUBLIC_COURSE_TOTAL_PAGE_COUNT_SUCCESS(HttpStatus.OK,"추천 코스 전체 페이지 개수 조회 성공"),
     GET_RECOMMENDED_PUBLIC_COURSE_SUCCESS(HttpStatus.OK, "추천 코스 조회 성공"),
     GET_PUBLIC_COURSE_DETAIL_SUCCESS(HttpStatus.OK,"업로드 코스 상세 조회 성공"),
+    GET_MARATHON_PUBLIC_COURSE_SUCCESS(HttpStatus.OK,"마라톤 코스 조회 성공"),
 
     SEARCH_PUBLIC_COURSE_SUCCESS(HttpStatus.OK,"업로드된 코스 검색 성공"),
 

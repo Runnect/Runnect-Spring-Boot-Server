@@ -35,4 +35,5 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Optional<Course> findByCourseIdAndUserId(@Param("courseId") Long courseId,  @Param("userId") Long userId);
 
     // DELETE
+
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum StampType {
+    DELETED_USER("알 수 없음",-1,-1),
     // 유저 스탬프 목록
     CSPR0("default", 0, -1),
 

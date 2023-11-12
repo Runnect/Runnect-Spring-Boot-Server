@@ -93,6 +93,15 @@ public class RunnectUser extends AuditingTimeEntity {
         this.createdScrap = 0L;
     }
 
+    public RunnectUser(String nickname) {
+        this.nickname = nickname;
+        this.socialId = null;
+        this.email = null;
+        this.provider = null;
+        this.latestStamp = StampType.DELETED_USER;
+        this.level = -1;
+    }
+
     public void updateUserLevel(int level) {
         this.level = level;
     }

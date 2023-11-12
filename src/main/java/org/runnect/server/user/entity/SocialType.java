@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum SocialType {
     KAKAO,
     APPLE,
-    GOOGLE
+    GOOGLE,
+    VISITOR
     ;
 }

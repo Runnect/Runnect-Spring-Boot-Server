@@ -25,6 +25,12 @@ public enum ErrorStatus {
     NOT_FOUND_RECORD_EXCEPTION(HttpStatus.BAD_REQUEST, "존재하지 않는 레코드 아이디입니다."),
     NOT_FOUND_PUBLIC_COURSE_EXCEPTION(HttpStatus.BAD_REQUEST,"유효하지 않은 퍼블릭 코스 아이디입니다."),
     UNMATCHED_COURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "로그인된 유저가 그린 코스가 아닙니다."),
+    INVALID_SORT_PARAMETER_EXCEPTION(HttpStatus.BAD_REQUEST, "sort 파라미터에 올바른 값이 입력되지 않았습니다."),
+    INVALID_PARAMETER_EXCEPTION(HttpStatus.BAD_REQUEST, "파라미터에 올바른 값이 입력되지 않았습니다."),
+    NOT_FOUND_APPLE_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "appleAccessToken이 없습니다."),
+    NOT_FOUND_SCRAP_EXCEPTION(HttpStatus.BAD_REQUEST, "스크랩한 코스가 없습니다."),
+    NOT_FOUND_IMAGE_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 이미지 파일입니다"),
+    NOT_FOUND_PUBLICCOURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "존재하지 않는 public course id입니다."),
 
     /**
      * 401 UNAUTHORIZED
@@ -36,6 +42,8 @@ public enum ErrorStatus {
     INVALID_GOOGLE_ID_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 구글 아이디 토큰입니다."),
     INVALID_APPLE_ID_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED,"유효하지 않은 애플 아이디 토큰입니다."),
     APPLE_ID_TOKEN_TIME_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED,"만료된 애플 아이디 토큰입니다."),
+    INVALID_APPLE_P8KEY_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 애플 p8키입니다."),
+    FAIL_TO_WITHDRAW_APPLE_SOCIAL_EXCEPTION(HttpStatus.UNAUTHORIZED,"애플 소셜 유저 탈퇴가 실패했습니다."),
 
     /**
      * 403 FORBIDDEN
@@ -47,10 +55,7 @@ public enum ErrorStatus {
      * 404 NOT FOUND
      */
     NOT_FOUND_USER_EXCEPTION(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다"),
-    NOT_FOUND_IMAGE_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 이미지 파일입니다"),
-    NOT_FOUND_PUBLICCOURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "존재하지 않는 public course id입니다."),
-    NOT_FOUND_SCRAP_EXCEPTION(HttpStatus.BAD_REQUEST, "스크랩한 코스가 없습니다."),
-
+    NOT_FOUND_MARATHON_PUBLIC_COURSE_EXCEPTION(HttpStatus.NOT_FOUND, "마라톤 코스가 존재하지 않습니다."),
     /**
      * 409 CONFLICT
      */

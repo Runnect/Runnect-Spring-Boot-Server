@@ -4,12 +4,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 import org.runnect.server.common.entity.AuditingTimeEntity;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.record.entity.Record;
 import org.runnect.server.scrap.entity.Scrap;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.runnect.server.user.entity.RunnectUser;
@@ -24,9 +26,6 @@ public class PublicCourse extends AuditingTimeEntity {
     private Long id;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private RunnectUser runnectUser;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
@@ -38,12 +37,12 @@ public class PublicCourse extends AuditingTimeEntity {
     @Column(nullable = false)
     private String description;
 
-    // 아래 코드 주석이유 -> 유저가 현재 스크랩한 코스는 scraptf가 treu인 경우만임
-//    @OneToMany(mappedBy = "publicCourse")
-//    private List<Scrap> scraps = new ArrayList<>();
 
     @OneToMany(mappedBy = "publicCourse")
     private List<Record> records = new ArrayList<>();
+
+    @Formula("(select count(*) from Scrap where Scrap.public_course_id=id and Scrap.scraptf=true)")
+    private Integer scrapCount;
 
     @Transient
     private Boolean isScrap=false; //현재 사용자가 스크랩한지 아닌지 여부
@@ -51,9 +50,8 @@ public class PublicCourse extends AuditingTimeEntity {
     public void setIsScrap(Boolean flag){ isScrap=flag;}
 
     @Builder
-    public PublicCourse(Course course, RunnectUser user, String title, String description) {
+    public PublicCourse(Course course, String title, String description) {
         this.course = course;
-        this.runnectUser = user;
         this.title = title;
         this.description = description;
     }
@@ -61,5 +59,10 @@ public class PublicCourse extends AuditingTimeEntity {
     public void updatePublicCourse(String title, String description) {
         this.title = title;
         this.description = description;
+    }
+
+    @Override
+    public void updateDeletedAt() {
+        throw new RuntimeException("Course를 제외한 테이블은 정상적으로 삭제됩니다.");
     }
 }

@@ -21,6 +21,7 @@ import org.runnect.server.course.dto.response.UpdateCourseResponseDto;
 import org.runnect.server.course.dto.response.UserResponse;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
+import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.user.entity.RunnectUser;
 import org.runnect.server.user.entity.StampType;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CourseService {
 
     private final CourseRepository courseRepository;
+    private final PublicCourseRepository publicCourseRepository;
     private final UserRepository userRepository;
     private final UserStampService userStampService;
 
@@ -135,6 +137,10 @@ public class CourseService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_COURSE_EXCEPTION,
                     NOT_FOUND_COURSE_EXCEPTION.getMessage()));
 
+            if(!course.getIsPrivate()){
+                publicCourseRepository.delete(course.getPublicCourse());
+                course.retrieveCourse();
+            }
             course.updateDeletedAt();
         });
         return DeleteCoursesResponseDto.from(courseIdList.size());

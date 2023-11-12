@@ -6,6 +6,7 @@ import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.constant.SuccessStatus;
 import org.runnect.server.common.dto.ApiResponseDto;
 import org.runnect.server.common.exception.BadRequestException;
+import org.runnect.server.common.resolver.userId.UserId;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
 import org.runnect.server.course.dto.request.DeleteCoursesRequestDto;
 import org.runnect.server.course.dto.request.UpdateCourseRequestDto;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,7 +41,7 @@ public class CourseController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponseDto<CourseCreateResponseDto> createCourse(
-        @RequestHeader Long userId,
+        @UserId Long userId,
         @ModelAttribute @Valid final CourseCreateRequestDto courseCreateRequestDto,
         BindingResult bindingResult
     ) {
@@ -56,7 +56,7 @@ public class CourseController {
 
     @GetMapping("/user")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponseDto<CourseGetByUserResponseDto> getCourseByUser(@RequestHeader Long userId) {
+    public ApiResponseDto<CourseGetByUserResponseDto> getCourseByUser(@UserId Long userId) {
         return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER_SUCCESS,
             courseService.getCourseByUser(userId));
     }
@@ -64,14 +64,14 @@ public class CourseController {
     @GetMapping("/private/user")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<CourseGetByUserResponseDto> getPrivateCourseByUser(
-        @RequestHeader Long userId) {
+        @UserId Long userId) {
         return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER_SUCCESS,
             courseService.getPrivateCourseByUser(userId));
     }
 
     @GetMapping("/detail/{courseId}")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponseDto<GetCourseDetailResponseDto> getCourseDetail(@RequestHeader Long userId,
+    public ApiResponseDto<GetCourseDetailResponseDto> getCourseDetail(@UserId Long userId,
         @PathVariable Long courseId) {
         return ApiResponseDto.success(SuccessStatus.GET_COURSE_DETAIL_SUCCESS,
             courseService.getCourseDetail(courseId));
@@ -79,7 +79,7 @@ public class CourseController {
 
     @PatchMapping("/{courseId}")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponseDto<UpdateCourseResponseDto> updateCourse(@RequestHeader Long userId,
+    public ApiResponseDto<UpdateCourseResponseDto> updateCourse(@UserId Long userId,
         @PathVariable(name = "courseId") Long courseId,
         @RequestBody @Valid final UpdateCourseRequestDto request) {
         return ApiResponseDto.success(SuccessStatus.UPDATE_COURSE_SUCCESS,
@@ -89,7 +89,7 @@ public class CourseController {
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<DeleteCoursesResponseDto> deleteCourses(
-        @RequestHeader Long userId,
+        @UserId Long userId,
         @Valid @RequestBody final DeleteCoursesRequestDto deleteCoursesRequestDto
     ) {
         return ApiResponseDto.success(SuccessStatus.DELETE_COURSES_SUCCESS,

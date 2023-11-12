@@ -119,7 +119,7 @@ public class PublicCourseController {
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<DeletePublicCoursesResponseDto> deletePublicCourses(
-        @RequestHeader final Long userId,
+        @UserId final Long userId,
         @Valid @RequestBody final DeletePublicCoursesRequestDto deletePublicCoursesRequestDto
     ) {
         return ApiResponseDto.success(SuccessStatus.DELETE_PUBLIC_COURSE_SUCCESS,
@@ -129,7 +129,7 @@ public class PublicCourseController {
     @PatchMapping("/{publicCourseId}")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<UpdatePublicCourseResponseDto> updatePublicCourse(
-            @RequestHeader Long userId, @PathVariable(name = "publicCourseId") Long publicCourseId,
+            @UserId Long userId, @PathVariable(name = "publicCourseId") Long publicCourseId,
             @RequestBody @Valid final UpdatePublicCourseRequestDto request)  {
         return ApiResponseDto.success(SuccessStatus.UPDATE_PUBLIC_COURSE_SUCCESS, publicCourseService.updatePublicCourse(userId, publicCourseId, request.getTitle(), request.getDescription()));
     }

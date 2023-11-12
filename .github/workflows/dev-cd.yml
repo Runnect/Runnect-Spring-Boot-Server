@@ -4,7 +4,7 @@ name: RUNNECT-DEV-CD
 # 해당 workflow가 언제 실행될 것인지에 대한 트리거를 지정
 on:
   push:
-    branches: [ dev ] # dev branch로 push 될 때 실행됩니다.
+    branches: [ dev ] # main branch로 push 될 때 실행됩니다.
 
 env:
   S3_BUCKET_NAME: runnect-dev-bucket
@@ -81,7 +81,7 @@ jobs:
         aws-region: ap-northeast-2
         
     - name: Upload to S3
-      run: aws s3 cp --region ap-northeast-2 ./runnect_dev_server.zip s3://$S3_BUCKET_NAME/
+      run: aws s3 cp --region ap-northeast-2 ./runnect_dev_server.zip.zip s3://$S3_BUCKET_NAME/
       
     # Deploy
     - name: Deploy

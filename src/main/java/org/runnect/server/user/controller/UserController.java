@@ -26,7 +26,7 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponseDto<MyPageResponseDto> getMyPage(@RequestHeader Long userId) {
+    public ApiResponseDto<MyPageResponseDto> getMyPage(@UserId Long userId) {
         return ApiResponseDto.success(
             SuccessStatus.GET_MY_PAGE_SUCCESS, userService.getMyPage(userId));
     }
@@ -34,7 +34,7 @@ public class UserController {
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<UpdateUserNicknameResponseDto> updateUserNickname(
-        @RequestHeader Long userId,
+        @UserId Long userId,
         @Valid @RequestBody UpdateUserNicknameRequestDto updateUserNicknameRequestDto
     ) {
         return ApiResponseDto.success(SuccessStatus.UPDATE_USER_NICKNAME_SUCCESS,
@@ -44,7 +44,7 @@ public class UserController {
     @GetMapping("/{profileUserId}")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<UserProfileResponseDto> getUserProfile(
-        @RequestHeader Long userId,
+        @UserId Long userId,
         @PathVariable Long profileUserId
     ) {
         return ApiResponseDto.success(SuccessStatus.GET_USER_PROFILE_SUCCESS,

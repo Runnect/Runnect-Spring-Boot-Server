@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<RunnectUser, Long> {
     // READ
     Optional<RunnectUser> findById(Long id);
 
-    @Query("select u from RunnectUser u join fetch u.userStamps where u.id = :userId")
+    @Query("select u from RunnectUser u where u.id = :userId")
     Optional<RunnectUser> findUserByIdWithUserStamps(@Param("userId") Long userId);
 
     boolean existsByNickname(String nickname);
@@ -21,9 +21,6 @@ public interface UserRepository extends JpaRepository<RunnectUser, Long> {
     boolean existsByEmailAndProvider(String email, SocialType provider);
 
     Optional<RunnectUser> findByEmailAndProvider(String email, SocialType provider);
-
-    @Query("select u from RunnectUser u join fetch u.userStamps where u.id = :userId")
-    Optional<RunnectUser> findByIdWithUserStamps(@Param("userId") Long userId);
 
     // DELETE
 

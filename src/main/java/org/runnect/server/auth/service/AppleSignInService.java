@@ -72,12 +72,10 @@ public class AppleSignInService {
             // 발급처, aud, 시간제한, 이메일 검증
 
             //만료된경우
-//            System.out.println("현재시간 : "+System.currentTimeMillis());
-//            System.out.println("애플시간 : "+claimsSet.getExpirationTime().getTime());
-//            if (System.currentTimeMillis() < claimsSet.getExpirationTime().getTime()) {
-//                throw new UnauthorizedException(ErrorStatus.APPLE_ID_TOKEN_TIME_EXPIRED_EXCEPTION,
-//                        ErrorStatus.APPLE_ID_TOKEN_TIME_EXPIRED_EXCEPTION.getMessage());
-//            }
+            if (System.currentTimeMillis() >= claimsSet.getExpirationTime().getTime()) {
+                throw new UnauthorizedException(ErrorStatus.APPLE_ID_TOKEN_TIME_EXPIRED_EXCEPTION,
+                        ErrorStatus.APPLE_ID_TOKEN_TIME_EXPIRED_EXCEPTION.getMessage());
+            }
 
             // 발급처, aud,이메일 검증 실패시
             if (!claimsSet.getIssuer().equals(APPLE_ISSUE_URL) ||

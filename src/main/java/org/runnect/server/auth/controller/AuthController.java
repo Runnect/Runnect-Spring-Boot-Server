@@ -35,6 +35,8 @@ public class AuthController {
         }
     }
 
+
+
     @GetMapping("/getNewToken")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<GetNewTokenResponseDto> getNewToken(@RequestHeader @NotBlank String accessToken,

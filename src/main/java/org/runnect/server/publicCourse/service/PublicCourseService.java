@@ -58,6 +58,7 @@ public class PublicCourseService {
     private final ScrapRepository scrapRepository;
     private final CourseRepository courseRepository;
 
+
     @Value("${runnect.marathon-public-course-id}")
     private void setMARATHON_PUBLIC_COURSE_IDS(String MARATHON_PUBLIC_COURSE_ID) {
         this.MARATHON_PUBLIC_COURSE_IDS = Stream.of(MARATHON_PUBLIC_COURSE_ID.split(","))

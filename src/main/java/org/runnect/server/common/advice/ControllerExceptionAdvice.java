@@ -1,6 +1,8 @@
 package org.runnect.server.common.advice;
 
 import lombok.RequiredArgsConstructor;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.BasicException;
 import org.runnect.server.config.slack.SlackApi;
 
+import java.io.IOException;
 import java.util.Objects;
 
 @RestControllerAdvice
@@ -65,14 +68,14 @@ public class ControllerExceptionAdvice {
 
     /**
      * 500 Internal Server Error
-     * TODO 배포시 주석풀기
+     *
      */
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler(Exception.class)
-//    protected ApiResponseDto<Object> handleException(final Exception error, final HttpServletRequest request) throws IOException {
-//        slackApi.sendAlert(error, request);
-//        return ApiResponseDto.error(ErrorStatus.INTERNAL_SERVER_ERROR);
-//    }
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    protected ApiResponseDto<Object> handleException(final Exception error, final HttpServletRequest request) throws IOException {
+        slackApi.sendAlert(error, request);
+        return ApiResponseDto.error(ErrorStatus.INTERNAL_SERVER_ERROR);
+    }
 
     /**
      * custom error

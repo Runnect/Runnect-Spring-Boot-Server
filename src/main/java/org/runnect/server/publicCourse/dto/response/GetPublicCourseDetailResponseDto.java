@@ -57,7 +57,7 @@ public class GetPublicCourseDetailResponseDto {
     public static class GetPublicCourseDetailPublicCourse {
         private Long id;
         private Long courseId;
-        private Boolean isScrap;
+        private Boolean scrap;
         private Long scrapCount;
         private String image;
         private String title;
@@ -68,25 +68,25 @@ public class GetPublicCourseDetailResponseDto {
 
 
         public static GetPublicCourseDetailResponseDto.GetPublicCourseDetailPublicCourse from(Long publicCourseId, Long courseId,
-                                                                                              Boolean isScrap, Long scrapCount,
+                                                                                              Boolean scrap, Long scrapCount,
                                                                                               String courseImage, String title,
                                                                                               String description, List<List<Double>> path,
                                                                                               Float distance, String region,
                                                                                               String city, String town, String name) {
             return new GetPublicCourseDetailResponseDto
-                    .GetPublicCourseDetailPublicCourse(publicCourseId, courseId, isScrap, scrapCount,
+                    .GetPublicCourseDetailPublicCourse(publicCourseId, courseId, scrap, scrapCount,
                     courseImage, title, description, path, distance,
                     new DepartureResponse(region, city, town, name));
         }
 
         public static GetPublicCourseDetailResponseDto.GetPublicCourseDetailPublicCourse from(Long publicCourseId, Long courseId,
-                                                                                               Boolean isScrap, Long scrapCount,
+                                                                                               Boolean scrap, Long scrapCount,
                                                                                                String courseImage, String title,
                                                                                                String description, List<List<Double>> path,
                                                                                                Float distance, String region,
                                                                                                String city, String town) {
             return new GetPublicCourseDetailResponseDto
-                    .GetPublicCourseDetailPublicCourse(publicCourseId, courseId, isScrap, scrapCount,
+                    .GetPublicCourseDetailPublicCourse(publicCourseId, courseId, scrap, scrapCount,
                     courseImage, title, description, path, distance,
                     new DepartureResponse(region, city, town));
         }

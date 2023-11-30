@@ -1,20 +1,17 @@
 package org.runnect.server.publicCourse.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
-import org.aspectj.lang.annotation.Before;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.constant.SortStatus;
 import org.runnect.server.common.exception.ConflictException;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
 import org.runnect.server.common.module.convert.CoordinatePathConverter;
-import org.runnect.server.course.dto.response.GetCourseDetailResponseDto;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.publicCourse.dto.request.CreatePublicCourseRequestDto;
@@ -34,7 +31,6 @@ import org.runnect.server.publicCourse.dto.response.searchPublicCourse.SearchPub
 import org.runnect.server.publicCourse.dto.response.searchPublicCourse.SearchPublicCourseResponseDto;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
-import org.runnect.server.record.entity.Record;
 import org.runnect.server.scrap.entity.Scrap;
 import org.runnect.server.scrap.repository.ScrapRepository;
 import org.runnect.server.user.entity.RunnectUser;
@@ -260,13 +256,13 @@ public class PublicCourseService {
         //6. 건물이름이 없는 경우분기처리
         if(course.getDepartureName()==null){
             return GetPublicCourseDetailResponseDto.of(
-                    uploader.getNickname(), uploader.getLevel(), uploader.getLatestStamp().toString(), uploader.equals(user),
+                    uploader.getId(),uploader.getNickname(), uploader.getLevel(), uploader.getLatestStamp().toString(), uploader.equals(user),
                     publicCourse.getId(), course.getId(), publicCourse.getIsScrap(), scrapCount, course.getImage(), publicCourse.getTitle(), publicCourse.getDescription(),
                     CoordinatePathConverter.pathConvertCoor(course.getPath()), course.getDistance(), course.getDepartureRegion(), course.getDepartureCity(), course.getDepartureTown());
         }
 
         return GetPublicCourseDetailResponseDto.of(
-                uploader.getNickname(), uploader.getLevel(), uploader.getLatestStamp().toString(), uploader.equals(user),
+                uploader.getId(), uploader.getNickname(), uploader.getLevel(), uploader.getLatestStamp().toString(), uploader.equals(user),
                 publicCourse.getId(), course.getId(), publicCourse.getIsScrap(), scrapCount, course.getImage(), publicCourse.getTitle(), publicCourse.getDescription(),
                 CoordinatePathConverter.pathConvertCoor(course.getPath()), course.getDistance(), course.getDepartureRegion(), course.getDepartureCity(), course.getDepartureTown(), course.getDepartureName());
 

@@ -94,6 +94,7 @@ public class RunnectUser extends AuditingTimeEntity {
     }
 
     public RunnectUser(String nickname) {
+        this.id = -1L;
         this.nickname = nickname;
         this.socialId = null;
         this.email = null;

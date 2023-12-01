@@ -44,6 +44,7 @@ public enum ErrorStatus {
     APPLE_ID_TOKEN_TIME_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED,"만료된 애플 아이디 토큰입니다."),
     INVALID_APPLE_P8KEY_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 애플 p8키입니다."),
     FAIL_TO_WITHDRAW_APPLE_SOCIAL_EXCEPTION(HttpStatus.UNAUTHORIZED,"애플 소셜 유저 탈퇴가 실패했습니다."),
+    INVALID_KAKAO_ID_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 카카오 아이디 토큰입니다."),
 
     /**
      * 403 FORBIDDEN

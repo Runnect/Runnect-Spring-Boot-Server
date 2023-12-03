@@ -77,6 +77,7 @@ public class AppleSignInService {
                         ErrorStatus.APPLE_ID_TOKEN_TIME_EXPIRED_EXCEPTION.getMessage());
             }
 
+
             // 발급처, aud,이메일 검증 실패시
             if (!claimsSet.getIssuer().equals(APPLE_ISSUE_URL) ||
                     !claimsSet.getAudience().get(0).equals(APPLE_BUNDLE_ID) ||

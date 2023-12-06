@@ -88,7 +88,12 @@ public class PublicCourseService {
         List<GetMarathonPublicCourse> getMarathonPublicCourses = new ArrayList<>();
         marathonPublicCourses.forEach(marathonPublicCourse->{
             //4. 각 코스들의 publicCourse와 scrap 여부 파악
-            scraps.forEach(scrap-> marathonPublicCourse.setIsScrap(scrap.getPublicCourse().equals(marathonPublicCourse)));
+            for(Scrap scrap : scraps){
+                if (scrap.getPublicCourse().equals(marathonPublicCourse)) {
+                    marathonPublicCourse.setIsScrap(true);
+                    break;
+                }
+            }
 
             getMarathonPublicCourses.add(GetMarathonPublicCourse.of(
                     marathonPublicCourse.getId(),
@@ -118,8 +123,12 @@ public class PublicCourseService {
         publicCourseRepository.searchPublicCourseByKeyword(keyword)
                 .forEach(publicCourse -> {
                     //4. 각 코스들의 publicCourse와 scrap 여부 파악
-                    scraps.forEach(scrap->
-                            publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
+                    for(Scrap scrap : scraps){
+                        if (scrap.getPublicCourse().equals(publicCourse)) {
+                            publicCourse.setIsScrap(true);
+                            break;
+                        }
+                    }
 
                     searchPublicCourses.add(SearchPublicCourse.of(
                             publicCourse.getId(),
@@ -164,8 +173,12 @@ public class PublicCourseService {
 
         publicCourses.forEach(publicCourse->{
             //4. 각 코스들의 publicCourse와 scrap 여부 파악
-            scraps.forEach(scrap->
-                    publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
+            for(Scrap scrap : scraps){
+                if (scrap.getPublicCourse().equals(publicCourse)) {
+                    publicCourse.setIsScrap(true);
+                    break;
+                }
+            }
 
             recommendPublicCourses.add(
                     RecommendPublicCourse.of(
@@ -201,9 +214,12 @@ public class PublicCourseService {
             PublicCourse publicCourse = course.getPublicCourse();
 
             //4. 각 코스들의 publicCourse와 scrap 여부 파악
-            scraps.forEach(scrap ->
-                    publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
-
+            for(Scrap scrap : scraps){
+                if (scrap.getPublicCourse().equals(publicCourse)) {
+                    publicCourse.setIsScrap(true);
+                    break;
+                }
+            }
             //5. responseDto 만듬
             getPublicCourseByUserPublicCourses.add(
                     GetPublicCourseByUserPublicCourse.of(
@@ -243,7 +259,12 @@ public class PublicCourseService {
         // 3. 유저가 해당 공개코스 스크랩했는지 여부
         //3.1 유저가 스크랩한 코스들 가져오기
         List<Scrap> scraps = scrapRepository.findAllByUserIdAndScrapTF(userId).get();
-        scraps.forEach(scrap -> publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
+        for(Scrap scrap : scraps){
+            if (scrap.getPublicCourse().equals(publicCourse)) {
+                publicCourse.setIsScrap(true);
+                break;
+            }
+        }
 
         //4. 해당 공개코스가 얼마나 스크랩되었는지 가져오기
         Long scrapCount = scrapRepository.countByPublicCourseAndScrapTFIsTrue(publicCourse);

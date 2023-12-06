@@ -12,9 +12,11 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RecommendPublicCourseResponseDto {
     private String ordering;
+    private Integer totalPageSize;
+    private Boolean isEnd;
     private List<RecommendPublicCourse> publicCourses;
 
-    public static RecommendPublicCourseResponseDto of(String ordering, List<RecommendPublicCourse> publicCourses) {
-        return new RecommendPublicCourseResponseDto(ordering, publicCourses);
+    public static RecommendPublicCourseResponseDto of(String ordering, Integer totalPageSize, Boolean isEnd, List<RecommendPublicCourse> publicCourses) {
+        return new RecommendPublicCourseResponseDto(ordering, totalPageSize, isEnd, publicCourses);
     }
 }

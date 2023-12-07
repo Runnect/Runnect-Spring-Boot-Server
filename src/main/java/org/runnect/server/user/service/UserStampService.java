@@ -72,16 +72,16 @@ public class UserStampService {
     private Long getActivityCount(RunnectUser user, StampType stampType) {
         Long activityCount = 0L;
         switch (stampType) {
-            case C:
+            case c:
                 activityCount = user.getCreatedCourse();
                 break;
-            case S:
+            case s:
                 activityCount = user.getCreatedScrap();
                 break;
-            case R:
+            case r:
                 activityCount = user.getCreatedRecord();
                 break;
-            case U:
+            case u:
                 activityCount = user.getCreatedPublicCourse();
                 break;
         }

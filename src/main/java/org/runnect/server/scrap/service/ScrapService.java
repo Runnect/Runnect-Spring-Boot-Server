@@ -48,7 +48,7 @@ public class ScrapService {
                         .build();
 
                 user.updateCreatedScrap();
-                userStampService.createStampByUser(user, StampType.S);
+                userStampService.createStampByUser(user, StampType.s);
 
                 scrapRepository.save(newScrap);
             } else {

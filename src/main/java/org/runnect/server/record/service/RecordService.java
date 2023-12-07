@@ -79,7 +79,7 @@ public class RecordService {
         recordRepository.save(record);
 
         user.updateCreatedRecord();
-        userStampService.createStampByUser(user, StampType.R);
+        userStampService.createStampByUser(user, StampType.r);
 
         CreateRecordDto recordDto = new CreateRecordDto(record.getId(), record.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
 

@@ -193,7 +193,7 @@ public class PublicCourseService {
         });
 
 
-        return RecommendPublicCourseResponseDto.of(sort, recommendPublicCourses);
+        return RecommendPublicCourseResponseDto.of(sort,publicCourses.getTotalPages(),(publicCourses.getTotalPages()==publicCourses.getNumber()+1),recommendPublicCourses);
 
     }
 

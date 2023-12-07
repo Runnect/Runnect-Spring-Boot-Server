@@ -61,15 +61,15 @@ public class PublicCourseService {
                 .map(Long::parseLong).collect(Collectors.toList());
     }
 
-    public GetPublicCourseTotalPageCountResponseDto getPublicCourseTotalPageCount(){
+    public GetPublicCourseTotalPageCountResponseDto getPublicCourseTotalPageCount() {
         Long totalPublicCourseCount = publicCourseRepository.countBy();
-        if(totalPublicCourseCount%PAGE_SIZE!=0){
-            return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount/PAGE_SIZE+1);
+        if (totalPublicCourseCount % PAGE_SIZE != 0) {
+            return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount / PAGE_SIZE + 1);
         }
-        return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount/PAGE_SIZE);
+        return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount / PAGE_SIZE);
     }
 
-    public GetMarathonPublicCourseResponseDto getMarathonPublicCourse(Long userId){
+    public GetMarathonPublicCourseResponseDto getMarathonPublicCourse(Long userId) {
         //1. 받은 userId가 유저가 존재하는지 확인
         RunnectUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
@@ -80,15 +80,21 @@ public class PublicCourseService {
 
         //3. 마라톤 코스들 가져오기
         List<PublicCourse> marathonPublicCourses = publicCourseRepository.findByIdIn(MARATHON_PUBLIC_COURSE_IDS);
-        if(marathonPublicCourses.size() != MARATHON_PUBLIC_COURSE_IDS.size()){
+        if (marathonPublicCourses.size() != MARATHON_PUBLIC_COURSE_IDS.size()) {
             throw new NotFoundException(ErrorStatus.NOT_FOUND_MARATHON_PUBLIC_COURSE_EXCEPTION,
                     ErrorStatus.NOT_FOUND_MARATHON_PUBLIC_COURSE_EXCEPTION.getMessage());
         }
 
         List<GetMarathonPublicCourse> getMarathonPublicCourses = new ArrayList<>();
-        marathonPublicCourses.forEach(marathonPublicCourse->{
+        marathonPublicCourses.forEach(marathonPublicCourse -> {
             //4. 각 코스들의 publicCourse와 scrap 여부 파악
-            scraps.forEach(scrap-> marathonPublicCourse.setIsScrap(scrap.getPublicCourse().equals(marathonPublicCourse)));
+            for(Scrap scrap : scraps){
+                if (scrap.getPublicCourse().equals(marathonPublicCourse)) {
+                    marathonPublicCourse.setIsScrap(true);
+                    break;
+                }
+            }
+
 
             getMarathonPublicCourses.add(GetMarathonPublicCourse.of(
                     marathonPublicCourse.getId(),
@@ -104,7 +110,7 @@ public class PublicCourseService {
 
     }
 
-    public SearchPublicCourseResponseDto searchPublicCourse(Long userId, String keyword){
+    public SearchPublicCourseResponseDto searchPublicCourse(Long userId, String keyword) {
         //1. 받은 userId가 유저가 존재하는지 확인
         RunnectUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
@@ -118,8 +124,12 @@ public class PublicCourseService {
         publicCourseRepository.searchPublicCourseByKeyword(keyword)
                 .forEach(publicCourse -> {
                     //4. 각 코스들의 publicCourse와 scrap 여부 파악
-                    scraps.forEach(scrap->
-                            publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
+                    for(Scrap scrap : scraps){
+                        if (scrap.getPublicCourse().equals(publicCourse)) {
+                            publicCourse.setIsScrap(true);
+                            break;
+                        }
+                    }
 
                     searchPublicCourses.add(SearchPublicCourse.of(
                             publicCourse.getId(),
@@ -130,7 +140,7 @@ public class PublicCourseService {
                             publicCourse.getCourse().getDepartureRegion(),
                             publicCourse.getCourse().getDepartureCity()));
 
-        });
+                });
 
 
         return SearchPublicCourseResponseDto.of(searchPublicCourses);
@@ -138,7 +148,7 @@ public class PublicCourseService {
 
     }
 
-    public RecommendPublicCourseResponseDto recommendPublicCourse(Long userId, Integer pageNo, String sort){
+    public RecommendPublicCourseResponseDto recommendPublicCourse(Long userId, Integer pageNo, String sort) {
         //1. 받은 userId가 유저가 존재하는지 확인
         RunnectUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
@@ -151,21 +161,25 @@ public class PublicCourseService {
         //3. page, sort 에 따라 데이터 가져오기
         List<RecommendPublicCourse> recommendPublicCourses = new ArrayList<>();
         Page<PublicCourse> publicCourses = null;
-        if(SortStatus.SCRAP_DESC.getVlaue().equals(sort)){
+        if (SortStatus.SCRAP_DESC.getVlaue().equals(sort)) {
             publicCourses = publicCourseRepository.findAll(
-                    PageRequest.of(pageNo-1, PAGE_SIZE,
-                            Sort.by(Sort.Direction.DESC,SortStatus.SCRAP_DESC.getProperty())));
+                    PageRequest.of(pageNo - 1, PAGE_SIZE,
+                            Sort.by(Sort.Direction.DESC, SortStatus.SCRAP_DESC.getProperty())));
 
         } else if (SortStatus.DATE_DESC.getVlaue().equals(sort)) {
             publicCourses = publicCourseRepository.findAll(
-                    PageRequest.of(pageNo-1, PAGE_SIZE,
-                            Sort.by(Sort.Direction.DESC,SortStatus.DATE_DESC.getProperty())));
+                    PageRequest.of(pageNo - 1, PAGE_SIZE,
+                            Sort.by(Sort.Direction.DESC, SortStatus.DATE_DESC.getProperty())));
         }
 
-        publicCourses.forEach(publicCourse->{
+        publicCourses.forEach(publicCourse -> {
             //4. 각 코스들의 publicCourse와 scrap 여부 파악
-            scraps.forEach(scrap->
-                    publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
+            for(Scrap scrap : scraps){
+                if (scrap.getPublicCourse().equals(publicCourse)) {
+                    publicCourse.setIsScrap(true);
+                    break;
+                }
+            }
 
             recommendPublicCourses.add(
                     RecommendPublicCourse.of(
@@ -179,11 +193,11 @@ public class PublicCourseService {
         });
 
 
-        return RecommendPublicCourseResponseDto.of(sort,recommendPublicCourses);
+        return RecommendPublicCourseResponseDto.of(sort, recommendPublicCourses);
 
     }
 
-    public GetPublicCourseByUserResponseDto getPublicCourseByUser(Long userId){
+    public GetPublicCourseByUserResponseDto getPublicCourseByUser(Long userId) {
         List<GetPublicCourseByUserPublicCourse> getPublicCourseByUserPublicCourses = new ArrayList<>();
 
         //1. 받은 userId가 유저가 존재하는지 확인
@@ -201,9 +215,12 @@ public class PublicCourseService {
             PublicCourse publicCourse = course.getPublicCourse();
 
             //4. 각 코스들의 publicCourse와 scrap 여부 파악
-            scraps.forEach(scrap ->
-                    publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
-
+            for(Scrap scrap : scraps){
+                if (scrap.getPublicCourse().equals(publicCourse)) {
+                    publicCourse.setIsScrap(true);
+                    break;
+                }
+            }
             //5. responseDto 만듬
             getPublicCourseByUserPublicCourses.add(
                     GetPublicCourseByUserPublicCourse.of(
@@ -230,7 +247,7 @@ public class PublicCourseService {
         //1. publicCourse가 존재하는지
         PublicCourse publicCourse = publicCourseRepository.findById(publicCourseId)
                 .orElseThrow(() -> new NotFoundException(ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION,
-                ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION.getMessage()));
+                        ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION.getMessage()));
 
         Course course = publicCourse.getCourse();
 
@@ -243,20 +260,25 @@ public class PublicCourseService {
         // 3. 유저가 해당 공개코스 스크랩했는지 여부
         //3.1 유저가 스크랩한 코스들 가져오기
         List<Scrap> scraps = scrapRepository.findAllByUserIdAndScrapTF(userId).get();
-        scraps.forEach(scrap -> publicCourse.setIsScrap(scrap.getPublicCourse().equals(publicCourse)));
+        for(Scrap scrap : scraps){
+            if (scrap.getPublicCourse().equals(publicCourse)) {
+                publicCourse.setIsScrap(true);
+                break;
+            }
+        }
 
         //4. 해당 공개코스가 얼마나 스크랩되었는지 가져오기
         Long scrapCount = scrapRepository.countByPublicCourseAndScrapTFIsTrue(publicCourse);
 
         //5. 삭제된 유저인 경우 처리 user=null일때
         RunnectUser uploader = course.getRunnectUser();
-        if(uploader == null){
+        if (uploader == null) {
             uploader = new RunnectUser("알 수 없음");
         }
         //6. 건물이름이 없는 경우분기처리
-        if(course.getDepartureName()==null){
+        if (course.getDepartureName() == null) {
             return GetPublicCourseDetailResponseDto.of(
-                    uploader.getId(),uploader.getNickname(), uploader.getLevel(), uploader.getLatestStamp().toString(), uploader.equals(user),
+                    uploader.getId(), uploader.getNickname(), uploader.getLevel(), uploader.getLatestStamp().toString(), uploader.equals(user),
                     publicCourse.getId(), course.getId(), publicCourse.getIsScrap(), scrapCount, course.getImage(), publicCourse.getTitle(), publicCourse.getDescription(),
                     CoordinatePathConverter.pathConvertCoor(course.getPath()), course.getDistance(), course.getDepartureRegion(), course.getDepartureCity(), course.getDepartureTown());
         }

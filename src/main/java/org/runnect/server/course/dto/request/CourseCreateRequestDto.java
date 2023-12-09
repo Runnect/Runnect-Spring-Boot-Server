@@ -30,9 +30,6 @@ public class CourseCreateRequestDto {
         @NotBlank(message = "title은 필수 입력 항목입니다.")
         private String title;
 
-        @NotNull(message = "image는 필수 입력 항목입니다.")
-        private MultipartFile image;
-
         @NotNull(message = "distance는 필수 입력 항목입니다.")
         private Float distance;
 

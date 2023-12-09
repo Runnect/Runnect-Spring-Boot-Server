@@ -19,6 +19,7 @@ import org.runnect.server.course.dto.response.UpdateCourseResponseDto;
 import org.runnect.server.course.service.CourseService;
 import org.runnect.server.external.aws.S3Service;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -40,7 +41,7 @@ public class CourseController {
     private final S3Service s3Service;
     private final CourseService courseService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponseDto<CourseCreateResponseDto> createCourse(
         @UserId Long userId,

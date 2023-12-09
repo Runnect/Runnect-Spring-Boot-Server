@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -14,6 +15,7 @@ import org.runnect.server.common.exception.BadRequestException;
 import org.runnect.server.common.exception.BasicException;
 import org.runnect.server.common.constant.ErrorStatus;
 
+@Slf4j
 public class CoordinatePathConverter {
 
     public static LineString coorConvertPath(String path) {
@@ -32,6 +34,8 @@ public class CoordinatePathConverter {
 
             return getLineString(coordinateDtos);
         } catch (Exception e) {
+            log.info("course 요청 데이터 값 (path) -> " + path);
+            log.info("course 요청 데이터 값의 타입 (path) -> " + path.getClass().getName());
             throw new BadRequestException(ErrorStatus.VALIDATION_COURSE_PATH_EXCEPTION, ErrorStatus.VALIDATION_COURSE_PATH_EXCEPTION.getMessage());
         }
     }

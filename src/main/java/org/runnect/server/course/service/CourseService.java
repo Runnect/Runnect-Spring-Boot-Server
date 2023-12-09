@@ -46,19 +46,19 @@ public class CourseService {
             .orElseThrow(() -> new NotFoundUserException(NOT_FOUND_USER_EXCEPTION,
                 NOT_FOUND_USER_EXCEPTION.getMessage()));
 
-        LineString path = CoordinatePathConverter.coorConvertPath(requestDto.getData().getPath());
+        LineString path = CoordinatePathConverter.coorConvertPath(requestDto.getPath());
         DepartureResponse departureResponse = DepartureConverter.requestConvertDeparture(
-            requestDto.getData().getDepartureAddress(), requestDto.getData().getDepartureName());
+            requestDto.getDepartureAddress(), requestDto.getDepartureName());
 
         Course course = Course.builder()
             .runnectUser(user)
-            .title(requestDto.getData().getTitle())
+            .title(requestDto.getTitle())
             .departureRegion(departureResponse.getRegion())
             .departureCity(departureResponse.getCity())
             .departureTown(departureResponse.getTown())
             .departureDetail(departureResponse.getDetail())
             .departureName(departureResponse.getName())
-            .distance(requestDto.getData().getDistance())
+            .distance(requestDto.getDistance())
             .image(image)
             .path(path)
             .build();
@@ -123,7 +123,7 @@ public class CourseService {
     @Transactional
     public UpdateCourseResponseDto updateCourse(Long userId, Long courseId, String title) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(()->new NotFoundException(NOT_FOUND_COURSE_EXCEPTION, NOT_FOUND_COURSE_EXCEPTION.getMessage()));
+            .orElseThrow(()->new NotFoundException(NOT_FOUND_COURSE_EXCEPTION, NOT_FOUND_COURSE_EXCEPTION.getMessage()));
 
         course.updateCourse(title);
 

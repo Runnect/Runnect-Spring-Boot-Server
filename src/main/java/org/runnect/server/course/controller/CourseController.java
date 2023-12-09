@@ -47,6 +47,12 @@ public class CourseController {
         @ModelAttribute @Valid final CourseCreateRequestDto courseCreateRequestDto,
         BindingResult bindingResult
     ) {
+        log.info("create course 요청 값");
+        log.info("departureAddress : " + courseCreateRequestDto.getDepartureAddress());
+        log.info("departureName : " + courseCreateRequestDto.getDepartureName());
+        log.info("path : " + courseCreateRequestDto.getPath());
+        log.info("distance : " + courseCreateRequestDto.getDistance().toString());
+        log.info("image : " + courseCreateRequestDto.getImage().toString());
         if (bindingResult.hasErrors()) {
             throw new BadRequestException(ErrorStatus.REQUEST_VALIDATION_EXCEPTION,
                 bindingResult.getFieldError().getField() + " 필드가 입력되지 않았습니다.");

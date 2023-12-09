@@ -2,6 +2,7 @@ package org.runnect.server.course.controller;
 
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.constant.SuccessStatus;
 import org.runnect.server.common.dto.ApiResponseDto;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/course")
@@ -45,6 +47,13 @@ public class CourseController {
         @ModelAttribute @Valid final CourseCreateRequestDto courseCreateRequestDto,
         BindingResult bindingResult
     ) {
+        log.info("create course 요청 값");
+        log.info(courseCreateRequestDto.getDepartureAddress());
+        log.info(courseCreateRequestDto.getPath());
+        log.info(courseCreateRequestDto.getTitle());
+        log.info(courseCreateRequestDto.getDistance().toString());
+        log.info(courseCreateRequestDto.getDepartureName());
+        log.info(courseCreateRequestDto.getImage().toString());
         if (bindingResult.hasErrors()) {
             throw new BadRequestException(ErrorStatus.REQUEST_VALIDATION_EXCEPTION,
                 bindingResult.getFieldError().getField() + " 필드가 입력되지 않았습니다.");

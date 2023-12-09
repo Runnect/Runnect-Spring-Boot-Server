@@ -46,19 +46,19 @@ public class CourseService {
             .orElseThrow(() -> new NotFoundUserException(NOT_FOUND_USER_EXCEPTION,
                 NOT_FOUND_USER_EXCEPTION.getMessage()));
 
-        LineString path = CoordinatePathConverter.coorConvertPath(requestDto.getPath());
+        LineString path = CoordinatePathConverter.coorConvertPath(requestDto.getData().getPath());
         DepartureResponse departureResponse = DepartureConverter.requestConvertDeparture(
-            requestDto.getDepartureAddress(), requestDto.getDepartureName());
+            requestDto.getData().getDepartureAddress(), requestDto.getData().getDepartureName());
 
         Course course = Course.builder()
             .runnectUser(user)
-            .title(requestDto.getTitle())
+            .title(requestDto.getData().getTitle())
             .departureRegion(departureResponse.getRegion())
             .departureCity(departureResponse.getCity())
             .departureTown(departureResponse.getTown())
             .departureDetail(departureResponse.getDetail())
             .departureName(departureResponse.getName())
-            .distance(requestDto.getDistance())
+            .distance(requestDto.getData().getDistance())
             .image(image)
             .path(path)
             .build();

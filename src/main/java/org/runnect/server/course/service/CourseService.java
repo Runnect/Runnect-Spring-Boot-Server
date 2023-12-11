@@ -12,6 +12,7 @@ import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.common.module.convert.DepartureConverter;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
+import org.runnect.server.course.dto.request.CourseCreateRequestDtoV2;
 import org.runnect.server.course.dto.response.CourseCreateResponseDto;
 import org.runnect.server.course.dto.response.CourseGetByUserResponseDto;
 import org.runnect.server.course.dto.response.CourseResponse;
@@ -47,6 +48,37 @@ public class CourseService {
                 NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         LineString path = CoordinatePathConverter.coorConvertPath(requestDto.getPath());
+        DepartureResponse departureResponse = DepartureConverter.requestConvertDeparture(
+            requestDto.getDepartureAddress(), requestDto.getDepartureName());
+
+        Course course = Course.builder()
+            .runnectUser(user)
+            .title(requestDto.getTitle())
+            .departureRegion(departureResponse.getRegion())
+            .departureCity(departureResponse.getCity())
+            .departureTown(departureResponse.getTown())
+            .departureDetail(departureResponse.getDetail())
+            .departureName(departureResponse.getName())
+            .distance(requestDto.getDistance())
+            .image(image)
+            .path(path)
+            .build();
+
+        Course saved = courseRepository.save(course);
+        user.updateCreatedCourse();
+        userStampService.createStampByUser(user, StampType.c);
+
+        return CourseCreateResponseDto.of(saved.getId(), saved.getCreatedAt());
+    }
+
+    @Transactional
+    public CourseCreateResponseDto createCourseV2(Long userId, CourseCreateRequestDtoV2 requestDto,
+        String image) {
+        RunnectUser user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundUserException(NOT_FOUND_USER_EXCEPTION,
+                NOT_FOUND_USER_EXCEPTION.getMessage()));
+
+        LineString path = CoordinatePathConverter.coorConvertPathV2(requestDto.getPath());
         DepartureResponse departureResponse = DepartureConverter.requestConvertDeparture(
             requestDto.getDepartureAddress(), requestDto.getDepartureName());
 

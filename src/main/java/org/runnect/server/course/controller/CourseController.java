@@ -9,6 +9,7 @@ import org.runnect.server.common.dto.ApiResponseDto;
 import org.runnect.server.common.exception.BadRequestException;
 import org.runnect.server.common.resolver.userId.UserId;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
+import org.runnect.server.course.dto.request.CourseCreateRequestDtoV2;
 import org.runnect.server.course.dto.request.DeleteCoursesRequestDto;
 import org.runnect.server.course.dto.request.UpdateCourseRequestDto;
 import org.runnect.server.course.dto.response.CourseCreateResponseDto;
@@ -29,8 +30,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -62,6 +65,25 @@ public class CourseController {
         return ApiResponseDto.success(SuccessStatus.CREATE_COURSE_SUCCESS,
             courseService.createCourse(userId, courseCreateRequestDto, imageUrl));
     }
+
+    @PostMapping(value = "/v2", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponseDto<CourseCreateResponseDto> createCourseV2(
+        @UserId Long userId,
+        @RequestPart @Valid final CourseCreateRequestDtoV2 courseCreateRequestDto,
+        @RequestPart final MultipartFile image
+    ) {
+        log.info("create course 요청 값");
+        log.info("departureAddress : " + courseCreateRequestDto.getDepartureAddress());
+        log.info("departureName : " + courseCreateRequestDto.getDepartureName());
+        log.info("path : " + courseCreateRequestDto.getPath());
+        log.info("distance : " + courseCreateRequestDto.getDistance().toString());
+
+        String imageUrl = s3Service.uploadImage(image, "course");
+        return ApiResponseDto.success(SuccessStatus.CREATE_COURSE_SUCCESS,
+            courseService.createCourseV2(userId, courseCreateRequestDto, imageUrl));
+    }
+
 
     @GetMapping("/user")
     @ResponseStatus(HttpStatus.OK)

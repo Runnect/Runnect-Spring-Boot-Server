@@ -30,8 +30,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -64,32 +66,20 @@ public class CourseController {
             courseService.createCourse(userId, courseCreateRequestDto, imageUrl));
     }
 
-    @PostMapping(value = "/v2", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/v2", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponseDto<CourseCreateResponseDto> createCourseV2(
         @UserId Long userId,
-        @ModelAttribute @Valid final CourseCreateRequestDtoV2 courseCreateRequestDto,
-        BindingResult bindingResult
+        @RequestPart @Valid final CourseCreateRequestDtoV2 courseCreateRequestDto,
+        @RequestPart final MultipartFile image
     ) {
         log.info("create course 요청 값");
         log.info("departureAddress : " + courseCreateRequestDto.getDepartureAddress());
         log.info("departureName : " + courseCreateRequestDto.getDepartureName());
         log.info("path : " + courseCreateRequestDto.getPath());
         log.info("distance : " + courseCreateRequestDto.getDistance().toString());
-        log.info("image : " + courseCreateRequestDto.getImage().toString());
-        if (bindingResult.hasErrors()) {
 
-//            List<Double> as = new ArrayList<>();
-//            as.add(23.0);
-//            as.add(11.3);
-//            List<List<Double>> asd = new ArrayList<>();
-//            asd.add(as);
-//            System.out.println(asd.toString());
-
-            throw new BadRequestException(ErrorStatus.REQUEST_VALIDATION_EXCEPTION,
-                bindingResult.getFieldError().getField() + " 필드가 입력되지 않았습니다.");
-        }
-        String imageUrl = s3Service.uploadImage(courseCreateRequestDto.getImage(), "course");
+        String imageUrl = s3Service.uploadImage(image, "course");
         return ApiResponseDto.success(SuccessStatus.CREATE_COURSE_SUCCESS,
             courseService.createCourseV2(userId, courseCreateRequestDto, imageUrl));
     }

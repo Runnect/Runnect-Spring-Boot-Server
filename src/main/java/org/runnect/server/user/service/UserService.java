@@ -72,7 +72,7 @@ public class UserService {
             .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
                 ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
-        List<PublicCourse> publicCourses = courseRepository.findCoursesByRunnectUserAndIsPrivateIsTrue(profileUser)
+        List<PublicCourse> publicCourses = courseRepository.findCoursesForUserProfile(profileUser)
                 .stream().map(course -> course.getPublicCourse()).collect(Collectors.toList());
 
         List<PublicCourseResponse> publicCourseResponses = publicCourses.stream()

@@ -7,16 +7,15 @@ import org.runnect.server.auth.service.AppleSignInService;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.UnauthorizedException;
 import org.runnect.server.course.repository.CourseRepository;
-import org.runnect.server.user.dto.request.UpdateUserNicknameRequestDto;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.scrap.repository.ScrapRepository;
+import org.runnect.server.user.dto.request.UpdateUserNicknameRequestDto;
+import org.runnect.server.user.dto.response.DeleteUserResponseDto;
 import org.runnect.server.user.dto.response.MyPageResponseDto;
 import org.runnect.server.user.dto.response.UpdateUserNicknameResponseDto;
 import org.runnect.server.user.dto.response.UserProfileResponseDto;
 import org.runnect.server.user.dto.response.UserProfileResponseDto.PublicCourseResponse;
 import org.runnect.server.user.dto.response.UserProfileResponseDto.UserProfile;
-import org.runnect.server.user.dto.response.DeleteUserResponseDto;
-
 import org.runnect.server.user.entity.RunnectUser;
 import org.runnect.server.user.entity.SocialType;
 import org.runnect.server.user.exception.userException.DuplicateNicknameException;
@@ -72,13 +71,15 @@ public class UserService {
             .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
                 ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
+        List<Long> scrappedPublicCourseIds = scrapRepository.getScrappedTruePublicCourseIds(requestUser);
+
         List<PublicCourse> publicCourses = courseRepository.findCoursesForUserProfile(profileUser)
                 .stream().map(course -> course.getPublicCourse()).collect(Collectors.toList());
 
         List<PublicCourseResponse> publicCourseResponses = publicCourses.stream()
             .map(publicCourse ->
                 PublicCourseResponse.of(publicCourse, publicCourse.getCourse(),
-                    scrapRepository.existsByPublicCourseAndRunnectUser(publicCourse, requestUser)))
+                    scrappedPublicCourseIds.contains(publicCourse.getId())))
             .collect(Collectors.toList());
 
         return UserProfileResponseDto.of(userProfile, publicCourseResponses);

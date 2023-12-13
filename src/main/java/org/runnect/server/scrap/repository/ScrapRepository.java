@@ -25,6 +25,9 @@ public interface ScrapRepository extends Repository<Scrap, Long> {
 
     Boolean existsByPublicCourseAndRunnectUser(PublicCourse publicCourse, RunnectUser runnectUser);
 
+    @Query("select s.publicCourse.id from Scrap s where s.runnectUser = :runnectUser and s.scrapTF = true")
+    List<Long> getScrappedTruePublicCourseIds(@Param("runnectUser") RunnectUser runnectUser);
+
     // DELETE
     Long deleteByPublicCourseIn(Collection<PublicCourse> publicCourses);
 

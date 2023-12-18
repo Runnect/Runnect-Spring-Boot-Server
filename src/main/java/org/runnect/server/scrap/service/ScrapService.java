@@ -29,7 +29,7 @@ public class ScrapService {
     private final UserStampService userStampService;
 
     @Transactional
-    public CreateAndDeleteScrapDto createAndDeleteScrap(Long userId, CreateAndDeleteScrapRequestDto request) {
+    public CreateAndDeleteScrapResponseDto createAndDeleteScrap(Long userId, CreateAndDeleteScrapRequestDto request) {
         Scrap scrap = scrapRepository.findByUserIdAndPublicCourseId(userId, request.getPublicCourseId()).orElse(null);
         RunnectUser user = userRepository.findById(userId).orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION, ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
         PublicCourse publicCourse = publicCourseRepository.findById(request.getPublicCourseId())
@@ -61,7 +61,7 @@ public class ScrapService {
         // 해당 public course의 전체 스크랩 개수
         Long scrapCount = scrapRepository.countByPublicCourseAndScrapTFIsTrue(publicCourse);
 
-        return CreateAndDeleteScrapDto.of(scrapCount);
+        return CreateAndDeleteScrapResponseDto.of(scrapCount);
     }
 
     public GetScrapCourseResponseDto getScrapCourseByUser(Long userId) {

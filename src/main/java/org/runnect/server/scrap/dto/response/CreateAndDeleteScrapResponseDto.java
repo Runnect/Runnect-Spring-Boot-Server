@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class CreateAndDeleteScrapDto {
+public class CreateAndDeleteScrapResponseDto {
     private Long scrapCount;
 
-    public static CreateAndDeleteScrapDto of (Long scrapCount) {
-        return new CreateAndDeleteScrapDto(scrapCount);
+    public static CreateAndDeleteScrapResponseDto of (Long scrapCount) {
+        return new CreateAndDeleteScrapResponseDto(scrapCount);
     }
 }

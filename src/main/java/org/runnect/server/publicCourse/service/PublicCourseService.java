@@ -267,8 +267,6 @@ public class PublicCourseService {
             }
         }
 
-        //4. 해당 공개코스가 얼마나 스크랩되었는지 가져오기
-        Long scrapCount = scrapRepository.countByPublicCourseAndScrapTFIsTrue(publicCourse);
 
         //5. 삭제된 유저인 경우 처리 user=null일때
         RunnectUser uploader = course.getRunnectUser();
@@ -279,13 +277,13 @@ public class PublicCourseService {
         if (course.getDepartureName() == null) {
             return GetPublicCourseDetailResponseDto.of(
                     uploader.getId(), uploader.getNickname(), uploader.getLevel(), uploader.getLatestStamp().toString(), uploader.equals(user),
-                    publicCourse.getId(), course.getId(), publicCourse.getIsScrap(), scrapCount, course.getImage(), publicCourse.getTitle(), publicCourse.getDescription(),
+                    publicCourse.getId(), course.getId(), publicCourse.getIsScrap(), publicCourse.getScrapCount(), course.getImage(), publicCourse.getTitle(), publicCourse.getDescription(),
                     CoordinatePathConverter.pathConvertCoor(course.getPath()), course.getDistance(), course.getDepartureRegion(), course.getDepartureCity(), course.getDepartureTown());
         }
 
         return GetPublicCourseDetailResponseDto.of(
                 uploader.getId(), uploader.getNickname(), uploader.getLevel(), uploader.getLatestStamp().toString(), uploader.equals(user),
-                publicCourse.getId(), course.getId(), publicCourse.getIsScrap(), scrapCount, course.getImage(), publicCourse.getTitle(), publicCourse.getDescription(),
+                publicCourse.getId(), course.getId(), publicCourse.getIsScrap(), publicCourse.getScrapCount(), course.getImage(), publicCourse.getTitle(), publicCourse.getDescription(),
                 CoordinatePathConverter.pathConvertCoor(course.getPath()), course.getDistance(), course.getDepartureRegion(), course.getDepartureCity(), course.getDepartureTown(), course.getDepartureName());
 
 

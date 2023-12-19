@@ -17,7 +17,7 @@ public class GetPublicCourseDetailResponseDto {
     private GetPublicCourseDetailPublicCourse publicCourse;
 
     public static GetPublicCourseDetailResponseDto of(Long id, String nickname, int level, String userImage, Boolean isNowUser,
-                                                      Long publicCourseId, Long courseId, Boolean isScrap, Integer scrapCount,
+                                                      Long publicCourseId, Long courseId, Boolean isScrap, Long scrapCount,
                                                       String courseImage, String title, String description, List<List<Double>> path,
                                                       Float distance, String region, String city, String town, String name) {
         return new GetPublicCourseDetailResponseDto(
@@ -26,7 +26,7 @@ public class GetPublicCourseDetailResponseDto {
     }
 
     public static GetPublicCourseDetailResponseDto of(Long id, String nickname, int level, String userImage, Boolean isNowUser,
-                                                      Long publicCourseId, Long courseId, Boolean isScrap, Integer scrapCount,
+                                                      Long publicCourseId, Long courseId, Boolean isScrap, Long scrapCount,
                                                       String courseImage, String title, String description, List<List<Double>> path,
                                                       Float distance, String region, String city, String town) {
         return new GetPublicCourseDetailResponseDto(
@@ -59,7 +59,7 @@ public class GetPublicCourseDetailResponseDto {
         private Long id;
         private Long courseId;
         private Boolean scrap;
-        private Integer scrapCount;
+        private Long scrapCount;
         private String image;
         private String title;
         private String description;
@@ -69,7 +69,7 @@ public class GetPublicCourseDetailResponseDto {
 
 
         public static GetPublicCourseDetailResponseDto.GetPublicCourseDetailPublicCourse from(Long publicCourseId, Long courseId,
-                                                                                              Boolean scrap, Integer scrapCount,
+                                                                                              Boolean scrap, Long scrapCount,
                                                                                               String courseImage, String title,
                                                                                               String description, List<List<Double>> path,
                                                                                               Float distance, String region,
@@ -81,7 +81,7 @@ public class GetPublicCourseDetailResponseDto {
         }
 
         public static GetPublicCourseDetailResponseDto.GetPublicCourseDetailPublicCourse from(Long publicCourseId, Long courseId,
-                                                                                              Boolean scrap, Integer scrapCount,
+                                                                                              Boolean scrap, Long scrapCount,
                                                                                               String courseImage, String title,
                                                                                               String description, List<List<Double>> path,
                                                                                               Float distance, String region,

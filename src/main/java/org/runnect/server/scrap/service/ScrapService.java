@@ -8,10 +8,7 @@ import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.scrap.dto.request.CreateAndDeleteScrapRequestDto;
-import org.runnect.server.scrap.dto.response.DepartureResponse;
-import org.runnect.server.scrap.dto.response.GetScrapCourseResponseDto;
-import org.runnect.server.scrap.dto.response.ScrapResponse;
-import org.runnect.server.scrap.dto.response.UserResponse;
+import org.runnect.server.scrap.dto.response.*;
 import org.runnect.server.scrap.entity.Scrap;
 import org.runnect.server.scrap.repository.ScrapRepository;
 import org.runnect.server.user.entity.RunnectUser;
@@ -32,15 +29,15 @@ public class ScrapService {
     private final UserStampService userStampService;
 
     @Transactional
-    public void createAndDeleteScrap(Long userId, CreateAndDeleteScrapRequestDto request) {
+    public CreateAndDeleteScrapResponseDto createAndDeleteScrap(Long userId, CreateAndDeleteScrapRequestDto request) {
         Scrap scrap = scrapRepository.findByUserIdAndPublicCourseId(userId, request.getPublicCourseId()).orElse(null);
         RunnectUser user = userRepository.findById(userId).orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION, ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
+        PublicCourse publicCourse = publicCourseRepository.findById(request.getPublicCourseId())
+                .orElseThrow(() -> new NotFoundException(ErrorStatus.NOT_FOUND_PUBLICCOURSE_EXCEPTION, ErrorStatus.NOT_FOUND_PUBLICCOURSE_EXCEPTION.getMessage()));
         // 스크랩 생성
         if (request.getScrapTF() == true) {
             if (scrap == null) {
                 // 기존 스크랩한 내역이 없을 때
-                PublicCourse publicCourse = publicCourseRepository.findById(request.getPublicCourseId())
-                        .orElseThrow(() -> new NotFoundException(ErrorStatus.NOT_FOUND_PUBLICCOURSE_EXCEPTION, ErrorStatus.NOT_FOUND_PUBLICCOURSE_EXCEPTION.getMessage()));
                 Scrap newScrap = Scrap.builder()
                         .scrapTF(true)
                         .publicCourse(publicCourse)
@@ -60,6 +57,11 @@ public class ScrapService {
         else {
             scrap.updateScrapTF(false);
         }
+
+        // 해당 public course의 전체 스크랩 개수
+        Long scrapCount = scrapRepository.countByPublicCourseAndScrapTFIsTrue(publicCourse);
+
+        return CreateAndDeleteScrapResponseDto.of(scrapCount);
     }
 
     public GetScrapCourseResponseDto getScrapCourseByUser(Long userId) {

@@ -21,12 +21,10 @@ public class ScrapController {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto createAndDeleteScrap(@UserId Long userId, @RequestBody @Valid final CreateAndDeleteScrapRequestDto request) {
 
-        scrapService.createAndDeleteScrap(userId, request);
-
         if (request.getScrapTF() == true) {
-            return ApiResponseDto.success(SuccessStatus.CREATE_SCRAP_SUCCESS);
+            return ApiResponseDto.success(SuccessStatus.CREATE_SCRAP_SUCCESS, scrapService.createAndDeleteScrap(userId, request));
         }
-        return ApiResponseDto.success(SuccessStatus.DELETE_SCRAP_SUCCESS);
+        return ApiResponseDto.success(SuccessStatus.DELETE_SCRAP_SUCCESS, scrapService.createAndDeleteScrap(userId, request));
     }
 
     @GetMapping("scrap/user")

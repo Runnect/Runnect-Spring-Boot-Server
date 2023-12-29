@@ -1,7 +1,5 @@
 package org.runnect.server.common.module.convert;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -16,31 +14,9 @@ import org.runnect.server.common.exception.BasicException;
 @Slf4j
 public class CoordinatePathConverter {
 
-    public static LineString coorConvertPathV2(List<CoordinateDto> path) {
+    public static LineString coorConvertPath(List<CoordinateDto> path) {
         try {
             return getLineString(path);
-        } catch (Exception e) {
-            log.warn("course 요청 데이터 값 (path) -> " + path);
-            log.warn("course 요청 데이터 값의 타입 (path) -> " + path.getClass().getName());
-            throw new BadRequestException(ErrorStatus.VALIDATION_COURSE_PATH_EXCEPTION, ErrorStatus.VALIDATION_COURSE_PATH_EXCEPTION.getMessage());
-        }
-    }
-
-    public static LineString coorConvertPath(String path) {
-
-        List<CoordinateDto> coordinateDtos = new ArrayList<>();
-
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(path);
-
-            for (JsonNode node : jsonNode) {
-                Double latitude = node.get("lat").asDouble();
-                Double longitude = node.get("long").asDouble();
-                coordinateDtos.add(new CoordinateDto(latitude, longitude));
-            }
-
-            return getLineString(coordinateDtos);
         } catch (Exception e) {
             log.warn("course 요청 데이터 값 (path) -> " + path);
             log.warn("course 요청 데이터 값의 타입 (path) -> " + path.getClass().getName());

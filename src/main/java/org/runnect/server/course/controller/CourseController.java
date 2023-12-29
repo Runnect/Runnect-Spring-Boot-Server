@@ -3,13 +3,10 @@ package org.runnect.server.course.controller;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.constant.SuccessStatus;
 import org.runnect.server.common.dto.ApiResponseDto;
-import org.runnect.server.common.exception.BadRequestException;
 import org.runnect.server.common.resolver.userId.UserId;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
-import org.runnect.server.course.dto.request.CourseCreateRequestDtoV2;
 import org.runnect.server.course.dto.request.DeleteCoursesRequestDto;
 import org.runnect.server.course.dto.request.UpdateCourseRequestDto;
 import org.runnect.server.course.dto.response.CourseCreateResponseDto;
@@ -21,9 +18,7 @@ import org.runnect.server.course.service.CourseService;
 import org.runnect.server.external.aws.S3Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,46 +39,17 @@ public class CourseController {
     private final S3Service s3Service;
     private final CourseService courseService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponseDto<CourseCreateResponseDto> createCourse(
         @UserId Long userId,
-        @ModelAttribute @Valid final CourseCreateRequestDto courseCreateRequestDto,
-        BindingResult bindingResult
-    ) {
-        log.info("create course 요청 값");
-        log.info("departureAddress : " + courseCreateRequestDto.getDepartureAddress());
-        log.info("departureName : " + courseCreateRequestDto.getDepartureName());
-        log.info("path : " + courseCreateRequestDto.getPath());
-        log.info("distance : " + courseCreateRequestDto.getDistance().toString());
-        log.info("image : " + courseCreateRequestDto.getImage().toString());
-        if (bindingResult.hasErrors()) {
-            throw new BadRequestException(ErrorStatus.REQUEST_VALIDATION_EXCEPTION,
-                bindingResult.getFieldError().getField() + " 필드가 입력되지 않았습니다.");
-        }
-        String imageUrl = s3Service.uploadImage(courseCreateRequestDto.getImage(), "course");
-        return ApiResponseDto.success(SuccessStatus.CREATE_COURSE_SUCCESS,
-            courseService.createCourse(userId, courseCreateRequestDto, imageUrl));
-    }
-
-    @PostMapping(value = "/v2", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponseDto<CourseCreateResponseDto> createCourseV2(
-        @UserId Long userId,
-        @RequestPart @Valid final CourseCreateRequestDtoV2 courseCreateRequestDto,
+        @RequestPart @Valid final CourseCreateRequestDto data,
         @RequestPart final MultipartFile image
     ) {
-        log.info("create course 요청 값");
-        log.info("departureAddress : " + courseCreateRequestDto.getDepartureAddress());
-        log.info("departureName : " + courseCreateRequestDto.getDepartureName());
-        log.info("path : " + courseCreateRequestDto.getPath());
-        log.info("distance : " + courseCreateRequestDto.getDistance().toString());
-
         String imageUrl = s3Service.uploadImage(image, "course");
         return ApiResponseDto.success(SuccessStatus.CREATE_COURSE_SUCCESS,
-            courseService.createCourseV2(userId, courseCreateRequestDto, imageUrl));
+            courseService.createCourse(userId, data, imageUrl));
     }
-
 
     @GetMapping("/user")
     @ResponseStatus(HttpStatus.OK)

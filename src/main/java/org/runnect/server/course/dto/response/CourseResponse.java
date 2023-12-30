@@ -15,12 +15,13 @@ public class CourseResponse {
     private Long id;
     private String image;
     private LocalDateTime createdAt;
+    private Float distance;
     private String title;
     private DepartureResponse departure;
 
-    public static CourseResponse of(Long id, String image, LocalDateTime createdAt, String title,
-        DepartureResponse departure) {
-        return new CourseResponse(id, image, createdAt, title, departure);
+    public static CourseResponse of(Long id, String image, LocalDateTime createdAt, Float distance,
+        String title, DepartureResponse departure) {
+        return new CourseResponse(id, image, createdAt, distance, title, departure);
     }
 
 }

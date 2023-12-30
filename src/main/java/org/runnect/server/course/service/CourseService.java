@@ -83,6 +83,7 @@ public class CourseService {
                 course.getId(),
                 course.getImage(),
                 course.getCreatedAt(),
+                course.getDistance(),
                 course.getTitle(),
                 DepartureResponse.from(course)
             )).collect(Collectors.toList());
@@ -103,6 +104,7 @@ public class CourseService {
                 course.getId(),
                 course.getImage(),
                 course.getCreatedAt(),
+                course.getDistance(),
                 course.getTitle(),
                 DepartureResponse.from(course)
             )).collect(Collectors.toList());

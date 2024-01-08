@@ -61,7 +61,7 @@ public class ScrapService {
         // 해당 public course의 전체 스크랩 개수
         Long scrapCount = scrapRepository.countByPublicCourseAndScrapTFIsTrue(publicCourse);
 
-        return CreateAndDeleteScrapResponseDto.of(scrapCount);
+        return CreateAndDeleteScrapResponseDto.of(request.getPublicCourseId(), scrapCount, request.getScrapTF());
     }
 
     public GetScrapCourseResponseDto getScrapCourseByUser(Long userId) {

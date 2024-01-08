@@ -9,9 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateAndDeleteScrapResponseDto {
-    private Long scrapCount;
 
-    public static CreateAndDeleteScrapResponseDto of (Long scrapCount) {
-        return new CreateAndDeleteScrapResponseDto(scrapCount);
+    private Long publicCourseId;
+    private Long scrapCount;
+    private Boolean scrapTF;
+
+    public static CreateAndDeleteScrapResponseDto of (Long publicCourseId, Long scrapCount, Boolean scrapTF) {
+        return new CreateAndDeleteScrapResponseDto(publicCourseId, scrapCount, scrapTF);
     }
 }

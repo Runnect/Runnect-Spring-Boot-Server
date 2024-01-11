@@ -161,12 +161,12 @@ public class PublicCourseService {
         //3. page, sort 에 따라 데이터 가져오기
         List<RecommendPublicCourse> recommendPublicCourses = new ArrayList<>();
         Page<PublicCourse> publicCourses = null;
-        if (SortStatus.SCRAP_DESC.getVlaue().equals(sort)) {
+        if (SortStatus.SCRAP_DESC.getValue().equals(sort)) {
             publicCourses = publicCourseRepository.findAll(
                     PageRequest.of(pageNo - 1, PAGE_SIZE,
                             Sort.by(Sort.Direction.DESC, SortStatus.SCRAP_DESC.getProperty())));
 
-        } else if (SortStatus.DATE_DESC.getVlaue().equals(sort)) {
+        } else if (SortStatus.DATE_DESC.getValue().equals(sort)) {
             publicCourses = publicCourseRepository.findAll(
                     PageRequest.of(pageNo - 1, PAGE_SIZE,
                             Sort.by(Sort.Direction.DESC, SortStatus.DATE_DESC.getProperty())));

@@ -42,7 +42,7 @@ public class SortStatusIdResolver implements HandlerMethodArgumentResolver{
         }
 
         if(!Arrays.stream(SortStatus.values())
-                .map(sortStatus -> sortStatus.getVlaue())
+                .map(sortStatus -> sortStatus.getValue())
                 .collect(Collectors.toList())
                 .contains(splitQuery.get("sort").get(0))){
             throw new BadRequestException(ErrorStatus.INVALID_SORT_PARAMETER_EXCEPTION,ErrorStatus.INVALID_SORT_PARAMETER_EXCEPTION.getMessage());

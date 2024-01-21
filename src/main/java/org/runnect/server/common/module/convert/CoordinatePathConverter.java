@@ -1,37 +1,25 @@
 package org.runnect.server.common.module.convert;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.PrecisionModel;
+import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.BadRequestException;
 import org.runnect.server.common.exception.BasicException;
-import org.runnect.server.common.constant.ErrorStatus;
 
+@Slf4j
 public class CoordinatePathConverter {
 
-    public static LineString coorConvertPath(String path) {
-
-        List<CoordinateDto> coordinateDtos = new ArrayList<>();
-
+    public static LineString coorConvertPath(List<CoordinateDto> path) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(path);
-
-            for (JsonNode node : jsonNode) {
-                Double latitude = node.get("lat").asDouble();
-                Double longitude = node.get("long").asDouble();
-                coordinateDtos.add(new CoordinateDto(latitude, longitude));
-            }
-
-            return getLineString(coordinateDtos);
+            return getLineString(path);
         } catch (Exception e) {
+            log.warn("course 요청 데이터 값 (path) -> " + path);
+            log.warn("course 요청 데이터 값의 타입 (path) -> " + path.getClass().getName());
             throw new BadRequestException(ErrorStatus.VALIDATION_COURSE_PATH_EXCEPTION, ErrorStatus.VALIDATION_COURSE_PATH_EXCEPTION.getMessage());
         }
     }
@@ -63,13 +51,4 @@ public class CoordinatePathConverter {
         LineString lineString = geometryFactory.createLineString(coordinates);
         return lineString;
     }
-
-    @Getter
-    @AllArgsConstructor
-    private static class CoordinateDto {
-        private double latitude;
-        private double longitude;
-    }
-
 }
-

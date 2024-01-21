@@ -26,6 +26,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final GoogleSignInService googleSignInService;
     private final AppleSignInService appleSignInService;
+    private final KakaoSignInService kakaoSignInService;
     private final JwtService jwtService;
     private final RedisService redisService;
 
@@ -41,7 +42,7 @@ public class AuthService {
         if (jwtService.verifyToken(refreshToken) == TokenStatus.TOKEN_EXPIRED) {
             throw new TimeExpiredRefreshTokenException(ErrorStatus.REFRESH_TOKEN_TIME_EXPIRED_EXCEPTION, ErrorStatus.REFRESH_TOKEN_TIME_EXPIRED_EXCEPTION.getMessage());
         } else if (jwtService.verifyToken(refreshToken) == TokenStatus.TOKEN_INVALID) {
-            throw new InvalidRefreshTokenException(ErrorStatus.INVALID_ACCESS_TOKEN_EXCEPTION, ErrorStatus.INVALID_ACCESS_TOKEN_EXCEPTION.getMessage());
+            throw new InvalidRefreshTokenException(ErrorStatus.INVALID_REFRESH_TOKEN_EXCEPTION, ErrorStatus.INVALID_REFRESH_TOKEN_EXCEPTION.getMessage());
         }
 
 
@@ -53,7 +54,7 @@ public class AuthService {
             final long userId =  Long.parseLong(tokenContents);
             if(redisService.getValuesByKey(String.valueOf(userId)).isBlank()){
                 //탈취된 refreshToken인 경우
-                throw new InvalidRefreshTokenException(ErrorStatus.INVALID_ACCESS_TOKEN_EXCEPTION, ErrorStatus.INVALID_ACCESS_TOKEN_EXCEPTION.getMessage());
+                throw new InvalidRefreshTokenException(ErrorStatus.INVALID_REFRESH_TOKEN_EXCEPTION, ErrorStatus.INVALID_REFRESH_TOKEN_EXCEPTION.getMessage());
             }
             RunnectUser user = userRepository.findById(userId)
                     .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION, ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
@@ -64,8 +65,10 @@ public class AuthService {
 
             return GetNewTokenResponseDto.of(newAccessToken,refreshToken);
 
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException e ) {
             throw new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION, ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage());
+        } catch(NullPointerException e){
+            throw new InvalidRefreshTokenException(ErrorStatus.INVALID_REFRESH_TOKEN_EXCEPTION, ErrorStatus.INVALID_REFRESH_TOKEN_EXCEPTION.getMessage());
         }
 
     }
@@ -116,7 +119,7 @@ public class AuthService {
                 socialInfoResponseDto = appleSignInService.getSocialInfo(socialAccessToken);
                 break;
             case KAKAO:
-                //카카오 소셜정보 해독
+                socialInfoResponseDto = kakaoSignInService.getSocialInfo(socialAccessToken);
                 break;
         }
 

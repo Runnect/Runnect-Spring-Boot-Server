@@ -2,10 +2,10 @@ package org.runnect.server.course.controller;
 
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.runnect.server.common.constant.ErrorStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.runnect.server.common.constant.SuccessStatus;
 import org.runnect.server.common.dto.ApiResponseDto;
-import org.runnect.server.common.exception.BadRequestException;
+import org.runnect.server.common.resolver.userId.UserId;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
 import org.runnect.server.course.dto.request.DeleteCoursesRequestDto;
 import org.runnect.server.course.dto.request.UpdateCourseRequestDto;
@@ -17,19 +17,20 @@ import org.runnect.server.course.dto.response.UpdateCourseResponseDto;
 import org.runnect.server.course.service.CourseService;
 import org.runnect.server.external.aws.S3Service;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/course")
@@ -38,25 +39,21 @@ public class CourseController {
     private final S3Service s3Service;
     private final CourseService courseService;
 
-    @PostMapping
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponseDto<CourseCreateResponseDto> createCourse(
-        @RequestHeader Long userId,
-        @ModelAttribute @Valid final CourseCreateRequestDto courseCreateRequestDto,
-        BindingResult bindingResult
+        @UserId Long userId,
+        @RequestPart @Valid final CourseCreateRequestDto data,
+        @RequestPart final MultipartFile image
     ) {
-        if (bindingResult.hasErrors()) {
-            throw new BadRequestException(ErrorStatus.REQUEST_VALIDATION_EXCEPTION,
-                bindingResult.getFieldError().getField() + " 필드가 입력되지 않았습니다.");
-        }
-        String imageUrl = s3Service.uploadImage(courseCreateRequestDto.getImage(), "course");
+        String imageUrl = s3Service.uploadImage(image, "course");
         return ApiResponseDto.success(SuccessStatus.CREATE_COURSE_SUCCESS,
-            courseService.createCourse(userId, courseCreateRequestDto, imageUrl));
+            courseService.createCourse(userId, data, imageUrl));
     }
 
     @GetMapping("/user")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponseDto<CourseGetByUserResponseDto> getCourseByUser(@RequestHeader Long userId) {
+    public ApiResponseDto<CourseGetByUserResponseDto> getCourseByUser(@UserId Long userId) {
         return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER_SUCCESS,
             courseService.getCourseByUser(userId));
     }
@@ -64,14 +61,14 @@ public class CourseController {
     @GetMapping("/private/user")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<CourseGetByUserResponseDto> getPrivateCourseByUser(
-        @RequestHeader Long userId) {
+        @UserId Long userId) {
         return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER_SUCCESS,
             courseService.getPrivateCourseByUser(userId));
     }
 
     @GetMapping("/detail/{courseId}")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponseDto<GetCourseDetailResponseDto> getCourseDetail(@RequestHeader Long userId,
+    public ApiResponseDto<GetCourseDetailResponseDto> getCourseDetail(@UserId Long userId,
         @PathVariable Long courseId) {
         return ApiResponseDto.success(SuccessStatus.GET_COURSE_DETAIL_SUCCESS,
             courseService.getCourseDetail(courseId));
@@ -79,7 +76,7 @@ public class CourseController {
 
     @PatchMapping("/{courseId}")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponseDto<UpdateCourseResponseDto> updateCourse(@RequestHeader Long userId,
+    public ApiResponseDto<UpdateCourseResponseDto> updateCourse(@UserId Long userId,
         @PathVariable(name = "courseId") Long courseId,
         @RequestBody @Valid final UpdateCourseRequestDto request) {
         return ApiResponseDto.success(SuccessStatus.UPDATE_COURSE_SUCCESS,
@@ -89,7 +86,7 @@ public class CourseController {
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseDto<DeleteCoursesResponseDto> deleteCourses(
-        @RequestHeader Long userId,
+        @UserId Long userId,
         @Valid @RequestBody final DeleteCoursesRequestDto deleteCoursesRequestDto
     ) {
         return ApiResponseDto.success(SuccessStatus.DELETE_COURSES_SUCCESS,

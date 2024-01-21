@@ -11,6 +11,6 @@ public enum SortStatus {
     SCRAP_DESC("scrap","scrapCount"),
     DATE_DESC("date","createdAt");
 
-    private final String vlaue;
+    private final String value;
     private final String property;
 }

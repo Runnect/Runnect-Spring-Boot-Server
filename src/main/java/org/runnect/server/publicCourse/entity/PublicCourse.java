@@ -25,8 +25,6 @@ public class PublicCourse extends AuditingTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
@@ -42,7 +40,7 @@ public class PublicCourse extends AuditingTimeEntity {
     private List<Record> records = new ArrayList<>();
 
     @Formula("(select count(*) from Scrap where Scrap.public_course_id=id and Scrap.scraptf=true)")
-    private Integer scrapCount;
+    private Long scrapCount;
 
     @Transient
     private Boolean isScrap=false; //현재 사용자가 스크랩한지 아닌지 여부

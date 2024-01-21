@@ -65,7 +65,7 @@ public class CourseService {
 
         Course saved = courseRepository.save(course);
         user.updateCreatedCourse();
-        userStampService.createStampByUser(user, StampType.C);
+        userStampService.createStampByUser(user, StampType.c);
 
         return CourseCreateResponseDto.of(saved.getId(), saved.getCreatedAt());
     }
@@ -83,6 +83,7 @@ public class CourseService {
                 course.getId(),
                 course.getImage(),
                 course.getCreatedAt(),
+                course.getDistance(),
                 course.getTitle(),
                 DepartureResponse.from(course)
             )).collect(Collectors.toList());
@@ -103,6 +104,7 @@ public class CourseService {
                 course.getId(),
                 course.getImage(),
                 course.getCreatedAt(),
+                course.getDistance(),
                 course.getTitle(),
                 DepartureResponse.from(course)
             )).collect(Collectors.toList());
@@ -123,7 +125,7 @@ public class CourseService {
     @Transactional
     public UpdateCourseResponseDto updateCourse(Long userId, Long courseId, String title) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(()->new NotFoundException(NOT_FOUND_COURSE_EXCEPTION, NOT_FOUND_COURSE_EXCEPTION.getMessage()));
+            .orElseThrow(()->new NotFoundException(NOT_FOUND_COURSE_EXCEPTION, NOT_FOUND_COURSE_EXCEPTION.getMessage()));
 
         course.updateCourse(title);
 

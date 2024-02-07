@@ -79,6 +79,8 @@ public class AuthService {
     public AuthResponseDto signIn(SignInRequestDto signInRequestDto) {
         SocialType socialType = SocialType.valueOf(signInRequestDto.getProvider());
 
+        System.out.println("타입은? "+ socialType);
+
         SocialInfoResponseDto socialInfo = getSocialInfo(socialType, signInRequestDto.getToken());
 
         boolean isRegistered = userRepository.existsByEmailAndProvider(socialInfo.getEmail(), socialType);

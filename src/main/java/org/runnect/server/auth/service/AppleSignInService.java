@@ -78,10 +78,11 @@ public class AppleSignInService {
             }
 
 
-            // 발급처, aud,이메일 검증 실패시
+
+            Boolean emailVerified = (Boolean) claimsSet.getClaim("email_verified");
             if (!claimsSet.getIssuer().equals(APPLE_ISSUE_URL) ||
                     !claimsSet.getAudience().get(0).equals(APPLE_BUNDLE_ID) ||
-                    !Boolean.parseBoolean(claimsSet.getStringClaim("email_verified"))) {
+                    emailVerified == null || !emailVerified) {
                 throw new UnauthorizedException(ErrorStatus.INVALID_APPLE_ID_TOKEN_EXCEPTION,
                         ErrorStatus.INVALID_APPLE_ID_TOKEN_EXCEPTION.getMessage());
 

@@ -113,13 +113,17 @@ public class CourseService {
     }
 
     @Transactional(readOnly = true)
-    public GetCourseDetailResponseDto getCourseDetail(Long courseId) {
+    public GetCourseDetailResponseDto getCourseDetail(Long courseId, Long userId) {
+        RunnectUser requestUser = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundUserException(NOT_FOUND_USER_EXCEPTION,
+                NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         Course course = courseRepository.findById(courseId)
             .orElseThrow(() -> new NotFoundException(NOT_FOUND_COURSE_EXCEPTION,
                 NOT_FOUND_COURSE_EXCEPTION.getMessage()));
+        RunnectUser uploader = course.getRunnectUser();
 
-        return GetCourseDetailResponseDto.from(course);
+        return GetCourseDetailResponseDto.of(course,uploader != null && uploader.equals(requestUser));
     }
 
     @Transactional

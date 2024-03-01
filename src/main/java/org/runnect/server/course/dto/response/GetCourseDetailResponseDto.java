@@ -19,10 +19,10 @@ public class GetCourseDetailResponseDto {
     private UserResponseCourseDetail user;
     private CourseDetailResponse course;
 
-    public static GetCourseDetailResponseDto from(Course course) {
+    public static GetCourseDetailResponseDto of(Course course, Boolean isNowUser) {
         return new GetCourseDetailResponseDto(
             UserResponseCourseDetail.from(course.getRunnectUser()),
-            CourseDetailResponse.of(course)
+            CourseDetailResponse.of(course, isNowUser)
         );
     }
 
@@ -51,8 +51,9 @@ public class GetCourseDetailResponseDto {
         private String image;
         private String title;
         private DepartureResponse departure;
+        private Boolean isNowUser;
 
-        public static CourseDetailResponse of(Course course) {
+        public static CourseDetailResponse of(Course course, Boolean isNowUser) {
             return new CourseDetailResponse(
                 course.getId(),
                 course.getCreatedAt(),
@@ -60,7 +61,8 @@ public class GetCourseDetailResponseDto {
                 course.getDistance(),
                 course.getImage(),
                 course.getTitle(),
-                DepartureResponse.from(course)
+                DepartureResponse.from(course),
+                isNowUser
             );
         }
     }

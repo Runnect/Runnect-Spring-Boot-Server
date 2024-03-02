@@ -2,7 +2,6 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.14'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
-	id "io.sentry.jvm.gradle" version "4.1.1"
 }
 
 group = 'org.runnect'
@@ -70,20 +69,11 @@ dependencies {
 	//json parser
 	implementation 'com.nimbusds:nimbus-jose-jwt:9.12'
 
+	// Sentry
+	implementation 'io.sentry:sentry-spring-boot-starter:4.3.0'
 
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
-}
-
-sentry {
-	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
-	// This enables source context, allowing you to see your source
-	// code as part of your stack traces in Sentry.
-	includeSourceContext = true
-
-	org = "runnect"
-	projectName = "java-spring-boot"
-	authToken = System.getenv("sentry.SENTRY_AUTH_TOKEN")
 }

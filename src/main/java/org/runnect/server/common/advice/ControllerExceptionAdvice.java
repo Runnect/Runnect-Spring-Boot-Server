@@ -1,9 +1,15 @@
 package org.runnect.server.common.advice;
 
-import lombok.RequiredArgsConstructor;
-
+import io.sentry.Sentry;
+import java.io.IOException;
+import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
+import org.runnect.server.common.constant.ErrorStatus;
+import org.runnect.server.common.dto.ApiResponseDto;
+import org.runnect.server.common.exception.BasicException;
+import org.runnect.server.config.slack.SlackApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -14,13 +20,6 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.runnect.server.common.dto.ApiResponseDto;
-import org.runnect.server.common.constant.ErrorStatus;
-import org.runnect.server.common.exception.BasicException;
-import org.runnect.server.config.slack.SlackApi;
-
-import java.io.IOException;
-import java.util.Objects;
 
 @RestControllerAdvice
 @Component
@@ -74,6 +73,7 @@ public class ControllerExceptionAdvice {
     @ExceptionHandler(Exception.class)
     protected ApiResponseDto<Object> handleException(final Exception error, final HttpServletRequest request) throws IOException {
         slackApi.sendAlert(error, request);
+        Sentry.captureException(error);
         return ApiResponseDto.error(ErrorStatus.INTERNAL_SERVER_ERROR);
     }
 

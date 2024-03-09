@@ -71,7 +71,7 @@ public class CourseController {
     public ApiResponseDto<GetCourseDetailResponseDto> getCourseDetail(@UserId Long userId,
         @PathVariable Long courseId) {
         return ApiResponseDto.success(SuccessStatus.GET_COURSE_DETAIL_SUCCESS,
-            courseService.getCourseDetail(courseId));
+            courseService.getCourseDetail(courseId, userId));
     }
 
     @PatchMapping("/{courseId}")

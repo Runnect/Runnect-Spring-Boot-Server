@@ -69,6 +69,8 @@ dependencies {
 	//json parser
 	implementation 'com.nimbusds:nimbus-jose-jwt:9.12'
 
+	// Sentry
+	implementation 'io.sentry:sentry-spring-boot-starter:4.3.0'
 
 }
 

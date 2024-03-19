@@ -3,6 +3,8 @@ package org.runnect.server.auth.controller;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.auth.dto.request.SignInRequestDto;
 import org.runnect.server.auth.dto.response.AuthResponseDto;
@@ -19,12 +21,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 @Validated
+@Tag(name = "Auth", description = "Auth API Document")
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Social Login & Sign Up", description = "소셜 로그인 및 회원가입")
     public ApiResponseDto<AuthResponseDto> signIn(@Valid @RequestBody SignInRequestDto requestDto) {
         AuthResponseDto result = authService.signIn(requestDto);
         if(result.getClass().equals(SignInResponseDto.class)){
@@ -39,6 +43,7 @@ public class AuthController {
 
     @GetMapping("/getNewToken")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "getNewToken", description = "accessToken 재발급")
     public ApiResponseDto<GetNewTokenResponseDto> getNewToken(@RequestHeader @NotBlank String accessToken,
                                                               @RequestHeader @NotBlank String refreshToken){
 

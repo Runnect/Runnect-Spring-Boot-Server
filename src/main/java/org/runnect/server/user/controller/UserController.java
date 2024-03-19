@@ -3,6 +3,8 @@ package org.runnect.server.user.controller;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.ApiResponseDto;
 import org.runnect.server.common.constant.SuccessStatus;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
+@Tag(name = "User", description = "User API Document")
 public class UserController {
 
     private final UserService userService;
@@ -26,6 +29,7 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "getMyPage", description = "마이페이지 조회")
     public ApiResponseDto<MyPageResponseDto> getMyPage(@UserId Long userId) {
         return ApiResponseDto.success(
             SuccessStatus.GET_MY_PAGE_SUCCESS, userService.getMyPage(userId));
@@ -33,6 +37,7 @@ public class UserController {
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "updateUserNickname", description = "닉네임 변경")
     public ApiResponseDto<UpdateUserNicknameResponseDto> updateUserNickname(
         @UserId Long userId,
         @Valid @RequestBody UpdateUserNicknameRequestDto updateUserNicknameRequestDto
@@ -43,6 +48,7 @@ public class UserController {
 
     @GetMapping("/{profileUserId}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "getUserProfile", description = "유저 프로필 조회")
     public ApiResponseDto<UserProfileResponseDto> getUserProfile(
         @UserId Long userId,
         @PathVariable Long profileUserId
@@ -53,6 +59,7 @@ public class UserController {
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "deleteUser", description = "회원 탈퇴")
     public ApiResponseDto<DeleteUserResponseDto> deleteUser(
             @UserId Long userId,
             @RequestHeader(required = false) @NotBlank String appleAccessToken

@@ -1,6 +1,9 @@
 package org.runnect.server.record.controller;
 
 import javax.validation.Valid;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.constant.SuccessStatus;
 import org.runnect.server.common.dto.ApiResponseDto;
@@ -27,11 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Tag(name = "Record", description = "Record API Document")
 public class RecordController {
     private final RecordService recordService;
 
     @PostMapping("record")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "createRecord", description = "러닝기록하기")
     public ApiResponseDto<CreateRecordResponseDto> createRecord(@UserId Long userId, @RequestBody @Valid final CreateRecordRequestDto request) {
 
         return ApiResponseDto.success(SuccessStatus.CREATE_RECORD_SUCCESS, recordService.createRecord(userId, request));
@@ -39,18 +44,21 @@ public class RecordController {
 
     @GetMapping("record/user")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "getRecordByUser", description = "유저 러닝 기록")
     public ApiResponseDto<GetRecordResponseDto> getRecordByUser(@UserId Long userId) {
         return ApiResponseDto.success(SuccessStatus.GET_RECORD_SUCCESS, recordService.getRecordByUser(userId));
     }
 
     @PatchMapping("record/{recordId}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "updateRecord", description = "러닝기록 제목 수정")
     public ApiResponseDto<UpdateRecordResponseDto> updateRecord(@UserId Long userId, @PathVariable(name = "recordId") Long recordId, @RequestBody @Valid final UpdateRecordRequestDto request) {
         return ApiResponseDto.success(SuccessStatus.UPDATE_RECORD_SUCCESS, recordService.updateRecord(userId, recordId, request));
     }
 
     @PutMapping("record")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "deleteRecord", description = "러닝기록삭제")
     public ApiResponseDto<DeleteRecordsResponseDto> deleteRecords(
         @UserId Long userId,
         @Valid @RequestBody DeleteRecordsRequestDto requestDto

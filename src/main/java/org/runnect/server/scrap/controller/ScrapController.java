@@ -1,5 +1,7 @@
 package org.runnect.server.scrap.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.dto.ApiResponseDto;
 import org.runnect.server.common.constant.SuccessStatus;
@@ -15,10 +17,12 @@ import javax.validation.Valid;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Tag(name = "Scrap", description = "Scrap API Document")
 public class ScrapController {
     private final ScrapService scrapService;
     @PostMapping("scrap")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "createAndDeleteScrap", description = "코스 스크랩, 스크랩 취소")
     public ApiResponseDto createAndDeleteScrap(@UserId Long userId, @RequestBody @Valid final CreateAndDeleteScrapRequestDto request) {
 
         if (request.getScrapTF() == true) {
@@ -29,6 +33,7 @@ public class ScrapController {
 
     @GetMapping("scrap/user")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "getScrapCourseByUser", description = "내가 스크랩한 코스")
     public ApiResponseDto<GetScrapCourseResponseDto> getScrapCourseByUser(@UserId Long userId) {
         return ApiResponseDto.success(SuccessStatus.GET_SCRAP_COURSE_BY_USER_SUCCESS, scrapService.getScrapCourseByUser(userId));
     }

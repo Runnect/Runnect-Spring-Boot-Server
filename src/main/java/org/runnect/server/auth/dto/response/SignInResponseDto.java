@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SignInResponseDto implements AuthResponseDto{
-
     private String type;
     private String email;
     private String accessToken;

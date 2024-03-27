@@ -1,6 +1,9 @@
 package org.runnect.server.course.controller;
 
 import javax.validation.Valid;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.runnect.server.common.constant.SuccessStatus;
@@ -34,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/course")
+@Tag(name = "Course", description = "Course API Document")
 public class CourseController {
 
     private final S3Service s3Service;
@@ -41,6 +45,7 @@ public class CourseController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "createCourse", description = "경로 그리기")
     public ApiResponseDto<CourseCreateResponseDto> createCourse(
         @UserId Long userId,
         @RequestPart @Valid final CourseCreateRequestDto data,
@@ -53,6 +58,7 @@ public class CourseController {
 
     @GetMapping("/user")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "getCourseByUser", description = "내가 그린 코스(업로드 포함)")
     public ApiResponseDto<CourseGetByUserResponseDto> getCourseByUser(@UserId Long userId) {
         return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER_SUCCESS,
             courseService.getCourseByUser(userId));
@@ -60,6 +66,7 @@ public class CourseController {
 
     @GetMapping("/private/user")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "getPrivateCourseByUser", description = "내가 그린 코스(업로드 미포함)")
     public ApiResponseDto<CourseGetByUserResponseDto> getPrivateCourseByUser(
         @UserId Long userId) {
         return ApiResponseDto.success(SuccessStatus.GET_COURSE_LIST_BY_USER_SUCCESS,
@@ -68,6 +75,7 @@ public class CourseController {
 
     @GetMapping("/detail/{courseId}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "getCourseDetail", description = "내가 그린 코스 상세 페이지와 달리기, 러닝 기록 작성 뷰")
     public ApiResponseDto<GetCourseDetailResponseDto> getCourseDetail(@UserId Long userId,
         @PathVariable Long courseId) {
         return ApiResponseDto.success(SuccessStatus.GET_COURSE_DETAIL_SUCCESS,
@@ -76,6 +84,7 @@ public class CourseController {
 
     @PatchMapping("/{courseId}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "updateCourse", description = "내가 그린 코스 제목 수정")
     public ApiResponseDto<UpdateCourseResponseDto> updateCourse(@UserId Long userId,
         @PathVariable(name = "courseId") Long courseId,
         @RequestBody @Valid final UpdateCourseRequestDto request) {
@@ -85,6 +94,7 @@ public class CourseController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "deleteCourse", description = "코스 삭제")
     public ApiResponseDto<DeleteCoursesResponseDto> deleteCourses(
         @UserId Long userId,
         @Valid @RequestBody final DeleteCoursesRequestDto deleteCoursesRequestDto

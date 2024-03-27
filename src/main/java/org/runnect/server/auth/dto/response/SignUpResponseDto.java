@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SignUpResponseDto implements AuthResponseDto{
-
     private String type;
     private String email;
     private String nickname;

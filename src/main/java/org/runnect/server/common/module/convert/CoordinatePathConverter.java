@@ -43,12 +43,16 @@ public class CoordinatePathConverter {
     }
 
     private static LineString getLineString(List<CoordinateDto> coordinateDtos) {
+        StringBuilder sb = new StringBuilder();
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         Coordinate[] coordinates = new Coordinate[coordinateDtos.size()];
         for (int i = 0; i < coordinateDtos.size(); i++) {
             coordinates[i] = new Coordinate(coordinateDtos.get(i).getLatitude(), coordinateDtos.get(i).getLongitude());
+            sb.append("(" + coordinateDtos.get(i).getLatitude() + ", " + coordinateDtos.get(i).getLongitude() + ")");
         }
         LineString lineString = geometryFactory.createLineString(coordinates);
+        log.info("create course!");
+        log.info(sb.toString());
         return lineString;
     }
 }

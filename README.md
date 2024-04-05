@@ -65,6 +65,16 @@
 # 💽 DB ERD
 <img width="545" alt="스크린샷 2024-03-26 오후 1 15 33" src="https://github.com/Runnect/Runnect-Spring-Boot-Server/assets/65851554/c48b0966-e73d-4ec0-be08-b097c6890265">
 
+</aside>
+<hr>
+</br>
+
+# 📄 API(+ Non - API) Docs
+
+
+<img width="1351" alt="스크린샷 2024-04-05 오후 6 35 31" src="https://github.com/Runnect/Runnect-Spring-Boot-Server/assets/65851554/6cdf531e-4945-4ace-86ad-a3feecd68793">
+<img width="1351" alt="스크린샷 2024-04-05 오후 6 36 54" src="https://github.com/Runnect/Runnect-Spring-Boot-Server/assets/65851554/48425786-0d44-4f66-90ab-d40453b32fb8">
+<img width="1351" alt="스크린샷 2024-04-05 오후 6 36 14" src="https://github.com/Runnect/Runnect-Spring-Boot-Server/assets/65851554/c3a009d2-6bb5-4af0-885d-7ba5ac0c2e7a">
 
 </aside>
 <hr>

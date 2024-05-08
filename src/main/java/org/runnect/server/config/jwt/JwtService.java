@@ -7,7 +7,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
 import javax.annotation.PostConstruct;
@@ -15,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.constant.TokenStatus;
 import org.runnect.server.config.redis.RedisService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 
@@ -26,7 +24,8 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    private final long accessTokenExpiryTime = 1000L * 60 * 60 * 2; // 2시간
+//    private final long accessTokenExpiryTime = 1000L * 60 * 60 * 2; // 2시간
+    private final long accessTokenExpiryTime = 1 * 60 * 1000L; // 안드로이드 테스트용
     private final long refreshTokenExpiryTime = 1000L * 60 * 60 * 24 * 14; // 2주
     private final String CLAIM_NAME = "userId";
 

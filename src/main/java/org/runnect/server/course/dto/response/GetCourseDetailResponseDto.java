@@ -34,8 +34,7 @@ public class GetCourseDetailResponseDto {
         private Long userId;
 
         public static UserResponseCourseDetail from(RunnectUser user) {
-            if (user == null) return null;
-            return new UserResponseCourseDetail(user.getId());
+            return new UserResponseCourseDetail(user != null ? user.getId() : -1);
         }
     }
 

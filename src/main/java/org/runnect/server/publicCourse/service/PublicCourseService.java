@@ -14,7 +14,6 @@ import org.runnect.server.common.exception.PermissionDeniedException;
 import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
-import org.runnect.server.record.repository.RecordRepository;
 import org.runnect.server.publicCourse.dto.request.CreatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
 import org.runnect.server.publicCourse.dto.response.CreatePublicCourseResponseDto;
@@ -54,7 +53,6 @@ public class PublicCourseService {
     private final UserRepository userRepository;
     private final ScrapRepository scrapRepository;
     private final CourseRepository courseRepository;
-    private final RecordRepository recordRepository;
 
 
     @Value("${runnect.marathon-public-course-id}")
@@ -352,22 +350,14 @@ public class PublicCourseService {
             throw new NotFoundException(ErrorStatus.NOT_FOUND_PUBLICCOURSE_EXCEPTION, ErrorStatus.NOT_FOUND_PUBLICCOURSE_EXCEPTION.getMessage());
         }
 
-        boolean isAdmin = userId.equals(280L);
-
         publicCourses.stream()
-                .filter(pc -> !isAdmin && !pc.getCourse().getRunnectUser().equals(user))
+                .filter(pc -> !pc.getCourse().getRunnectUser().equals(user))
                 .findAny()
                 .ifPresent(pc -> {
                     throw new PermissionDeniedException(
                             ErrorStatus.PERMISSION_DENIED_PUBLIC_COURSE_DELETE_EXCEPTION,
                             ErrorStatus.PERMISSION_DENIED_PUBLIC_COURSE_DELETE_EXCEPTION.getMessage());
                 });
-
-        //삭제전 연관된 스크랩 먼저 삭제
-        scrapRepository.deleteByPublicCourseIn(publicCourses);
-
-        //삭제전 연관된 Record의 publicCourse FK null 처리
-        recordRepository.nullifyPublicCourseIn(publicCourses);
 
         //삭제전 course의 isPrivate update
         publicCourses.forEach(publicCourse -> publicCourse.getCourse().retrieveCourse());

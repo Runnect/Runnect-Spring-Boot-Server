@@ -1,8 +1,10 @@
 package org.runnect.server.record.repository;
 
 import java.util.Collection;
+import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.record.entity.Record;
 import org.runnect.server.user.entity.RunnectUser;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
@@ -29,4 +31,8 @@ public interface RecordRepository extends Repository<Record, Long> {
 
     // DELETE
     long deleteByIdIn(Collection<Long> ids);
+
+    @Modifying
+    @Query("UPDATE Record r SET r.publicCourse = null WHERE r.publicCourse IN :publicCourses")
+    int nullifyPublicCourseIn(@Param("publicCourses") Collection<PublicCourse> publicCourses);
 }

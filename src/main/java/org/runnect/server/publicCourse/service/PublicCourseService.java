@@ -48,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PublicCourseService {
     private static final Integer PAGE_SIZE = 10;
     private static List<Long> MARATHON_PUBLIC_COURSE_IDS;
+    private static final Long ADMIN_USER_ID = 280L;
 
     private final PublicCourseRepository publicCourseRepository;
     private final UserRepository userRepository;
@@ -350,8 +351,10 @@ public class PublicCourseService {
             throw new NotFoundException(ErrorStatus.NOT_FOUND_PUBLICCOURSE_EXCEPTION, ErrorStatus.NOT_FOUND_PUBLICCOURSE_EXCEPTION.getMessage());
         }
 
+        boolean isAdmin = userId.equals(ADMIN_USER_ID);
+
         publicCourses.stream()
-                .filter(pc -> !pc.getCourse().getRunnectUser().equals(user))
+                .filter(pc -> !isAdmin && !pc.getCourse().getRunnectUser().equals(user))
                 .findAny()
                 .ifPresent(pc -> {
                     throw new PermissionDeniedException(

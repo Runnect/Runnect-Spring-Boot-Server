@@ -361,6 +361,9 @@ public class PublicCourseService {
                             ErrorStatus.PERMISSION_DENIED_PUBLIC_COURSE_DELETE_EXCEPTION.getMessage());
                 });
 
+        //삭제전 연관된 스크랩 먼저 삭제
+        scrapRepository.deleteByPublicCourseIn(publicCourses);
+
         //삭제전 course의 isPrivate update
         publicCourses.forEach(publicCourse -> publicCourse.getCourse().retrieveCourse());
 

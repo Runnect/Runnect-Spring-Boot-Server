@@ -43,16 +43,23 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 @Service
 @RequiredArgsConstructor
 public class PublicCourseService {
     private static final Integer PAGE_SIZE = 10;
     private static List<Long> MARATHON_PUBLIC_COURSE_IDS;
+    private static final Long ADMIN_USER_ID = 280L;
 
     private final PublicCourseRepository publicCourseRepository;
     private final UserRepository userRepository;
     private final ScrapRepository scrapRepository;
     private final CourseRepository courseRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
 
     @Value("${runnect.marathon-public-course-id}")
@@ -350,8 +357,10 @@ public class PublicCourseService {
             throw new NotFoundException(ErrorStatus.NOT_FOUND_PUBLICCOURSE_EXCEPTION, ErrorStatus.NOT_FOUND_PUBLICCOURSE_EXCEPTION.getMessage());
         }
 
+        boolean isAdmin = userId.equals(ADMIN_USER_ID);
+
         publicCourses.stream()
-                .filter(pc -> !pc.getCourse().getRunnectUser().equals(user))
+                .filter(pc -> !isAdmin && !pc.getCourse().getRunnectUser().equals(user))
                 .findAny()
                 .ifPresent(pc -> {
                     throw new PermissionDeniedException(
@@ -361,6 +370,15 @@ public class PublicCourseService {
 
         //삭제전 course의 isPrivate update
         publicCourses.forEach(publicCourse -> publicCourse.getCourse().retrieveCourse());
+
+        // Record의 publicCourse FK를 null로 설정 (Record 테이블 FK 제약조건 해제)
+        entityManager.createQuery(
+                        "UPDATE Record r SET r.publicCourse = null WHERE r.publicCourse IN :publicCourses")
+                .setParameter("publicCourses", publicCourses)
+                .executeUpdate();
+
+        // Scrap 삭제 (Scrap 테이블 FK NOT NULL 제약조건)
+        scrapRepository.deleteByPublicCourseIn(publicCourses);
 
         publicCourseRepository.deleteAllInBatch(publicCourses);
 

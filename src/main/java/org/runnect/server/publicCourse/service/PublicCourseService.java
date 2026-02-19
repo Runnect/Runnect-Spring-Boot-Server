@@ -14,7 +14,6 @@ import org.runnect.server.common.exception.PermissionDeniedException;
 import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
-import org.runnect.server.record.repository.RecordRepository;
 import org.runnect.server.publicCourse.dto.request.CreatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
 import org.runnect.server.publicCourse.dto.response.CreatePublicCourseResponseDto;
@@ -44,17 +43,23 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 @Service
 @RequiredArgsConstructor
 public class PublicCourseService {
     private static final Integer PAGE_SIZE = 10;
     private static List<Long> MARATHON_PUBLIC_COURSE_IDS;
+    private static final Long ADMIN_USER_ID = 280L;
 
     private final PublicCourseRepository publicCourseRepository;
     private final UserRepository userRepository;
     private final ScrapRepository scrapRepository;
     private final CourseRepository courseRepository;
-    private final RecordRepository recordRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
 
     @Value("${runnect.marathon-public-course-id}")
@@ -352,7 +357,7 @@ public class PublicCourseService {
             throw new NotFoundException(ErrorStatus.NOT_FOUND_PUBLICCOURSE_EXCEPTION, ErrorStatus.NOT_FOUND_PUBLICCOURSE_EXCEPTION.getMessage());
         }
 
-        boolean isAdmin = userId.equals(280L);
+        boolean isAdmin = userId.equals(ADMIN_USER_ID);
 
         publicCourses.stream()
                 .filter(pc -> !isAdmin && !pc.getCourse().getRunnectUser().equals(user))
@@ -363,14 +368,17 @@ public class PublicCourseService {
                             ErrorStatus.PERMISSION_DENIED_PUBLIC_COURSE_DELETE_EXCEPTION.getMessage());
                 });
 
-        //삭제전 연관된 스크랩 먼저 삭제
-        scrapRepository.deleteByPublicCourseIn(publicCourses);
-
-        //삭제전 연관된 Record의 publicCourse FK null 처리
-        recordRepository.nullifyPublicCourseIn(publicCourses);
-
         //삭제전 course의 isPrivate update
         publicCourses.forEach(publicCourse -> publicCourse.getCourse().retrieveCourse());
+
+        // Record의 publicCourse FK를 null로 설정 (Record 테이블 FK 제약조건 해제)
+        entityManager.createQuery(
+                        "UPDATE Record r SET r.publicCourse = null WHERE r.publicCourse IN :publicCourses")
+                .setParameter("publicCourses", publicCourses)
+                .executeUpdate();
+
+        // Scrap 삭제 (Scrap 테이블 FK NOT NULL 제약조건)
+        scrapRepository.deleteByPublicCourseIn(publicCourses);
 
         publicCourseRepository.deleteAllInBatch(publicCourses);
 

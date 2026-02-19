@@ -13,6 +13,7 @@ import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
 import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.course.entity.Course;
+import org.runnect.server.record.entity.Record;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.publicCourse.dto.request.CreatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
@@ -365,7 +366,16 @@ public class PublicCourseService {
         //삭제전 course의 isPrivate update
         publicCourses.forEach(publicCourse -> publicCourse.getCourse().retrieveCourse());
 
-        publicCourseRepository.deleteAllInBatch(publicCourses);
+        // FK 제약 조건 해소: Record.public_course_id (NULLABLE) → null 처리
+        publicCourses.forEach(publicCourse ->
+            publicCourse.getRecords().forEach(Record::setPublicCourseNull)
+        );
+
+        // FK 제약 조건 해소: Scrap.public_course_id (NOT NULL) → 행 삭제
+        scrapRepository.deleteByPublicCourseIn(publicCourses);
+
+        // deleteAll: Hibernate ActionQueue가 UPDATE → DELETE 순서 보장
+        publicCourseRepository.deleteAll(publicCourses);
 
         return DeletePublicCoursesResponseDto.from(publicCourses.size());
     }

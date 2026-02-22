@@ -31,6 +31,9 @@ public enum ErrorStatus {
     NOT_FOUND_SCRAP_EXCEPTION(HttpStatus.BAD_REQUEST, "스크랩한 코스가 없습니다."),
     NOT_FOUND_IMAGE_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 이미지 파일입니다"),
     NOT_FOUND_PUBLICCOURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "존재하지 않는 public course id입니다."),
+    INVALID_HEALTH_DATA_EXCEPTION(HttpStatus.BAD_REQUEST, "유효하지 않은 건강 데이터입니다"),
+    INVALID_DATE_RANGE_EXCEPTION(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 범위입니다"),
+    EXCEED_HEART_RATE_SAMPLES_EXCEPTION(HttpStatus.BAD_REQUEST, "심박수 샘플은 최대 5000건까지 허용됩니다"),
 
     /**
      * 401 UNAUTHORIZED
@@ -51,6 +54,7 @@ public enum ErrorStatus {
      */
     PERMISSION_DENIED_PUBLIC_COURSE_DELETE_EXCEPTION(HttpStatus.FORBIDDEN, "퍼블릭 코스를 삭제할 권한이 존재하지 않습니다."),
     PERMISSION_DENIED_RECORD_DELETE_EXCEPTION(HttpStatus.FORBIDDEN, "기록을 삭제할 권한이 존재하지 않습니다."),
+    PERMISSION_DENIED_HEALTH_DATA_EXCEPTION(HttpStatus.FORBIDDEN, "건강 데이터에 대한 접근 권한이 없습니다"),
 
     /**
      * 404 NOT FOUND
@@ -63,6 +67,7 @@ public enum ErrorStatus {
     ALREADY_EXIST_USER_EXCEPTION(HttpStatus.CONFLICT, "이미 존재하는 유저입니다"),
     ALREADY_EXIST_NICKNAME_EXCEPTION(HttpStatus.CONFLICT, "중복된 닉네임입니다."),
     ALREADY_UPLOAD_COURSE_EXCEPTION(HttpStatus.CONFLICT, "이미 업로드된 코스입니다."),
+    ALREADY_EXIST_HEALTH_DATA_EXCEPTION(HttpStatus.CONFLICT, "이미 건강 데이터가 등록된 기록입니다"),
 
     /**
      * 500 INTERNAL SERVER ERROR

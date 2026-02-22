@@ -21,9 +21,16 @@ public class RecordResponse {
     private String time;
     private String pace;
     private DepartureResponse departure;
+    private HealthDataResponse healthData;
 
     public static RecordResponse of(Long id, Long courseId, Long publicCourseId, Long userId, String title,
                                     String image, String createdAt, Float distance, String time, String pace, DepartureResponse departure) {
-        return new RecordResponse(id, courseId, publicCourseId, userId, title, image, createdAt, distance, time, pace, departure);
+        return new RecordResponse(id, courseId, publicCourseId, userId, title, image, createdAt, distance, time, pace, departure, null);
+    }
+
+    public static RecordResponse of(Long id, Long courseId, Long publicCourseId, Long userId, String title,
+                                    String image, String createdAt, Float distance, String time, String pace, DepartureResponse departure,
+                                    HealthDataResponse healthData) {
+        return new RecordResponse(id, courseId, publicCourseId, userId, title, image, createdAt, distance, time, pace, departure, healthData);
     }
 }

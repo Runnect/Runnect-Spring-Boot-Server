@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
@@ -18,8 +19,10 @@ import org.runnect.server.record.dto.request.UpdateRecordRequestDto;
 import org.runnect.server.record.dto.response.CreateRecordDto;
 import org.runnect.server.record.dto.response.CreateRecordResponseDto;
 import org.runnect.server.record.dto.response.DeleteRecordsResponseDto;
+import org.runnect.server.health.repository.RecordHealthDataRepository;
 import org.runnect.server.record.dto.response.DepartureResponse;
 import org.runnect.server.record.dto.response.GetRecordResponseDto;
+import org.runnect.server.record.dto.response.HealthDataResponse;
 import org.runnect.server.record.dto.response.RecordResponse;
 import org.runnect.server.record.dto.response.UpdateRecordResponse;
 import org.runnect.server.record.dto.response.UpdateRecordResponseDto;
@@ -34,6 +37,7 @@ import org.runnect.server.user.service.UserStampService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecordService {
@@ -43,6 +47,7 @@ public class RecordService {
     private final CourseRepository courseRepository;
     private final PublicCourseRepository publicCourseRepository;
     private final UserStampService userStampService;
+    private final RecordHealthDataRepository recordHealthDataRepository;
 
     @Transactional
     public CreateRecordResponseDto createRecord(Long userId, CreateRecordRequestDto request) {
@@ -106,9 +111,19 @@ public class RecordService {
 
             DepartureResponse departure = DepartureResponse.of(course.getDepartureRegion(), course.getDepartureCity());
 
+            // 건강 데이터 조회 (실패해도 기록 목록은 정상 반환)
+            HealthDataResponse healthData = null;
+            try {
+                healthData = recordHealthDataRepository.findByRecordId(record.getId())
+                        .map(h -> HealthDataResponse.of(h.getAvgHeartRate(), h.getCalories()))
+                        .orElse(null);
+            } catch (Exception e) {
+                log.warn("건강 데이터 조회 실패 (recordId={}): {}", record.getId(), e.getMessage());
+            }
+
             RecordResponse recordResponse = RecordResponse.of(record.getId(), course.getId(), publicCourseId, userId,
                     record.getTitle(), course.getImage(), record.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")), course.getDistance(), record.getTime().toString(),
-                    record.getPace().toString(), departure);
+                    record.getPace().toString(), departure, healthData);
 
             recordResponses.add(recordResponse);
 

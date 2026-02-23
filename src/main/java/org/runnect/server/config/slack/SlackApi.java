@@ -27,15 +27,13 @@ public class SlackApi {
     private final static String NEW_LINE = "\n";
     private final static String DOUBLE_NEW_LINE = "\n\n";
 
-    private StringBuilder sb = new StringBuilder();
-
     public void sendAlert(Exception error, HttpServletRequest request) throws IOException {
 
         List<LayoutBlock> layoutBlocks = generateLayoutBlock(error, request);
 
         Slack.getInstance().send(webhookUrl, WebhookPayloads
                 .payload(p ->
-                        p.username("Exception is detected 🚨")
+                        p.username("Exception is detected \uD83D\uDEA8")
                                 .iconUrl("https://yt3.googleusercontent.com/ytc/AGIKgqMVUzRrhoo1gDQcqvPo0PxaJz7e0gqDXT0D78R5VQ=s900-c-k-c0x00ffffff-no-rj")
                                 .blocks(layoutBlocks)));
     }
@@ -53,16 +51,16 @@ public class SlackApi {
     }
 
     private String generateErrorMessage(Exception error) {
-        sb.setLength(0);
-        sb.append("*[🔥 Exception]*" + NEW_LINE + error.toString() + DOUBLE_NEW_LINE);
-        sb.append("*[📩 From]*" + NEW_LINE + readRootStackTrace(error) + DOUBLE_NEW_LINE);
+        StringBuilder sb = new StringBuilder();
+        sb.append("*[\uD83D\uDD25 Exception]*" + NEW_LINE + error.toString() + DOUBLE_NEW_LINE);
+        sb.append("*[\uD83D\uDCE9 From]*" + NEW_LINE + readRootStackTrace(error) + DOUBLE_NEW_LINE);
 
         return sb.toString();
     }
 
     private String generateErrorPointMessage(HttpServletRequest request) {
-        sb.setLength(0);
-        sb.append("*[🧾세부정보]*" + NEW_LINE);
+        StringBuilder sb = new StringBuilder();
+        sb.append("*[\uD83E\uDDFE세부정보]*" + NEW_LINE);
         sb.append("Request URL : " + request.getRequestURL().toString() + NEW_LINE);
         sb.append("Request Method : " + request.getMethod() + NEW_LINE);
         sb.append("Request Time : " + new Date() + NEW_LINE);
@@ -71,6 +69,9 @@ public class SlackApi {
     }
 
     private String readRootStackTrace(Exception error) {
+        if (error.getStackTrace() == null || error.getStackTrace().length == 0) {
+            return "Unknown";
+        }
         return error.getStackTrace()[0].toString();
     }
 

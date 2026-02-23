@@ -1,7 +1,6 @@
 package org.runnect.server.common.advice;
 
 import io.sentry.Sentry;
-import java.io.IOException;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
@@ -10,6 +9,7 @@ import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.dto.ApiResponseDto;
 import org.runnect.server.common.exception.BasicException;
 import org.runnect.server.config.slack.SlackApi;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 @Component
 @RequiredArgsConstructor
@@ -71,9 +72,17 @@ public class ControllerExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    protected ApiResponseDto<Object> handleException(final Exception error, final HttpServletRequest request) throws IOException {
-        slackApi.sendAlert(error, request);
-        Sentry.captureException(error);
+    protected ApiResponseDto<Object> handleException(final Exception error, final HttpServletRequest request) {
+        try {
+            slackApi.sendAlert(error, request);
+        } catch (Exception e) {
+            log.error("Slack 알림 전송 실패", e);
+        }
+        try {
+            Sentry.captureException(error);
+        } catch (Exception e) {
+            log.error("Sentry 전송 실패", e);
+        }
         return ApiResponseDto.error(ErrorStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -86,5 +95,3 @@ public class ControllerExceptionAdvice {
                 .body(ApiResponseDto.error(e.getErrorStatus(), e.getMessage()));
     }
 }
-
-

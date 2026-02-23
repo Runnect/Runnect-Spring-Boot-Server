@@ -18,11 +18,8 @@ import org.runnect.server.record.dto.request.UpdateRecordRequestDto;
 import org.runnect.server.record.dto.response.CreateRecordDto;
 import org.runnect.server.record.dto.response.CreateRecordResponseDto;
 import org.runnect.server.record.dto.response.DeleteRecordsResponseDto;
-import org.runnect.server.health.entity.RecordHealthData;
-import org.runnect.server.health.repository.RecordHealthDataRepository;
 import org.runnect.server.record.dto.response.DepartureResponse;
 import org.runnect.server.record.dto.response.GetRecordResponseDto;
-import org.runnect.server.record.dto.response.HealthDataResponse;
 import org.runnect.server.record.dto.response.RecordResponse;
 import org.runnect.server.record.dto.response.UpdateRecordResponse;
 import org.runnect.server.record.dto.response.UpdateRecordResponseDto;
@@ -46,7 +43,6 @@ public class RecordService {
     private final CourseRepository courseRepository;
     private final PublicCourseRepository publicCourseRepository;
     private final UserStampService userStampService;
-    private final RecordHealthDataRepository recordHealthDataRepository;
 
     @Transactional
     public CreateRecordResponseDto createRecord(Long userId, CreateRecordRequestDto request) {
@@ -110,14 +106,9 @@ public class RecordService {
 
             DepartureResponse departure = DepartureResponse.of(course.getDepartureRegion(), course.getDepartureCity());
 
-            // 건강 데이터 조회
-            HealthDataResponse healthData = recordHealthDataRepository.findByRecordId(record.getId())
-                    .map(h -> HealthDataResponse.of(h.getAvgHeartRate(), h.getCalories()))
-                    .orElse(null);
-
             RecordResponse recordResponse = RecordResponse.of(record.getId(), course.getId(), publicCourseId, userId,
                     record.getTitle(), course.getImage(), record.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")), course.getDistance(), record.getTime().toString(),
-                    record.getPace().toString(), departure, healthData);
+                    record.getPace().toString(), departure);
 
             recordResponses.add(recordResponse);
 

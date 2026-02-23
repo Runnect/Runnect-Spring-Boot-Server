@@ -77,6 +77,28 @@ do
   sleep 10
 done
 
+echo "> Nginx 상태 확인"
+if ! sudo systemctl is-active --quiet nginx; then
+  echo "> Nginx가 중지되어 있습니다. 재시작합니다."
+  sudo systemctl start nginx
+  sleep 2
+  if sudo systemctl is-active --quiet nginx; then
+    echo "> Nginx 재시작 성공"
+  else
+    echo "> Nginx 재시작 실패. 상태:"
+    sudo systemctl status nginx
+  fi
+else
+  echo "> Nginx 정상 구동 중"
+fi
+
 echo "> 스위칭"
 sleep 10
 /home/ubuntu/app/nonstop/switch.sh
+
+echo "> 배포 완료. 최종 상태 확인"
+echo "> Nginx: $(sudo systemctl is-active nginx)"
+echo "> Java 프로세스:"
+pgrep -a java || echo "> Java 프로세스 없음"
+echo "> 포트 리스닝:"
+sudo ss -tlnp | grep -E ':(80|8081|8082) ' || echo "> 해당 포트 리스닝 없음"

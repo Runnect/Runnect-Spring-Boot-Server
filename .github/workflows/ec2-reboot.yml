@@ -1,0 +1,77 @@
+name: EC2-REBOOT
+
+on:
+  workflow_dispatch:
+
+jobs:
+  reboot:
+    name: Reboot EC2 Instance
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_PROD_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_PROD_SECRET_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Find EC2 instance
+      id: find-ec2
+      run: |
+        echo "=== 모든 EC2 인스턴스 조회 ==="
+        aws ec2 describe-instances \
+          --query "Reservations[].Instances[].[InstanceId, PublicIpAddress, State.Name, Tags[?Key=='Name'].Value | [0]]" \
+          --output table
+
+        echo ""
+        echo "=== Public IP 3.35.195.11 으로 검색 ==="
+        INSTANCE_ID=$(aws ec2 describe-instances \
+          --filters "Name=ip-address,Values=3.35.195.11" \
+          --query "Reservations[].Instances[].InstanceId" \
+          --output text)
+
+        if [ -z "$INSTANCE_ID" ]; then
+          echo "Public IP로 찾지 못함. 실행 중인 모든 인스턴스 확인..."
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=instance-state-name,Values=running,stopped" \
+            --query "Reservations[].Instances[].InstanceId" \
+            --output text)
+        fi
+
+        echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_OUTPUT
+        echo "찾은 Instance ID: $INSTANCE_ID"
+
+    - name: Reboot EC2 instance
+      run: |
+        INSTANCE_ID="${{ steps.find-ec2.outputs.INSTANCE_ID }}"
+        if [ -n "$INSTANCE_ID" ]; then
+          echo "EC2 리부트 시작: $INSTANCE_ID"
+          aws ec2 reboot-instances --instance-ids $INSTANCE_ID
+          echo "리부트 명령 전송 완료!"
+
+          echo "60초 대기 후 상태 확인..."
+          sleep 60
+
+          aws ec2 describe-instances \
+            --instance-ids $INSTANCE_ID \
+            --query "Reservations[].Instances[].[InstanceId, PublicIpAddress, State.Name]" \
+            --output table
+        else
+          echo "ERROR: 인스턴스를 찾을 수 없습니다!"
+          exit 1
+        fi
+
+    - name: Health check
+      run: |
+        echo "서버 헬스 체크 시작 (최대 3분 대기)..."
+        for i in $(seq 1 18); do
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 --max-time 10 http://3.35.195.11/actuator/health 2>/dev/null || echo "000")
+          echo "[$i/18] HTTP: $HTTP_CODE"
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "서버 복구 완료!"
+            exit 0
+          fi
+          sleep 10
+        done
+        echo "WARNING: 서버가 아직 응답하지 않습니다. EC2는 리부트되었지만 앱 시작에 시간이 더 필요할 수 있습니다."

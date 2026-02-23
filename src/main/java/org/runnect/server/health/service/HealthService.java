@@ -153,7 +153,8 @@ public class HealthService {
         LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
 
         // 3. 통계 쿼리 실행
-        Object[] result = recordHealthDataRepository.getHealthSummary(userId, startDateTime, endDateTime);
+        List<Object[]> results = recordHealthDataRepository.getHealthSummary(userId, startDateTime, endDateTime);
+        Object[] result = results.isEmpty() ? new Object[10] : results.get(0);
 
         Long totalRecords = result[0] != null ? ((Number) result[0]).longValue() : 0L;
         Long recordsWithHealth = result[1] != null ? ((Number) result[1]).longValue() : 0L;

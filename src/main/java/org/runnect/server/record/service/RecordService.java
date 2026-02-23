@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
@@ -37,6 +38,7 @@ import org.runnect.server.user.service.UserStampService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecordService {
@@ -117,7 +119,7 @@ public class RecordService {
                         .map(h -> HealthDataResponse.of(h.getAvgHeartRate(), h.getCalories()))
                         .orElse(null);
             } catch (Exception e) {
-                // 건강 데이터 테이블 미생성 등 예외 발생 시 무시
+                log.warn("건강 데이터 조회 실패 (recordId={}): {}", record.getId(), e.getMessage());
             }
 
             RecordResponse recordResponse = RecordResponse.of(record.getId(), course.getId(), publicCourseId, userId,

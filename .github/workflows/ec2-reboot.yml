@@ -1,11 +1,11 @@
-name: EC2-READ-DIAGNOSTIC
+name: EC2-READ-DEPLOY-LOG
 
 on:
   workflow_dispatch:
 
 jobs:
-  read-diag:
-    name: Read S3 Diagnostic
+  read-log:
+    name: Read CodeDeploy Logs
     runs-on: ubuntu-latest
 
     steps:
@@ -16,50 +16,38 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_PROD_SECRET_KEY }}
         aws-region: ap-northeast-2
 
-    - name: Check latest CodeDeploy deployment
+    - name: Get deployment lifecycle events
       run: |
-        LATEST=$(aws deploy list-deployments \
+        echo "=== 최근 배포 목록 (최대 5개) ==="
+        DEPLOYMENTS=$(aws deploy list-deployments \
           --application-name runnect-prod-codedeploy \
           --deployment-group-name runnect-prod-codedeploy-group \
-          --query "deployments[0]" \
+          --query "deployments[:5]" \
           --output text 2>/dev/null)
-        echo "Latest deployment: $LATEST"
+        echo "Deployments: $DEPLOYMENTS"
 
-        aws deploy get-deployment --deployment-id "$LATEST" \
-          --query "deploymentInfo.{status:status, createTime:createTime, completeTime:completeTime}" \
-          --output json 2>&1
-
-    - name: List S3 diagnostics
-      run: |
-        echo "=== S3 diagnostics 폴더 ==="
-        aws s3 ls s3://runnect-prod-bucket/diagnostics/ 2>&1 || echo "diagnostics 폴더 없거나 접근 불가"
-
-        echo ""
-        echo "=== S3 버킷 전체 목록 ==="
-        aws s3 ls s3://runnect-prod-bucket/ 2>&1 || echo "S3 접근 실패"
-
-    - name: Download and display diagnostic file
-      run: |
-        echo "=== 진단 파일 다운로드 시도 ==="
-        LATEST_FILE=$(aws s3 ls s3://runnect-prod-bucket/diagnostics/ --recursive 2>/dev/null | sort | tail -1 | awk '{print $4}')
-
-        if [ -n "$LATEST_FILE" ]; then
-          echo "Found: $LATEST_FILE"
-          aws s3 cp "s3://runnect-prod-bucket/$LATEST_FILE" /tmp/diagnostic.txt 2>&1
+        for DEP_ID in $DEPLOYMENTS; do
           echo ""
-          echo "=== DIAGNOSTIC CONTENTS ==="
-          cat /tmp/diagnostic.txt
-        else
-          echo "진단 파일이 없습니다."
-          echo ""
-          echo "S3에 직접 접근하여 모든 파일 확인..."
-          aws s3 ls s3://runnect-prod-bucket/ --recursive 2>&1 | tail -20
-        fi
+          echo "================================================"
+          echo "=== Deployment: $DEP_ID ==="
+          echo "================================================"
 
-    - name: Health check from GitHub Actions
-      run: |
-        echo "=== External Health Check ==="
-        for PORT in 80 8081 8082; do
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 --max-time 10 http://3.35.195.11:$PORT/actuator/health 2>/dev/null || echo "000")
-          echo "Port $PORT: HTTP $HTTP_CODE"
+          aws deploy get-deployment --deployment-id "$DEP_ID" \
+            --query "deploymentInfo.{status:status, createTime:createTime, completeTime:completeTime, error:errorInformation}" \
+            --output json 2>&1
+
+          echo ""
+          echo "--- Instance lifecycle events ---"
+          INSTANCES=$(aws deploy list-deployment-instances \
+            --deployment-id "$DEP_ID" \
+            --query "instancesList" \
+            --output text 2>/dev/null)
+
+          for INST in $INSTANCES; do
+            echo "Instance: $INST"
+            aws deploy get-deployment-instance \
+              --deployment-id "$DEP_ID" \
+              --instance-id "$INST" \
+              --output json 2>&1
+          done
         done

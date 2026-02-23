@@ -27,6 +27,8 @@ public class SlackApi {
     private final static String NEW_LINE = "\n";
     private final static String DOUBLE_NEW_LINE = "\n\n";
 
+    private StringBuilder sb = new StringBuilder();
+
     public void sendAlert(Exception error, HttpServletRequest request) throws IOException {
 
         List<LayoutBlock> layoutBlocks = generateLayoutBlock(error, request);
@@ -51,7 +53,7 @@ public class SlackApi {
     }
 
     private String generateErrorMessage(Exception error) {
-        StringBuilder sb = new StringBuilder();
+        sb.setLength(0);
         sb.append("*[🔥 Exception]*" + NEW_LINE + error.toString() + DOUBLE_NEW_LINE);
         sb.append("*[📩 From]*" + NEW_LINE + readRootStackTrace(error) + DOUBLE_NEW_LINE);
 
@@ -59,7 +61,7 @@ public class SlackApi {
     }
 
     private String generateErrorPointMessage(HttpServletRequest request) {
-        StringBuilder sb = new StringBuilder();
+        sb.setLength(0);
         sb.append("*[🧾세부정보]*" + NEW_LINE);
         sb.append("Request URL : " + request.getRequestURL().toString() + NEW_LINE);
         sb.append("Request Method : " + request.getMethod() + NEW_LINE);
@@ -69,9 +71,6 @@ public class SlackApi {
     }
 
     private String readRootStackTrace(Exception error) {
-        if (error.getStackTrace() == null || error.getStackTrace().length == 0) {
-            return "Unknown";
-        }
         return error.getStackTrace()[0].toString();
     }
 

@@ -6,6 +6,7 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface RecordHealthDataRepository extends Repository<RecordHealthData, Long> {
@@ -27,7 +28,7 @@ public interface RecordHealthDataRepository extends Repository<RecordHealthData,
             "COALESCE(SUM(h.zone5Seconds), 0) " +
             "FROM Record r LEFT JOIN RecordHealthData h ON r.id = h.record.id " +
             "WHERE r.runnectUser.id = :userId AND r.createdAt >= :startDate AND r.createdAt < :endDate")
-    Object[] getHealthSummary(@Param("userId") Long userId,
-                              @Param("startDate") LocalDateTime startDate,
-                              @Param("endDate") LocalDateTime endDate);
+    List<Object[]> getHealthSummary(@Param("userId") Long userId,
+                                    @Param("startDate") LocalDateTime startDate,
+                                    @Param("endDate") LocalDateTime endDate);
 }

@@ -29,6 +29,9 @@ public enum SuccessStatus {
 
     SEARCH_PUBLIC_COURSE_SUCCESS(HttpStatus.OK,"업로드된 코스 검색 성공"),
 
+    GET_HEALTH_DATA_SUCCESS(HttpStatus.OK, "건강 데이터 조회 성공"),
+    GET_HEALTH_SUMMARY_SUCCESS(HttpStatus.OK, "건강 통계 조회 성공"),
+
 
     UPDATE_RECORD_SUCCESS(HttpStatus.OK, "활동 기록 수정 성공"),
     UPDATE_USER_NICKNAME_SUCCESS(HttpStatus.OK, "닉네임 변경에 성공했습니다."),
@@ -41,6 +44,7 @@ public enum SuccessStatus {
     DELETE_PUBLIC_COURSE_SUCCESS(HttpStatus.OK, "퍼블릭 코스 삭제에 성공했습니다."),
     DELETE_RECORD_SUCCESS(HttpStatus.OK, "기록 삭제에 성공했습니다."),
     DELETE_COURSES_SUCCESS(HttpStatus.OK, "코스 삭제 성공"),
+    DELETE_HEALTH_DATA_SUCCESS(HttpStatus.OK, "건강 데이터 삭제 성공"),
 
 
     /**
@@ -52,6 +56,7 @@ public enum SuccessStatus {
     CREATE_PUBLIC_COURSE_SUCCESS(HttpStatus.CREATED, "코드 업로드에 성공했습니다."),
     CREATE_SCRAP_SUCCESS(HttpStatus.CREATED, "코스 스크랩 성공"),
     NEW_TOKEN_SUCCESS(HttpStatus.CREATED, "토큰 재발급에 성공했습니다."),
+    CREATE_HEALTH_DATA_SUCCESS(HttpStatus.CREATED, "건강 데이터 저장 성공"),
     ;
 
     private final HttpStatus httpStatus;

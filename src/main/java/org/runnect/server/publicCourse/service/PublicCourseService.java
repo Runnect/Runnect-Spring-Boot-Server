@@ -13,6 +13,7 @@ import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
 import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.course.entity.Course;
+import org.runnect.server.record.entity.Record;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.publicCourse.dto.request.CreatePublicCourseRequestDto;
 import org.runnect.server.publicCourse.dto.request.DeletePublicCoursesRequestDto;
@@ -43,9 +44,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 @Service
 @RequiredArgsConstructor
 public class PublicCourseService {
@@ -57,9 +55,6 @@ public class PublicCourseService {
     private final UserRepository userRepository;
     private final ScrapRepository scrapRepository;
     private final CourseRepository courseRepository;
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
 
     @Value("${runnect.marathon-public-course-id}")
@@ -371,16 +366,16 @@ public class PublicCourseService {
         //삭제전 course의 isPrivate update
         publicCourses.forEach(publicCourse -> publicCourse.getCourse().retrieveCourse());
 
-        // Record의 publicCourse FK를 null로 설정 (Record 테이블 FK 제약조건 해제)
-        entityManager.createQuery(
-                        "UPDATE Record r SET r.publicCourse = null WHERE r.publicCourse IN :publicCourses")
-                .setParameter("publicCourses", publicCourses)
-                .executeUpdate();
+        // FK 제약 조건 해소: Record.public_course_id (NULLABLE) → null 처리
+        publicCourses.forEach(publicCourse ->
+            publicCourse.getRecords().forEach(Record::setPublicCourseNull)
+        );
 
-        // Scrap 삭제 (Scrap 테이블 FK NOT NULL 제약조건)
+        // FK 제약 조건 해소: Scrap.public_course_id (NOT NULL) → 행 삭제
         scrapRepository.deleteByPublicCourseIn(publicCourses);
 
-        publicCourseRepository.deleteAllInBatch(publicCourses);
+        // deleteAll: Hibernate ActionQueue가 UPDATE → DELETE 순서 보장
+        publicCourseRepository.deleteAll(publicCourses);
 
         return DeletePublicCoursesResponseDto.from(publicCourses.size());
     }

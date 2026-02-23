@@ -110,10 +110,15 @@ public class RecordService {
 
             DepartureResponse departure = DepartureResponse.of(course.getDepartureRegion(), course.getDepartureCity());
 
-            // 건강 데이터 조회
-            HealthDataResponse healthData = recordHealthDataRepository.findByRecordId(record.getId())
-                    .map(h -> HealthDataResponse.of(h.getAvgHeartRate(), h.getCalories()))
-                    .orElse(null);
+            // 건강 데이터 조회 (실패해도 기록 목록은 정상 반환)
+            HealthDataResponse healthData = null;
+            try {
+                healthData = recordHealthDataRepository.findByRecordId(record.getId())
+                        .map(h -> HealthDataResponse.of(h.getAvgHeartRate(), h.getCalories()))
+                        .orElse(null);
+            } catch (Exception e) {
+                // 건강 데이터 테이블 미생성 등 예외 발생 시 무시
+            }
 
             RecordResponse recordResponse = RecordResponse.of(record.getId(), course.getId(), publicCourseId, userId,
                     record.getTitle(), course.getImage(), record.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")), course.getDistance(), record.getTime().toString(),

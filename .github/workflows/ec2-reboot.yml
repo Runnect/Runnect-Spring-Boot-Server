@@ -1,11 +1,11 @@
-name: EC2-DIAGNOSTIC
+name: EC2-READ-DIAGNOSTIC
 
 on:
   workflow_dispatch:
 
 jobs:
-  diagnose:
-    name: Diagnose EC2 Instance
+  read-diag:
+    name: Read S3 Diagnostic
     runs-on: ubuntu-latest
 
     steps:
@@ -16,37 +16,8 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_PROD_SECRET_KEY }}
         aws-region: ap-northeast-2
 
-    - name: Check IAM identity and permissions
+    - name: Check latest CodeDeploy deployment
       run: |
-        echo "=== IAM 정보 ==="
-        aws sts get-caller-identity 2>&1 || true
-
-        echo ""
-        echo "=== IAM 정책 확인 ==="
-        ACCOUNT=$(aws sts get-caller-identity --query Account --output text 2>/dev/null)
-        USER_NAME=$(aws sts get-caller-identity --query Arn --output text 2>/dev/null | awk -F'/' '{print $NF}')
-        echo "Account: $ACCOUNT"
-        echo "User: $USER_NAME"
-
-        echo ""
-        echo "=== Attached Policies ==="
-        aws iam list-attached-user-policies --user-name "$USER_NAME" 2>&1 || echo "IAM 정책 조회 권한 없음"
-
-        echo ""
-        echo "=== Inline Policies ==="
-        aws iam list-user-policies --user-name "$USER_NAME" 2>&1 || echo "IAM 인라인 정책 조회 권한 없음"
-
-    - name: CodeDeploy deployment group info
-      run: |
-        echo "=== 배포 그룹 상세 ==="
-        aws deploy get-deployment-group \
-          --application-name runnect-prod-codedeploy \
-          --deployment-group-name runnect-prod-codedeploy-group \
-          --output json 2>&1 || echo "배포 그룹 조회 실패"
-
-    - name: Latest deployment details
-      run: |
-        echo "=== 최근 배포 목록 ==="
         LATEST=$(aws deploy list-deployments \
           --application-name runnect-prod-codedeploy \
           --deployment-group-name runnect-prod-codedeploy-group \
@@ -54,43 +25,41 @@ jobs:
           --output text 2>/dev/null)
         echo "Latest deployment: $LATEST"
 
-        if [ -n "$LATEST" ] && [ "$LATEST" != "None" ]; then
-          echo ""
-          echo "=== 배포 상세 ==="
-          aws deploy get-deployment --deployment-id "$LATEST" --output json 2>&1
+        aws deploy get-deployment --deployment-id "$LATEST" \
+          --query "deploymentInfo.{status:status, createTime:createTime, completeTime:completeTime}" \
+          --output json 2>&1
 
-          echo ""
-          echo "=== 배포 인스턴스 목록 ==="
-          aws deploy list-deployment-instances --deployment-id "$LATEST" --output json 2>&1 || echo "인스턴스 목록 조회 실패"
+    - name: List S3 diagnostics
+      run: |
+        echo "=== S3 diagnostics 폴더 ==="
+        aws s3 ls s3://runnect-prod-bucket/diagnostics/ 2>&1 || echo "diagnostics 폴더 없거나 접근 불가"
 
+        echo ""
+        echo "=== S3 버킷 전체 목록 ==="
+        aws s3 ls s3://runnect-prod-bucket/ 2>&1 || echo "S3 접근 실패"
+
+    - name: Download and display diagnostic file
+      run: |
+        echo "=== 진단 파일 다운로드 시도 ==="
+        LATEST_FILE=$(aws s3 ls s3://runnect-prod-bucket/diagnostics/ --recursive 2>/dev/null | sort | tail -1 | awk '{print $4}')
+
+        if [ -n "$LATEST_FILE" ]; then
+          echo "Found: $LATEST_FILE"
+          aws s3 cp "s3://runnect-prod-bucket/$LATEST_FILE" /tmp/diagnostic.txt 2>&1
           echo ""
-          echo "=== 배포 타겟 상세 ==="
-          INSTANCE_IDS=$(aws deploy list-deployment-instances --deployment-id "$LATEST" --query "instancesList" --output text 2>/dev/null)
-          for INST in $INSTANCE_IDS; do
-            echo "--- Instance: $INST ---"
-            aws deploy get-deployment-instance --deployment-id "$LATEST" --instance-id "$INST" --output json 2>&1 || echo "조회 실패"
-          done
+          echo "=== DIAGNOSTIC CONTENTS ==="
+          cat /tmp/diagnostic.txt
+        else
+          echo "진단 파일이 없습니다."
+          echo ""
+          echo "S3에 직접 접근하여 모든 파일 확인..."
+          aws s3 ls s3://runnect-prod-bucket/ --recursive 2>&1 | tail -20
         fi
 
-    - name: Check SSM access
+    - name: Health check from GitHub Actions
       run: |
-        echo "=== SSM 인스턴스 목록 ==="
-        aws ssm describe-instance-information --output json 2>&1 || echo "SSM 권한 없음"
-
-    - name: Try EC2 describe (may fail)
-      run: |
-        echo "=== EC2 인스턴스 조회 시도 ==="
-        aws ec2 describe-instances --output json 2>&1 || echo "EC2 권한 없음"
-
-        echo ""
-        echo "=== Elastic IP 조회 시도 ==="
-        aws ec2 describe-addresses --public-ips 3.35.195.11 2>&1 || echo "Elastic IP 조회 실패"
-
-        echo ""
-        echo "=== 보안 그룹 조회 시도 ==="
-        aws ec2 describe-security-groups 2>&1 || echo "보안 그룹 조회 실패"
-
-    - name: Check S3 bucket
-      run: |
-        echo "=== S3 버킷 확인 ==="
-        aws s3 ls s3://runnect-prod-bucket/ 2>&1 || echo "S3 접근 실패"
+        echo "=== External Health Check ==="
+        for PORT in 80 8081 8082; do
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 --max-time 10 http://3.35.195.11:$PORT/actuator/health 2>/dev/null || echo "000")
+          echo "Port $PORT: HTTP $HTTP_CODE"
+        done

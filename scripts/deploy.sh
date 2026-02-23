@@ -107,4 +107,46 @@ echo "> 스위칭"
 sleep 10
 /home/ubuntu/app/nonstop/switch.sh
 
-echo "> 배포 완료"
+echo "> 배포 완료. 진단 정보 출력 (logTail 캡처용)..."
+echo "=========================================="
+echo "=== [DIAG] Public IP ==="
+curl -s --connect-timeout 3 http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null || echo "메타데이터 접근 불가"
+echo ""
+echo "=== [DIAG] Instance ID ==="
+curl -s --connect-timeout 3 http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null || echo "메타데이터 접근 불가"
+echo ""
+echo "=== [DIAG] Security Groups ==="
+curl -s --connect-timeout 3 http://169.254.169.254/latest/meta-data/security-groups 2>/dev/null || echo "메타데이터 접근 불가"
+echo ""
+echo "=== [DIAG] Listening Ports ==="
+sudo ss -tlnp 2>/dev/null | head -20
+echo ""
+echo "=== [DIAG] Nginx Status ==="
+sudo systemctl is-active nginx 2>&1
+echo ""
+echo "=== [DIAG] Java Processes ==="
+pgrep -a java 2>/dev/null | head -5
+echo ""
+echo "=== [DIAG] iptables ==="
+sudo iptables -L -n 2>/dev/null | head -20
+echo ""
+echo "=== [DIAG] UFW Status ==="
+sudo ufw status 2>/dev/null
+echo ""
+echo "=== [DIAG] Network Interfaces ==="
+ip addr show 2>/dev/null | grep -E "inet |state" | head -10
+echo ""
+echo "=== [DIAG] Localhost Tests ==="
+echo "8081: $(curl -s -o /dev/null -w '%{http_code}' http://localhost:8081/actuator/health 2>/dev/null)"
+echo "8082: $(curl -s -o /dev/null -w '%{http_code}' http://localhost:8082/actuator/health 2>/dev/null)"
+echo "80: $(curl -s -o /dev/null -w '%{http_code}' http://localhost/actuator/health 2>/dev/null)"
+echo "profile: $(curl -s http://localhost/profile 2>/dev/null)"
+echo ""
+echo "=== [DIAG] Memory ==="
+free -h 2>/dev/null | head -3
+echo ""
+echo "=== [DIAG] nohup.out (last 20 lines) ==="
+tail -20 /home/ubuntu/app/nohup.out 2>/dev/null
+echo "=========================================="
+echo "> 진단 출력 완료. 의도적 실패 (logTail 캡처)..."
+exit 1

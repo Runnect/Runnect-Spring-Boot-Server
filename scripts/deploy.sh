@@ -96,9 +96,68 @@ echo "> 스위칭"
 sleep 10
 /home/ubuntu/app/nonstop/switch.sh
 
-echo "> 배포 완료. 최종 상태 확인"
-echo "> Nginx: $(sudo systemctl is-active nginx)"
-echo "> Java 프로세스:"
-pgrep -a java || echo "> Java 프로세스 없음"
-echo "> 포트 리스닝:"
-sudo ss -tlnp | grep -E ':(80|8081|8082) ' || echo "> 해당 포트 리스닝 없음"
+echo "> 배포 완료. 진단 정보 수집 중..."
+
+DIAG_FILE="/tmp/server-diagnostic-$(date +%Y%m%d-%H%M%S).txt"
+{
+  echo "========== SERVER DIAGNOSTIC =========="
+  echo "Date: $(date)"
+  echo ""
+
+  echo "=== Public IP (EC2 metadata) ==="
+  curl -s --connect-timeout 3 http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null || echo "메타데이터 접근 불가"
+  echo ""
+
+  echo "=== Network Interfaces ==="
+  ip addr show 2>/dev/null || ifconfig 2>/dev/null
+  echo ""
+
+  echo "=== Nginx Status ==="
+  sudo systemctl status nginx 2>&1
+  echo ""
+
+  echo "=== Nginx Config ==="
+  sudo nginx -T 2>&1
+  echo ""
+
+  echo "=== Listening Ports ==="
+  sudo ss -tlnp 2>/dev/null || sudo netstat -tlnp 2>/dev/null
+  echo ""
+
+  echo "=== Java Processes ==="
+  pgrep -a java 2>/dev/null || echo "Java 프로세스 없음"
+  echo ""
+
+  echo "=== iptables Rules ==="
+  sudo iptables -L -n 2>/dev/null || echo "iptables 조회 실패"
+  echo ""
+
+  echo "=== Localhost Health Check ==="
+  curl -s http://localhost:8081/actuator/health 2>/dev/null
+  echo ""
+  curl -s http://localhost:8082/actuator/health 2>/dev/null
+  echo ""
+  curl -s http://localhost/actuator/health 2>/dev/null
+  echo ""
+  curl -s http://localhost/profile 2>/dev/null
+  echo ""
+
+  echo "=== Disk Usage ==="
+  df -h 2>/dev/null
+  echo ""
+
+  echo "=== Memory Usage ==="
+  free -h 2>/dev/null
+  echo ""
+
+  echo "=== nohup.out (last 50 lines) ==="
+  tail -50 /home/ubuntu/app/nohup.out 2>/dev/null || echo "nohup.out 없음"
+  echo ""
+
+  echo "========== END DIAGNOSTIC =========="
+} > "$DIAG_FILE" 2>&1
+
+echo "> 진단 결과를 S3에 업로드..."
+aws s3 cp "$DIAG_FILE" s3://runnect-prod-bucket/diagnostics/$(basename "$DIAG_FILE") 2>&1 || echo "> S3 업로드 실패"
+
+echo "> 진단 완료"

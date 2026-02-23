@@ -19,7 +19,6 @@ import org.runnect.server.record.dto.request.UpdateRecordRequestDto;
 import org.runnect.server.record.dto.response.CreateRecordDto;
 import org.runnect.server.record.dto.response.CreateRecordResponseDto;
 import org.runnect.server.record.dto.response.DeleteRecordsResponseDto;
-import org.runnect.server.health.entity.RecordHealthData;
 import org.runnect.server.health.repository.RecordHealthDataRepository;
 import org.runnect.server.record.dto.response.DepartureResponse;
 import org.runnect.server.record.dto.response.GetRecordResponseDto;

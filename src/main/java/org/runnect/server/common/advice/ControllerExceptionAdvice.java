@@ -95,5 +95,3 @@ public class ControllerExceptionAdvice {
                 .body(ApiResponseDto.error(e.getErrorStatus(), e.getMessage()));
     }
 }
-
-

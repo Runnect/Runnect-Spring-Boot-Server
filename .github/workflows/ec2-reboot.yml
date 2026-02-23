@@ -1,11 +1,11 @@
-name: EC2-REBOOT
+name: EC2-RECOVERY
 
 on:
   workflow_dispatch:
 
 jobs:
-  reboot:
-    name: Reboot EC2 Instance
+  recover:
+    name: Recover Server
     runs-on: ubuntu-latest
 
     steps:
@@ -16,55 +16,70 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_PROD_SECRET_KEY }}
         aws-region: ap-northeast-2
 
-    - name: Find EC2 instance
-      id: find-ec2
+    - name: Check IAM identity
       run: |
-        echo "=== 모든 EC2 인스턴스 조회 ==="
-        aws ec2 describe-instances \
-          --query "Reservations[].Instances[].[InstanceId, PublicIpAddress, State.Name, Tags[?Key=='Name'].Value | [0]]" \
-          --output table
+        echo "=== IAM 정보 확인 ==="
+        aws sts get-caller-identity || echo "STS 호출 실패"
 
-        echo ""
-        echo "=== Public IP 3.35.195.11 으로 검색 ==="
-        INSTANCE_ID=$(aws ec2 describe-instances \
-          --filters "Name=ip-address,Values=3.35.195.11" \
-          --query "Reservations[].Instances[].InstanceId" \
+    - name: Check CodeDeploy deployments
+      run: |
+        echo "=== 최근 배포 상태 확인 ==="
+        aws deploy list-deployments \
+          --application-name runnect-prod-codedeploy \
+          --deployment-group-name runnect-prod-codedeploy-group \
+          --include-only-statuses "Succeeded,Failed,InProgress" \
+          --query "deployments[:3]" \
+          --output text || echo "배포 목록 조회 실패"
+
+        LATEST=$(aws deploy list-deployments \
+          --application-name runnect-prod-codedeploy \
+          --deployment-group-name runnect-prod-codedeploy-group \
+          --query "deployments[0]" \
+          --output text 2>/dev/null)
+
+        if [ -n "$LATEST" ] && [ "$LATEST" != "None" ]; then
+          echo ""
+          echo "=== 최신 배포 상세 ==="
+          aws deploy get-deployment --deployment-id "$LATEST" \
+            --query "deploymentInfo.{status:status, createTime:createTime, completeTime:completeTime, errorInfo:errorInformation}" \
+            --output json
+        fi
+
+    - name: Trigger new CodeDeploy deployment
+      run: |
+        echo "=== 새 CodeDeploy 배포 트리거 ==="
+        DEPLOYMENT_ID=$(aws deploy create-deployment \
+          --application-name runnect-prod-codedeploy \
+          --deployment-group-name runnect-prod-codedeploy-group \
+          --file-exists-behavior OVERWRITE \
+          --s3-location bucket=runnect-prod-bucket,bundleType=zip,key=runnect_prod_server.zip \
+          --region ap-northeast-2 \
+          --query "deploymentId" \
           --output text)
 
-        if [ -z "$INSTANCE_ID" ]; then
-          echo "Public IP로 찾지 못함. 실행 중인 모든 인스턴스 확인..."
-          INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=instance-state-name,Values=running,stopped" \
-            --query "Reservations[].Instances[].InstanceId" \
-            --output text)
-        fi
+        echo "Deployment ID: $DEPLOYMENT_ID"
 
-        echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_OUTPUT
-        echo "찾은 Instance ID: $INSTANCE_ID"
+        echo "배포 완료 대기 (최대 5분)..."
+        for i in $(seq 1 30); do
+          STATUS=$(aws deploy get-deployment --deployment-id "$DEPLOYMENT_ID" \
+            --query "deploymentInfo.status" --output text 2>/dev/null)
+          echo "[$i/30] Status: $STATUS"
 
-    - name: Reboot EC2 instance
-      run: |
-        INSTANCE_ID="${{ steps.find-ec2.outputs.INSTANCE_ID }}"
-        if [ -n "$INSTANCE_ID" ]; then
-          echo "EC2 리부트 시작: $INSTANCE_ID"
-          aws ec2 reboot-instances --instance-ids $INSTANCE_ID
-          echo "리부트 명령 전송 완료!"
-
-          echo "60초 대기 후 상태 확인..."
-          sleep 60
-
-          aws ec2 describe-instances \
-            --instance-ids $INSTANCE_ID \
-            --query "Reservations[].Instances[].[InstanceId, PublicIpAddress, State.Name]" \
-            --output table
-        else
-          echo "ERROR: 인스턴스를 찾을 수 없습니다!"
-          exit 1
-        fi
+          if [ "$STATUS" = "Succeeded" ]; then
+            echo "배포 성공!"
+            break
+          elif [ "$STATUS" = "Failed" ] || [ "$STATUS" = "Stopped" ]; then
+            echo "배포 실패! 상세 정보:"
+            aws deploy get-deployment --deployment-id "$DEPLOYMENT_ID" \
+              --query "deploymentInfo.errorInformation" --output json
+            break
+          fi
+          sleep 10
+        done
 
     - name: Health check
       run: |
-        echo "서버 헬스 체크 시작 (최대 3분 대기)..."
+        echo "서버 헬스 체크 (최대 3분 대기)..."
         for i in $(seq 1 18); do
           HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 --max-time 10 http://3.35.195.11/actuator/health 2>/dev/null || echo "000")
           echo "[$i/18] HTTP: $HTTP_CODE"
@@ -74,4 +89,11 @@ jobs:
           fi
           sleep 10
         done
-        echo "WARNING: 서버가 아직 응답하지 않습니다. EC2는 리부트되었지만 앱 시작에 시간이 더 필요할 수 있습니다."
+
+        echo ""
+        echo "=== 포트별 체크 ==="
+        for PORT in 80 8081 8082; do
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 --max-time 10 http://3.35.195.11:$PORT/actuator/health 2>/dev/null || echo "000")
+          echo "Port $PORT: HTTP $HTTP_CODE"
+        done
+        echo "WARNING: 서버가 아직 응답하지 않습니다."

@@ -1,11 +1,11 @@
-name: EC2-READ-DEPLOY-LOG
+name: EC2-READ-LOGTAIL
 
 on:
   workflow_dispatch:
 
 jobs:
   read-log:
-    name: Read CodeDeploy Logs
+    name: Read CodeDeploy LogTail
     runs-on: ubuntu-latest
 
     steps:
@@ -16,13 +16,13 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_PROD_SECRET_KEY }}
         aws-region: ap-northeast-2
 
-    - name: Get deployment lifecycle events
+    - name: Get latest deployment logTail
       run: |
-        echo "=== 최근 배포 목록 (최대 5개) ==="
+        echo "=== 최근 배포 목록 ==="
         DEPLOYMENTS=$(aws deploy list-deployments \
           --application-name runnect-prod-codedeploy \
           --deployment-group-name runnect-prod-codedeploy-group \
-          --query "deployments[:5]" \
+          --query "deployments[:3]" \
           --output text 2>/dev/null)
         echo "Deployments: $DEPLOYMENTS"
 
@@ -30,24 +30,25 @@ jobs:
           echo ""
           echo "================================================"
           echo "=== Deployment: $DEP_ID ==="
-          echo "================================================"
 
-          aws deploy get-deployment --deployment-id "$DEP_ID" \
-            --query "deploymentInfo.{status:status, createTime:createTime, completeTime:completeTime, error:errorInformation}" \
-            --output json 2>&1
+          DEP_STATUS=$(aws deploy get-deployment --deployment-id "$DEP_ID" \
+            --query "deploymentInfo.status" --output text 2>/dev/null)
+          DEP_TIME=$(aws deploy get-deployment --deployment-id "$DEP_ID" \
+            --query "deploymentInfo.createTime" --output text 2>/dev/null)
+          echo "Status: $DEP_STATUS | Created: $DEP_TIME"
 
-          echo ""
-          echo "--- Instance lifecycle events ---"
           INSTANCES=$(aws deploy list-deployment-instances \
             --deployment-id "$DEP_ID" \
             --query "instancesList" \
             --output text 2>/dev/null)
 
           for INST in $INSTANCES; do
-            echo "Instance: $INST"
+            echo ""
+            echo "--- Instance: $INST ---"
             aws deploy get-deployment-instance \
               --deployment-id "$DEP_ID" \
               --instance-id "$INST" \
+              --query "instanceSummary.lifecycleEvents[].{name:lifecycleEventName, status:status, logTail:diagnostics.logTail}" \
               --output json 2>&1
           done
         done

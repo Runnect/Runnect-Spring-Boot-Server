@@ -90,9 +90,9 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_PROD_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_PROD_SECRET_KEY }}
       run:
-        aws deploy create-deployment 
-        --application-name runnect-prod-codedeploy
-        --deployment-group-name runnect-prod-codedeploy-group
+        aws deploy create-deployment
+        --application-name runnect-prod-app
+        --deployment-group-name runnect-prod-deploy-group
         --file-exists-behavior OVERWRITE 
         --s3-location bucket=runnect-prod-bucket,bundleType=zip,key=runnect_prod_server.zip
         --region ap-northeast-2

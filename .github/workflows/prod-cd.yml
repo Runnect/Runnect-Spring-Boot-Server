@@ -8,7 +8,7 @@ on:
     branches: [ main ] # main branch로 push 될 때 실행됩니다.
 
 env:
-  S3_BUCKET_NAME: runnect-prod-bucket
+  S3_BUCKET_NAME: runnect-prod-bucket-604764467555-ap-northeast-2-an
 
 jobs:
   build:
@@ -94,5 +94,5 @@ jobs:
         --application-name runnect-prod-app
         --deployment-group-name runnect-prod-deploy-group
         --file-exists-behavior OVERWRITE 
-        --s3-location bucket=runnect-prod-bucket,bundleType=zip,key=runnect_prod_server.zip
+        --s3-location bucket=runnect-prod-bucket-604764467555-ap-northeast-2-an,bundleType=zip,key=runnect_prod_server.zip
         --region ap-northeast-2

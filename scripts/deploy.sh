@@ -2,7 +2,7 @@
 set -e
 
 APP_DIR=/home/ec2-user/app
-JAR_PATH=$(ls $APP_DIR/*.jar | head -1)
+JAR_PATH=$(ls $APP_DIR/*.jar | grep -v plain | head -1)
 echo "> JAR 파일: $JAR_PATH"
 
 echo "> 실행 중인 애플리케이션 종료"

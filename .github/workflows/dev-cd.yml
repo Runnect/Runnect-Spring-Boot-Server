@@ -7,7 +7,7 @@ on:
     branches: [ dev ] # main branch로 push 될 때 실행됩니다.
 
 env:
-  S3_BUCKET_NAME: runnect-dev-bucket
+  S3_BUCKET_NAME: runnect-staging-bucket-604764467555-ap-northeast-2-an
 
 jobs:
   build:
@@ -89,9 +89,9 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DEV_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_SECRET_KEY }}
       run:
-        aws deploy create-deployment 
-        --application-name runnect-dev-codedeploy
-        --deployment-group-name runnect-dev-codedeploy-group
-        --file-exists-behavior OVERWRITE 
-        --s3-location bucket=runnect-dev-bucket,bundleType=zip,key=runnect_dev_server.zip
+        aws deploy create-deployment
+        --application-name runnect-staging-app
+        --deployment-group-name runnect-staging-deploy-group
+        --file-exists-behavior OVERWRITE
+        --s3-location bucket=runnect-staging-bucket-604764467555-ap-northeast-2-an,bundleType=zip,key=runnect_dev_server.zip
         --region ap-northeast-2

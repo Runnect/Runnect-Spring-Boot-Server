@@ -42,3 +42,5 @@ application.yaml
 
 ### DS_Store
 .DS_Store
+logs/
+test_write.tmp

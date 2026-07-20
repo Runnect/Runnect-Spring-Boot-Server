@@ -1,0 +1,48 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: runnect-alerts
+    folder: Runnect Alerts
+    interval: 30s
+    rules:
+      - uid: runnect-server-down
+        title: "Runnect Server Down"
+        condition: C
+        for: 30s
+        noDataState: Alerting
+        execErrState: Alerting
+        data:
+          - refId: A
+            datasourceUid: prometheus-ds
+            relativeTimeRange:
+              from: 120
+              to: 0
+            model:
+              expr: 'up{job="runnect-server"}'
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: "-100"
+            relativeTimeRange:
+              from: 120
+              to: 0
+            model:
+              type: threshold
+              refId: C
+              expression: A
+              conditions:
+                - evaluator:
+                    type: lt
+                    params: [1]
+                  operator:
+                    type: and
+                  query:
+                    params: ["A"]
+                  reducer:
+                    type: last
+                    params: []
+        annotations:
+          summary: "Runnect 서버가 응답하지 않고 있습니다 (up == 0)"
+        labels:
+          severity: critical

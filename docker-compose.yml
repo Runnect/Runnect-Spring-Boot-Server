@@ -1,0 +1,115 @@
+version: "3.8"
+
+services:
+  runnect-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: runnect-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - runnect-net
+
+  postgres:
+    image: postgres:15
+    container_name: runnect-postgres
+    environment:
+      POSTGRES_DB: runnect
+      POSTGRES_USER: runnect
+      POSTGRES_PASSWORD: runnect_local_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - runnect-net
+
+  redis:
+    image: redis:7
+    container_name: runnect-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - runnect-net
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: runnect-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    networks:
+      - runnect-net
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.13.4
+    container_name: runnect-logstash
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./logs:/usr/share/logstash/logs
+      - logstash_data:/usr/share/logstash/data
+    ports:
+      - "5044:5044"
+    networks:
+      - runnect-net
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    container_name: runnect-kibana
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - runnect-net
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: runnect-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - runnect-app
+    networks:
+      - runnect-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: runnect-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - runnect-net
+
+networks:
+  runnect-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  grafana_data:
+  logstash_data:

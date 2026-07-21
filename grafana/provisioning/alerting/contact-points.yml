@@ -1,0 +1,11 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: slack-alert
+    receivers:
+      - uid: slack-alert-receiver
+        type: slack
+        settings:
+          url: $__env{SLACK_WEBHOOK_URL}
+          username: "Grafana"

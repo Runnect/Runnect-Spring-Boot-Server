@@ -16,7 +16,20 @@ else
 fi
 
 echo "> 애플리케이션 시작"
-nohup java -jar \
+OTEL_AGENT_JAR=$APP_DIR/grafana-opentelemetry-java.jar
+OTEL_ENV_FILE=$APP_DIR/otel.env
+JAVA_AGENT_OPTS=""
+if [ -f "$OTEL_AGENT_JAR" ] && [ -f "$OTEL_ENV_FILE" ]; then
+  echo "> Grafana OTel agent 감지, 모니터링 활성화"
+  set -a
+  source "$OTEL_ENV_FILE"
+  set +a
+  JAVA_AGENT_OPTS="-javaagent:$OTEL_AGENT_JAR"
+else
+  echo "> Grafana OTel agent 미설정, 모니터링 없이 실행"
+fi
+
+nohup java $JAVA_AGENT_OPTS -jar \
   -Duser.timezone=Asia/Seoul \
   $JAR_PATH \
   >> /home/ec2-user/app/nohup.out 2>&1 &

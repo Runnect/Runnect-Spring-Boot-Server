@@ -2,6 +2,7 @@
 set -e
 
 APP_DIR=/home/ec2-user/app
+cd "$APP_DIR"
 JAR_PATH=$(ls $APP_DIR/*.jar | grep -v plain | head -1)
 echo "> JAR 파일: $JAR_PATH"
 

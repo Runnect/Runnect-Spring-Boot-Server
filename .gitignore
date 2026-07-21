@@ -44,3 +44,5 @@ application.yaml
 .DS_Store
 logs/
 test_write.tmp
+.env
+grafana/provisioning/alerting/contact-points.yml

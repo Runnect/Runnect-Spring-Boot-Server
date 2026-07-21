@@ -1,5 +1,6 @@
 package org.runnect.server.config.logging;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -16,6 +18,7 @@ import java.util.UUID;
  * 로그 패턴에 %X{traceId}를 포함시키면(logback-spring.xml), 여러 요청이 뒤섞인 로그에서도
  * 같은 traceId로 특정 요청의 흐름만 추적할 수 있다.
  */
+@Slf4j
 @Component
 public class MdcLoggingFilter implements Filter {
 
@@ -28,6 +31,8 @@ public class MdcLoggingFilter implements Filter {
         String traceId = UUID.randomUUID().toString().substring(0, TRACE_ID_LENGTH);
         try {
             MDC.put(TRACE_ID_KEY, traceId);
+            HttpServletRequest httpRequest = (HttpServletRequest) request;
+            log.info("{} {}", httpRequest.getMethod(), httpRequest.getRequestURI());
             chain.doFilter(request, response);
         } finally {
             MDC.remove(TRACE_ID_KEY);

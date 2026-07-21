@@ -93,6 +93,12 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        sed "s|__SLACK_WEBHOOK_URL__|$${SLACK_WEBHOOK_URL}|g" /etc/grafana/provisioning/alerting/contact-points.yml.tpl > /etc/grafana/provisioning/alerting/contact-points.yml
+        exec /run.sh
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
       - grafana_data:/var/lib/grafana

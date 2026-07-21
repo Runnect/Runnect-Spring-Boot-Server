@@ -58,6 +58,7 @@ services:
     volumes:
       - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - ./logs:/usr/share/logstash/logs
+      - logstash_data:/usr/share/logstash/data
     ports:
       - "5044:5044"
     networks:
@@ -94,11 +95,6 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - |
-        sed "s|__SLACK_WEBHOOK_URL__|$${SLACK_WEBHOOK_URL}|g" /etc/grafana/provisioning/alerting/contact-points.yml.tpl > /etc/grafana/provisioning/alerting/contact-points.yml
-        exec /run.sh
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
       - grafana_data:/var/lib/grafana
@@ -116,3 +112,4 @@ networks:
 volumes:
   postgres_data:
   grafana_data:
+  logstash_data:

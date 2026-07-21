@@ -45,4 +45,3 @@ application.yaml
 logs/
 test_write.tmp
 .env
-grafana/provisioning/alerting/contact-points.yml

@@ -2,10 +2,10 @@ apiVersion: 1
 
 contactPoints:
   - orgId: 1
-    name: discord-alert
+    name: slack-alert
     receivers:
-      - uid: discord-alert-receiver
-        type: discord
+      - uid: slack-alert-receiver
+        type: slack
         settings:
-          url: "REPLACE_WITH_YOUR_DISCORD_WEBHOOK_URL"
-          use_discord_username: true
+          url: $__env{SLACK_WEBHOOK_URL}
+          username: "Grafana"

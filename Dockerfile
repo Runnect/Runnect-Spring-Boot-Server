@@ -21,6 +21,10 @@ WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 COPY --from=build /app/application.yml application.yml
 
+# Grafana Cloud 모니터링용 OTel Java agent (없어도 앱 실행에는 영향 없음)
+RUN curl -sL -o grafana-opentelemetry-java.jar \
+    https://github.com/grafana/grafana-opentelemetry-java/releases/latest/download/grafana-opentelemetry-java.jar
+
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "app.jar", "--spring.config.location=file:./application.yml"]
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-javaagent:grafana-opentelemetry-java.jar", "-jar", "app.jar", "--spring.config.location=file:./application.yml"]

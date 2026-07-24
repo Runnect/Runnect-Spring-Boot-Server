@@ -2,6 +2,7 @@ package org.runnect.server.config.redis;
 
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
+import io.lettuce.core.SslOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -38,15 +39,19 @@ public class RedisConfig {
             standaloneConfig.setPassword(password);
         }
 
-        ClientOptions clientOptions = ClientOptions.builder()
+        ClientOptions.Builder clientOptionsBuilder = ClientOptions.builder()
                 .socketOptions(SocketOptions.builder()
                         .connectTimeout(Duration.ofSeconds(30))
-                        .build())
-                .build();
+                        .build());
+        if (sslEnabled) {
+            clientOptionsBuilder.sslOptions(SslOptions.builder()
+                    .handshakeTimeout(Duration.ofSeconds(30))
+                    .build());
+        }
 
         LettuceClientConfiguration.LettuceClientConfigurationBuilder clientConfigBuilder =
                 LettuceClientConfiguration.builder()
-                        .clientOptions(clientOptions)
+                        .clientOptions(clientOptionsBuilder.build())
                         .commandTimeout(Duration.ofSeconds(30));
         if (sslEnabled) {
             clientConfigBuilder.useSsl();

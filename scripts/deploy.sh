@@ -40,8 +40,8 @@ nohup java $JAVA_AGENT_OPTS -jar \
 APP_PID=$!
 echo "> 프로세스 시작됨 (PID: $APP_PID)"
 
-echo "> 앱 준비 신호 대기 중 (최대 300초, 프로세스 생존 여부로 실패 판단)"
-MAX_WAIT=300
+echo "> 앱 준비 신호 대기 중 (최대 240초, 프로세스 생존 여부로 실패 판단)"
+MAX_WAIT=240
 ELAPSED=0
 READY=false
 
@@ -72,7 +72,7 @@ if [ "$READY" != "true" ]; then
   exit 1
 fi
 
-RESPONSE=$(curl -s http://localhost:8080/actuator/health || true)
+RESPONSE=$(curl -s --max-time 10 http://localhost:8080/actuator/health || true)
 echo "> 헬스체크 확인: $RESPONSE"
 
 echo "> Nginx 시작"

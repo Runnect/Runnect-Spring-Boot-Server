@@ -27,4 +27,4 @@ RUN curl -sL -o grafana-opentelemetry-java.jar \
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-Xmx192m", "-XX:MaxMetaspaceSize=128m", "-XX:ReservedCodeCacheSize=48m", "-javaagent:grafana-opentelemetry-java.jar", "-jar", "app.jar", "--spring.config.location=file:./application.yml"]
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-javaagent:grafana-opentelemetry-java.jar", "-jar", "app.jar", "--spring.config.location=file:./application.yml"]

@@ -21,10 +21,8 @@ WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 COPY --from=build /app/application.yml application.yml
 
-# Grafana Cloud 모니터링용 OTel Java agent (없어도 앱 실행에는 영향 없음)
-RUN curl -sL -o grafana-opentelemetry-java.jar \
-    https://github.com/grafana/grafana-opentelemetry-java/releases/latest/download/grafana-opentelemetry-java.jar
-
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-javaagent:grafana-opentelemetry-java.jar", "-jar", "app.jar", "--spring.config.location=file:./application.yml"]
+# dev(Render Free tier, 512MB)는 메모리 여유가 없어 OTel agent를 뺀다.
+# prod는 CD가 이 Dockerfile을 쓰지 않으므로(별도 CodeDeploy) 영향 없음.
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "app.jar", "--spring.config.location=file:./application.yml"]

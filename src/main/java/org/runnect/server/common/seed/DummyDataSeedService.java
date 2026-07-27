@@ -1,5 +1,9 @@
 package org.runnect.server.common.seed;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -20,6 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 // (유저만 저장되고 코스는 저장 안 된 상태로 남는 부분 실패를 방지 — 그 부분 실패가
 // 재시작마다 유니크 제약 위반 크래시 루프의 원인이었음). 유저 존재 여부도 먼저 확인해서
 // 재실행해도 안전하게(idempotent) 동작한다.
+// staging DB에는 PostGIS extension이 설치돼 있지 않아 geometry 컬럼 저장이
+// "Unknown type geometry" 에러로 실패했던 적이 있어, 시딩 전에 extension 존재를 보장한다
+// (IF NOT EXISTS라 이미 있는 prod 등에서 실행돼도 아무 영향 없음).
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -34,6 +41,7 @@ public class DummyDataSeedService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final PublicCourseRepository publicCourseRepository;
+    private final DataSource dataSource;
 
     @Transactional
     public void seedIfNeeded() {
@@ -41,6 +49,8 @@ public class DummyDataSeedService {
             log.info("[DummyDataSeedService] 이미 공개 코스가 존재해 시딩을 건너뜁니다.");
             return;
         }
+
+        ensurePostgisExtension();
 
         RunnectUser user = userRepository.findByEmailAndProvider(SEED_EMAIL, SocialType.GOOGLE)
             .orElseGet(() -> userRepository.save(RunnectUser.builder()
@@ -83,5 +93,16 @@ public class DummyDataSeedService {
         }
 
         log.info("[DummyDataSeedService] 더미 데이터 {}건 생성 완료.", TITLES.length);
+    }
+
+    private void ensurePostgisExtension() {
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.execute("CREATE EXTENSION IF NOT EXISTS postgis");
+            log.info("[DummyDataSeedService] PostGIS extension 확인/생성 완료.");
+        } catch (SQLException e) {
+            log.error("[DummyDataSeedService] PostGIS extension 생성 실패 (DB 계정 권한 부족일 수 있음)", e);
+            throw new IllegalStateException("PostGIS extension 준비 실패", e);
+        }
     }
 }

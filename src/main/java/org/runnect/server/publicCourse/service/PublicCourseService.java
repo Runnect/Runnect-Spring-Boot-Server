@@ -38,6 +38,7 @@ import org.runnect.server.user.entity.RunnectUser;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -63,6 +64,8 @@ public class PublicCourseService {
                 .map(Long::parseLong).collect(Collectors.toList());
     }
 
+    // 전체 유저에게 동일한 값이라 캐시 키에 별도 파라미터가 필요 없음
+    @Cacheable(value = "publicCourseTotalPageCount")
     public GetPublicCourseTotalPageCountResponseDto getPublicCourseTotalPageCount() {
         Long totalPublicCourseCount = publicCourseRepository.countBy();
         if (totalPublicCourseCount % PAGE_SIZE != 0) {
@@ -71,6 +74,10 @@ public class PublicCourseService {
         return GetPublicCourseTotalPageCountResponseDto.of(totalPublicCourseCount / PAGE_SIZE);
     }
 
+    // 응답에 유저별 스크랩 여부(isScrap)가 섞여있어 userId를 캐시 키에 포함함
+    // (그만큼 유저별로 캐시가 나뉘어서, 여러 유저가 섞인 실트래픽에서는 히트율이
+    // 이번 부하테스트(단일 유저 반복 호출)만큼 극적이진 않을 수 있음)
+    @Cacheable(value = "marathonPublicCourse", key = "#userId")
     public GetMarathonPublicCourseResponseDto getMarathonPublicCourse(Long userId) {
         //1. 받은 userId가 유저가 존재하는지 확인
         RunnectUser user = userRepository.findById(userId)
@@ -150,6 +157,8 @@ public class PublicCourseService {
 
     }
 
+    // marathonPublicCourse와 동일한 이유로 userId를 캐시 키에 포함
+    @Cacheable(value = "recommendPublicCourse", key = "#userId + '_' + #pageNo + '_' + #sort")
     public RecommendPublicCourseResponseDto recommendPublicCourse(Long userId, Integer pageNo, String sort) {
         //1. 받은 userId가 유저가 존재하는지 확인
         RunnectUser user = userRepository.findById(userId)

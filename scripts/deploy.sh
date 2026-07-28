@@ -3,7 +3,7 @@ set -e
 
 APP_DIR=/home/ec2-user/app
 cd "$APP_DIR"
-JAR_PATH=$(ls $APP_DIR/*.jar | grep -v plain | head -1)
+JAR_PATH=$(ls $APP_DIR/*.jar | grep -v plain | grep -v opentelemetry | head -1)
 echo "> JAR 파일: $JAR_PATH"
 
 OTEL_AGENT_JAR=$APP_DIR/grafana-opentelemetry-java.jar

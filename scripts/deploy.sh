@@ -3,7 +3,10 @@ set -e
 
 APP_DIR=/home/ec2-user/app
 cd "$APP_DIR"
-JAR_PATH=$(ls $APP_DIR/*.jar | grep -v plain | grep -v opentelemetry | head -1)
+# CI가 항상 app.jar라는 고정된 이름으로 복사해주므로, 여러 jar 중
+# 하나를 ls/grep으로 추측해서 고를 필요가 없다 (이 디렉토리에 다른
+# jar 파일이 나중에 추가돼도 절대 헷갈리지 않음).
+JAR_PATH=$APP_DIR/app.jar
 echo "> JAR 파일: $JAR_PATH"
 
 OTEL_AGENT_JAR=$APP_DIR/grafana-opentelemetry-java.jar

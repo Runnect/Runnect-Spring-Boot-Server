@@ -60,7 +60,11 @@ jobs:
       
     # Jar 파일 복사
     - name: Copy Jar
-      run: cp ./build/libs/*.jar ./deploy
+      # 실행 가능한 jar 하나만 골라 고정된 이름(app.jar)으로 복사한다.
+      # deploy.sh가 ls/grep으로 여러 jar 중 하나를 "추측"하지 않고
+      # 이 고정 경로만 참조하도록 해서, 나중에 다른 jar 파일이 같은
+      # 디렉토리에 추가돼도(예: OTel agent jar) 절대 헷갈리지 않게 한다.
+      run: cp $(ls ./build/libs/*.jar | grep -v plain) ./deploy/app.jar
     
     # appspec.yml 파일 복사
     - name: Copy appspec.yml

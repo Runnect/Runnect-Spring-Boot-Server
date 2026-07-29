@@ -28,7 +28,8 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-    
+        cache: 'gradle'
+
     # 3) 환경변수 파일 생성
     - name: make application.properties 파일 생성
       run: |

@@ -19,6 +19,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
+          cache: 'gradle'
 
       - name: make application.properties 파일 생성
         run: |

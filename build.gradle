@@ -63,6 +63,9 @@ dependencies {
 	// cache
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	// Kafka (record-created 이벤트 프로듀서/컨슈머 학습용, dev 로컬 전용)
+	implementation 'org.springframework.kafka:spring-kafka'
+
 	// google login
 	implementation group: 'com.google.api-client', name: 'google-api-client', version: '1.30.0'
 

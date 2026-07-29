@@ -11,13 +11,15 @@ services:
     depends_on:
       - postgres
       - redis
+      - kafka
     volumes:
       - ./logs:/app/logs
     networks:
       - runnect-net
 
   postgres:
-    image: postgres:15
+    # PostGIS 확장(geometry 컬럼)이 필요해 일반 postgres 이미지 대신 사용
+    image: postgis/postgis:15-3.4
     container_name: runnect-postgres
     environment:
       POSTGRES_DB: runnect
@@ -35,6 +37,30 @@ services:
     container_name: runnect-redis
     ports:
       - "6379:6379"
+    networks:
+      - runnect-net
+
+  # 카프카 학습 실습용 — KRaft 모드(Zookeeper 불필요) 단일 브로커.
+  # 실제 운영 부하를 감당할 목적이 아니라 프로듀서/컨슈머/파티션 병렬 처리를
+  # 로컬에서 직접 검증하기 위한 것이라, prod/Render dev에는 올리지 않고
+  # 이 로컬 docker-compose 안에서만 띄운다.
+  kafka:
+    image: apache/kafka:3.7.0
+    container_name: runnect-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
     networks:
       - runnect-net
 

@@ -28,12 +28,12 @@ import org.runnect.server.record.dto.response.UpdateRecordResponse;
 import org.runnect.server.record.dto.response.UpdateRecordResponseDto;
 import org.runnect.server.record.dto.response.UserResponse;
 import org.runnect.server.record.entity.Record;
+import org.runnect.server.record.event.RecordCreatedEvent;
+import org.runnect.server.record.event.RecordEventProducer;
 import org.runnect.server.record.repository.RecordRepository;
 import org.runnect.server.user.entity.RunnectUser;
-import org.runnect.server.user.entity.StampType;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
-import org.runnect.server.user.service.UserStampService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,8 +46,8 @@ public class RecordService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final PublicCourseRepository publicCourseRepository;
-    private final UserStampService userStampService;
     private final RecordHealthDataRepository recordHealthDataRepository;
+    private final RecordEventProducer recordEventProducer;
 
     @Transactional
     public CreateRecordResponseDto createRecord(Long userId, CreateRecordRequestDto request) {
@@ -83,8 +83,9 @@ public class RecordService {
 
         recordRepository.save(record);
 
-        user.updateCreatedRecord();
-        userStampService.createStampByUser(user, StampType.r);
+        // 스탬프 갱신/통계 집계는 API 응답을 기다릴 필요가 없어 Kafka 이벤트로
+        // 비동기 처리한다 (RecordStatsConsumer 참고)
+        recordEventProducer.publish(new RecordCreatedEvent(userId, record.getId()));
 
         CreateRecordDto recordDto = new CreateRecordDto(record.getId(), record.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
 

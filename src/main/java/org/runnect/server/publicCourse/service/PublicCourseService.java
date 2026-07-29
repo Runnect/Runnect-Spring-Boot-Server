@@ -38,6 +38,7 @@ import org.runnect.server.user.entity.RunnectUser;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -300,6 +301,9 @@ public class PublicCourseService {
 
     }
 
+    // 코스 목록에 영향을 주는 쓰기 작업이라, 작성자 본인 캐시만이 아니라
+    // 전체 유저가 보는 목록 캐시(전체페이지수/마라톤/추천)를 다 지워야 함
+    @CacheEvict(value = {"publicCourseTotalPageCount", "marathonPublicCourse", "recommendPublicCourse"}, allEntries = true)
     @Transactional
     public CreatePublicCourseResponseDto createPublicCourse(
             final Long userId,
@@ -344,6 +348,7 @@ public class PublicCourseService {
 
     }
 
+    @CacheEvict(value = {"publicCourseTotalPageCount", "marathonPublicCourse", "recommendPublicCourse"}, allEntries = true)
     @Transactional
     public DeletePublicCoursesResponseDto deletePublicCourses(
             Long userId,
@@ -389,6 +394,8 @@ public class PublicCourseService {
         return DeletePublicCoursesResponseDto.from(publicCourses.size());
     }
 
+    // 제목/설명만 바뀌고 코스 개수는 그대로라 전체페이지수 캐시는 지울 필요 없음
+    @CacheEvict(value = {"marathonPublicCourse", "recommendPublicCourse"}, allEntries = true)
     @Transactional
     public UpdatePublicCourseResponseDto updatePublicCourse(Long userId, Long publicCourseId, String title, String description) {
         PublicCourse publicCourse = publicCourseRepository.findById(publicCourseId)

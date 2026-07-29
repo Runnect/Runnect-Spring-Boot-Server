@@ -27,6 +27,7 @@ import org.runnect.server.user.entity.StampType;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
 import org.runnect.server.user.service.UserStampService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -136,6 +137,9 @@ public class CourseService {
         return UpdateCourseResponseDto.of(course);
     }
 
+    // 조건부로 공개 코스가 같이 삭제될 수 있어(비공개 코스면 스킵), 매번 무효화해도
+    // 안전한 쪽(과다 무효화)을 택함 — 공개 코스 목록 캐시(전체페이지수/마라톤/추천) 대상
+    @CacheEvict(value = {"publicCourseTotalPageCount", "marathonPublicCourse", "recommendPublicCourse"}, allEntries = true)
     @Transactional
     public DeleteCoursesResponseDto deleteCourses(List<Long> courseIdList, Long userId) {
         courseIdList.forEach(courseId -> {

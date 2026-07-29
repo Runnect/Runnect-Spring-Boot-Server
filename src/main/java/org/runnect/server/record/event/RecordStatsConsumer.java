@@ -19,12 +19,21 @@ public class RecordStatsConsumer {
 
     private final UserRepository userRepository;
     private final UserStampService userStampService;
+    private final ProcessedRecordEventRepository processedRecordEventRepository;
 
     // concurrency=4: 토픽 파티션 수(4개)만큼 컨슈머 스레드를 띄워, 각 스레드가
     // 파티션 하나씩 맡아 병렬로 처리한다 (파티션 수가 병렬 처리의 상한선).
     @KafkaListener(topics = "record-created", groupId = "stats-processor", concurrency = "4")
     @Transactional
     public void consume(RecordCreatedEvent event) {
+        // 카프카는 at-least-once 전달만 보장해 같은 이벤트가 재전달될 수 있음.
+        // 이미 처리된 recordId면 카운터/스탬프가 중복 반영되지 않도록 여기서 걸러낸다.
+        if (processedRecordEventRepository.existsById(event.getRecordId())) {
+            log.info("[Kafka] 이미 처리된 이벤트라 스킵 (recordId={})", event.getRecordId());
+            return;
+        }
+        processedRecordEventRepository.save(new ProcessedRecordEvent(event.getRecordId()));
+
         // 실제로는 가벼운 DB 갱신 작업이지만, "이 후처리가 무겁다"는 상황을
         // 실습으로 재현하기 위해 인위적으로 지연을 준다 (실제 서비스 로직 아님).
         simulateHeavyWork();

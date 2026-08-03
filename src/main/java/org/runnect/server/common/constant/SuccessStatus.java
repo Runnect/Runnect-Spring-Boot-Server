@@ -31,6 +31,7 @@ public enum SuccessStatus {
 
     GET_HEALTH_DATA_SUCCESS(HttpStatus.OK, "건강 데이터 조회 성공"),
     GET_HEALTH_SUMMARY_SUCCESS(HttpStatus.OK, "건강 통계 조회 성공"),
+    GET_BANNER_SUCCESS(HttpStatus.OK, "배너 조회 성공"),
 
 
     UPDATE_RECORD_SUCCESS(HttpStatus.OK, "활동 기록 수정 성공"),

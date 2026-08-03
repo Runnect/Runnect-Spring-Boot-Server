@@ -17,7 +17,7 @@ public class BannerService {
     private final BannerRepository bannerRepository;
 
     public GetBannerResponseDto getBanners() {
-        List<Banner> banners = bannerRepository.findByIsActiveTrueOrderBySortOrderAsc();
+        List<Banner> banners = bannerRepository.findByIsActiveTrueOrderBySortOrderAscIdAsc();
 
         List<BannerResponse> bannerResponses = new ArrayList<>();
         for (int index = 0; index < banners.size(); index++) {

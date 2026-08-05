@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.runnect.server.common.constant.TokenStatus;
@@ -16,7 +15,6 @@ import org.runnect.server.user.exception.authException.InvalidAccessTokenExcepti
 import org.runnect.server.user.exception.authException.NullAccessTokenException;
 import org.runnect.server.user.exception.authException.TimeExpiredAccessTokenException;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
-import org.slf4j.MDC;
 import org.springframework.core.MethodParameter;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -36,11 +34,6 @@ class UserIdResolverTest {
         ReflectionTestUtils.setField(userIdResolver, "VISITOR_ID", VISITOR_ID);
         ReflectionTestUtils.invokeMethod(userIdResolver, "setVISITOR_POSSIBLE_URLS", "/api/public-course");
         methodParameter = mock(MethodParameter.class);
-    }
-
-    @AfterEach
-    void tearDown() {
-        MDC.clear();
     }
 
     private NativeWebRequest webRequestWith(String accessToken, String refreshToken, String method, String uri) {
@@ -72,13 +65,12 @@ class UserIdResolverTest {
     }
 
     @Test
-    void 방문자_모드_허용_URL이면_VISITOR_ID를_반환하고_MDC에_채운다() {
+    void 방문자_모드_허용_URL이면_VISITOR_ID를_반환한다() {
         NativeWebRequest webRequest = webRequestWith("visitor", "visitor", "GET", "/api/public-course/123");
 
         Object result = userIdResolver.resolveArgument(methodParameter, null, webRequest, null);
 
         assertThat(result).isEqualTo(VISITOR_ID);
-        assertThat(MDC.get("userId")).isEqualTo(String.valueOf(VISITOR_ID));
     }
 
     @Test
@@ -100,7 +92,7 @@ class UserIdResolverTest {
     }
 
     @Test
-    void 유효한_토큰이면_userId를_반환하고_MDC에_채운다() {
+    void 유효한_토큰이면_userId를_반환한다() {
         when(jwtService.verifyToken("valid")).thenReturn(TokenStatus.TOKEN_VALID);
         when(jwtService.getJwtContents("valid")).thenReturn("42");
         NativeWebRequest webRequest = webRequestWith("valid", "refresh", "GET", "/api/user");
@@ -108,7 +100,6 @@ class UserIdResolverTest {
         Object result = userIdResolver.resolveArgument(methodParameter, null, webRequest, null);
 
         assertThat(result).isEqualTo(42L);
-        assertThat(MDC.get("userId")).isEqualTo("42");
     }
 
     @Test

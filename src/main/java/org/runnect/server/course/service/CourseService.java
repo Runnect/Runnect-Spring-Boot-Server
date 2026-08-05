@@ -128,7 +128,7 @@ public class CourseService {
 
     @Transactional
     public UpdateCourseResponseDto updateCourse(Long userId, Long courseId, String title) {
-        Course course = courseRepository.findById(courseId)
+        Course course = courseRepository.findByCourseIdAndUserId(courseId, userId)
             .orElseThrow(()->new NotFoundException(NOT_FOUND_COURSE_EXCEPTION, NOT_FOUND_COURSE_EXCEPTION.getMessage()));
 
         course.updateCourse(title);

@@ -131,4 +131,24 @@ public class RunnectUser extends AuditingTimeEntity {
     public void updateDeletedAt() {
         throw new RuntimeException("Course를 제외한 테이블은 정상적으로 삭제됩니다.");
     }
+
+    // 기본 equals(참조 비교)에 의존하면, 같은 유저를 서로 다른 조회 경로로 가져왔을 때
+    // (예: 로그인 유저 vs 코스에 매핑된 유저) 같은 사람인데도 다르다고 판정될 수 있다.
+    // id 기준으로 비교하고, hashCode는 영속화 전후로 값이 바뀌지 않도록 상수로 고정한다.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof RunnectUser)) {
+            return false;
+        }
+        RunnectUser that = (RunnectUser) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

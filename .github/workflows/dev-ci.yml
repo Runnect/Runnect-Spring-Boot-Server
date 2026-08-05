@@ -78,4 +78,6 @@ jobs:
       run: ./gradlew build -PactiveProfiles=local
       env:
         SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/runnect
+        SPRING_DATASOURCE_USERNAME: runnect
+        SPRING_DATASOURCE_PASSWORD: runnect_local_password
         SPRING_DATA_REDIS_HOST: localhost

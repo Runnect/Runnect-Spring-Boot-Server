@@ -52,8 +52,12 @@ public class AuthService {
         try {
             // refreshToken으로 유저찾기
             final long userId =  Long.parseLong(tokenContents);
-            if(redisService.getValuesByKey(String.valueOf(userId)).isBlank()){
-                //탈취된 refreshToken인 경우
+            final String storedRefreshToken = redisService.getValuesByKey(String.valueOf(userId));
+            // Redis에 저장된 최신 refreshToken과 실제로 일치하는지까지 확인한다.
+            // (단순히 "뭔가 저장돼 있는지"만 보면, 재로그인 등으로 이미 무효화된
+            // 예전 refreshToken도 계속 accessToken 재발급에 쓰일 수 있었음)
+            if (storedRefreshToken == null || storedRefreshToken.isBlank() || !storedRefreshToken.equals(refreshToken)) {
+                //탈취되었거나 이미 무효화된 refreshToken인 경우
                 throw new InvalidRefreshTokenException(ErrorStatus.INVALID_REFRESH_TOKEN_EXCEPTION, ErrorStatus.INVALID_REFRESH_TOKEN_EXCEPTION.getMessage());
             }
             RunnectUser user = userRepository.findById(userId)
@@ -78,8 +82,6 @@ public class AuthService {
     @Transactional
     public AuthResponseDto signIn(SignInRequestDto signInRequestDto) {
         SocialType socialType = SocialType.valueOf(signInRequestDto.getProvider());
-
-        System.out.println("타입은? "+ socialType);
 
         SocialInfoResponseDto socialInfo = getSocialInfo(socialType, signInRequestDto.getToken());
 

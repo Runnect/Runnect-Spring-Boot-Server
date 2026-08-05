@@ -12,6 +12,32 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # 테스트(contextLoads 등)는 실제 prod DB/Redis가 아니라 CI 안에서 띄우는
+    # 임시 컨테이너를 바라보게 한다 (원격 prod 환경에 직접 의존하지 않도록).
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: runnect
+          POSTGRES_USER: runnect
+          POSTGRES_PASSWORD: runnect_local_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 11
@@ -42,4 +68,9 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build -x test
+        run: ./gradlew build
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/runnect
+          SPRING_DATASOURCE_USERNAME: runnect
+          SPRING_DATASOURCE_PASSWORD: runnect_local_password
+          SPRING_DATA_REDIS_HOST: localhost

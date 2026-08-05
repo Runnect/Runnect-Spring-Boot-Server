@@ -29,20 +29,24 @@ public class KakaoSignInService {
 
         HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
         RestTemplate rt = new RestTemplate();
-        ResponseEntity<String> response = rt.exchange(
-                "https://kapi.kakao.com/v2/user/me",
-                HttpMethod.POST,
-                kakaoUserInfoRequest,
-                String.class
-        );
-
-        // responseBody 속 정보 꺼내기
-        String responseBody = response.getBody();
 
         String userId = null;
         String email = null;
 
         try {
+            // 카카오 API가 4xx/5xx를 반환하면(토큰 만료/무효 등, 흔히 발생) RestTemplate이
+            // 예외를 던진다. 이 try 블록 밖에 있으면 여기서 잡히지 않고 그대로 500으로
+            // 새어나가 버리므로(실제로는 401로 처리돼야 할 흔한 케이스인데도) 같이 묶는다.
+            ResponseEntity<String> response = rt.exchange(
+                    "https://kapi.kakao.com/v2/user/me",
+                    HttpMethod.POST,
+                    kakaoUserInfoRequest,
+                    String.class
+            );
+
+            // responseBody 속 정보 꺼내기
+            String responseBody = response.getBody();
+
             JSONParser parser = new JSONParser();
             JSONObject obj = (JSONObject) parser.parse(responseBody);
             JSONObject kakao_account = (JSONObject) obj.get("kakao_account");

@@ -34,6 +34,7 @@ public enum ErrorStatus {
     INVALID_HEALTH_DATA_EXCEPTION(HttpStatus.BAD_REQUEST, "유효하지 않은 건강 데이터입니다"),
     INVALID_DATE_RANGE_EXCEPTION(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 범위입니다"),
     EXCEED_HEART_RATE_SAMPLES_EXCEPTION(HttpStatus.BAD_REQUEST, "심박수 샘플은 최대 5000건까지 허용됩니다"),
+    VALIDATION_DEPARTURE_ADDRESS_EXCEPTION(HttpStatus.BAD_REQUEST, "출발지 주소 형식이 올바르지 않습니다."),
 
     /**
      * 401 UNAUTHORIZED

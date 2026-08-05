@@ -1,6 +1,8 @@
 package org.runnect.server.common.module.convert;
 
+import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.dto.DepartureResponse;
+import org.runnect.server.common.exception.BadRequestException;
 
 import java.util.Arrays;
 
@@ -8,7 +10,8 @@ public class DepartureConverter {
     public static DepartureResponse requestConvertDeparture(String departureAddress, String departureName) {
         String[] departures = departureAddress.split(" ");
         if (departures.length < 3) {
-            return null;
+            throw new BadRequestException(ErrorStatus.VALIDATION_DEPARTURE_ADDRESS_EXCEPTION,
+                ErrorStatus.VALIDATION_DEPARTURE_ADDRESS_EXCEPTION.getMessage());
         } else if (departures.length == 3) {
             return new DepartureResponse(
                     departures[0],

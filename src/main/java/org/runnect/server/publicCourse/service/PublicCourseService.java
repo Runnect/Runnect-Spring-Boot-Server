@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.constant.SortStatus;
+import org.runnect.server.common.exception.BadRequestException;
 import org.runnect.server.common.exception.ConflictException;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
@@ -182,6 +183,9 @@ public class PublicCourseService {
             publicCourses = publicCourseRepository.findAll(
                     PageRequest.of(pageNo - 1, PAGE_SIZE,
                             Sort.by(Sort.Direction.DESC, SortStatus.DATE_DESC.getProperty())));
+        } else {
+            throw new BadRequestException(ErrorStatus.INVALID_SORT_PARAMETER_EXCEPTION,
+                    ErrorStatus.INVALID_SORT_PARAMETER_EXCEPTION.getMessage());
         }
 
         publicCourses.forEach(publicCourse -> {
@@ -264,8 +268,8 @@ public class PublicCourseService {
         Course course = publicCourse.getCourse();
 
         //2. 이미 삭제된 코스인지
-        if (course.getDeletedAt() == null) {
-            new NotFoundException(ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION,
+        if (course.getDeletedAt() != null) {
+            throw new NotFoundException(ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION,
                     ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION.getMessage());
         }
 
@@ -400,6 +404,12 @@ public class PublicCourseService {
     public UpdatePublicCourseResponseDto updatePublicCourse(Long userId, Long publicCourseId, String title, String description) {
         PublicCourse publicCourse = publicCourseRepository.findById(publicCourseId)
                 .orElseThrow(() -> new NotFoundException(ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION, ErrorStatus.NOT_FOUND_PUBLIC_COURSE_EXCEPTION.getMessage()));
+
+        boolean isAdmin = userId.equals(ADMIN_USER_ID);
+        if (!isAdmin && !publicCourse.getCourse().getRunnectUser().getId().equals(userId)) {
+            throw new PermissionDeniedException(ErrorStatus.PERMISSION_DENIED_PUBLIC_COURSE_UPDATE_EXCEPTION,
+                    ErrorStatus.PERMISSION_DENIED_PUBLIC_COURSE_UPDATE_EXCEPTION.getMessage());
+        }
 
         publicCourse.updatePublicCourse(title, description);
 

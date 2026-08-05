@@ -54,7 +54,8 @@ public class ScrapService {
             }
         }
         // 스크랩 삭제
-        else {
+        else if (scrap != null) {
+            // 스크랩한 적이 없는 코스를 취소 요청하면 할 게 없으니 그냥 무시한다 (NPE 방지)
             scrap.updateScrapTF(false);
         }
 

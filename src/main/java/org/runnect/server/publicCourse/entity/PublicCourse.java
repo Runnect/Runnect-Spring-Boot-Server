@@ -63,4 +63,23 @@ public class PublicCourse extends AuditingTimeEntity {
     public void updateDeletedAt() {
         throw new RuntimeException("Course를 제외한 테이블은 정상적으로 삭제됩니다.");
     }
+
+    // RunnectUser와 동일한 이유(참조 동일성 의존 방지)로 id 기준 equals/hashCode를 둔다.
+    // scrap 목록과 publicCourse 목록을 서로 다른 쿼리로 가져와 비교하는 곳(isScrap 매칭)이 많아서 영향이 크다.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PublicCourse)) {
+            return false;
+        }
+        PublicCourse that = (PublicCourse) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

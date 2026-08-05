@@ -36,6 +36,7 @@ public class MdcLoggingFilter implements Filter {
             chain.doFilter(request, response);
         } finally {
             MDC.remove(TRACE_ID_KEY);
+            MDC.remove("userId");
         }
     }
 }

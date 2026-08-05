@@ -138,6 +138,11 @@ public class RecordService {
         Record record = recordRepository.findById(recordId)
                 .orElseThrow(()->new NotFoundException(ErrorStatus.NOT_FOUND_RECORD_EXCEPTION, ErrorStatus.NOT_FOUND_RECORD_EXCEPTION.getMessage()));
 
+        if (!record.getRunnectUser().getId().equals(userId)) {
+            throw new PermissionDeniedException(ErrorStatus.PERMISSION_DENIED_RECORD_UPDATE_EXCEPTION,
+                ErrorStatus.PERMISSION_DENIED_RECORD_UPDATE_EXCEPTION.getMessage());
+        }
+
         record.updateRecord(request.getTitle());
 
         return UpdateRecordResponseDto.of(UpdateRecordResponse.of(record.getId(), request.getTitle()));

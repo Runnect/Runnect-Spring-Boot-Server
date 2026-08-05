@@ -173,14 +173,16 @@ class CourseServiceTest {
         }
 
         @Test
-        @DisplayName("[버그 의심] 출발지 주소가 3토큰 미만이면 DepartureConverter가 null을 반환해 NPE가 난다")
-        void 출발지_주소가_불완전하면_NPE() {
+        @DisplayName("출발지 주소가 3토큰 미만이면 BadRequestException")
+        void 출발지_주소가_불완전하면_BadRequestException() {
             RunnectUser user = buildUser(1L);
             when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
             assertThatThrownBy(() -> courseService.createCourse(1L,
                 createRequestDto(validPath(), "경기 시흥시"), "img"))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(BadRequestException.class);
+
+            verify(courseRepository, never()).save(any());
         }
     }
 
@@ -292,9 +294,8 @@ class CourseServiceTest {
         }
 
         @Test
-        @DisplayName("[주의] 업로더와 요청자의 id가 같아도 객체 인스턴스가 다르면 isNowUser가 false로 나온다"
-            + " (RunnectUser에 equals/hashCode 미구현, 참조 동일성으로 비교됨)")
-        void 같은_id여도_인스턴스가_다르면_다른_사람으로_판정된다() {
+        @DisplayName("업로더와 요청자의 id가 같으면 객체 인스턴스가 달라도 같은 사람으로 판정된다")
+        void 같은_id면_인스턴스가_달라도_같은_사람으로_판정된다() {
             RunnectUser requester = buildUser(1L);
             RunnectUser uploaderWithSameIdButDifferentInstance = buildUser(1L);
             when(userRepository.findById(1L)).thenReturn(Optional.of(requester));
@@ -303,7 +304,7 @@ class CourseServiceTest {
 
             GetCourseDetailResponseDto response = courseService.getCourseDetail(10L, 1L);
 
-            assertThat(response.getCourse().getIsNowUser()).isFalse();
+            assertThat(response.getCourse().getIsNowUser()).isTrue();
         }
 
         @Test
@@ -350,7 +351,7 @@ class CourseServiceTest {
         void 정상_수정() {
             RunnectUser user = buildUser(1L);
             Course course = buildCourse(10L, user, true);
-            when(courseRepository.findById(10L)).thenReturn(Optional.of(course));
+            when(courseRepository.findByCourseIdAndUserId(10L, 1L)).thenReturn(Optional.of(course));
 
             UpdateCourseResponseDto response = courseService.updateCourse(1L, 10L, "새 제목");
 
@@ -362,24 +363,20 @@ class CourseServiceTest {
         @Test
         @DisplayName("존재하지 않는 코스면 NotFoundException")
         void 존재하지_않는_코스() {
-            when(courseRepository.findById(10L)).thenReturn(Optional.empty());
+            when(courseRepository.findByCourseIdAndUserId(10L, 1L)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> courseService.updateCourse(1L, 10L, "새 제목"))
                 .isInstanceOf(NotFoundException.class);
         }
 
         @Test
-        @DisplayName("[버그 의심] userId로 소유자 검증을 하지 않아, 코스 소유자가 아니어도 제목을 수정할 수 있다")
-        void 소유자가_아니어도_수정_가능() {
-            RunnectUser owner = buildUser(1L);
-            Course course = buildCourse(10L, owner, true);
-            when(courseRepository.findById(10L)).thenReturn(Optional.of(course));
-
+        @DisplayName("코스 소유자가 아니면 NotFoundException (IDOR 방지)")
+        void 소유자가_아니면_수정_불가() {
             Long 다른유저Id = 999L;
-            UpdateCourseResponseDto response = courseService.updateCourse(다른유저Id, 10L, "남의 코스 제목 변경");
+            when(courseRepository.findByCourseIdAndUserId(10L, 다른유저Id)).thenReturn(Optional.empty());
 
-            assertThat(course.getTitle()).isEqualTo("남의 코스 제목 변경");
-            assertThat(response.getCourse().getTitle()).isEqualTo("남의 코스 제목 변경");
+            assertThatThrownBy(() -> courseService.updateCourse(다른유저Id, 10L, "남의 코스 제목 변경"))
+                .isInstanceOf(NotFoundException.class);
         }
     }
 

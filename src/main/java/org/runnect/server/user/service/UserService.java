@@ -46,15 +46,18 @@ public class UserService {
     public UpdateUserNicknameResponseDto updateUserNickname(
         Long userId, UpdateUserNicknameRequestDto updateUserNicknameRequestDto
     ) {
-        if (userRepository.existsByNickname(updateUserNicknameRequestDto.getNickname())) {
-            throw new DuplicateNicknameException(ErrorStatus.ALREADY_EXIST_NICKNAME_EXCEPTION, ErrorStatus.ALREADY_EXIST_NICKNAME_EXCEPTION.getMessage());
-        }
-
         RunnectUser user = userRepository.findUserByIdWithUserStamps(userId)
             .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
                 ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
-        user.updateUserNickname(updateUserNicknameRequestDto.getNickname());
+        String newNickname = updateUserNicknameRequestDto.getNickname();
+        // 기존 닉네임과 동일한 값으로 "변경"하는 경우까지 중복으로 처리하면
+        // 본인의 현재 닉네임을 다시 저장할 수 없게 되므로 그 경우는 제외한다.
+        if (!user.getNickname().equals(newNickname) && userRepository.existsByNickname(newNickname)) {
+            throw new DuplicateNicknameException(ErrorStatus.ALREADY_EXIST_NICKNAME_EXCEPTION, ErrorStatus.ALREADY_EXIST_NICKNAME_EXCEPTION.getMessage());
+        }
+
+        user.updateUserNickname(newNickname);
 
         return UpdateUserNicknameResponseDto.of(user, calculateUserLevelPercent(user));
     }

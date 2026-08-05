@@ -70,8 +70,14 @@ public class S3Service {
 
     // 파일 유효성 검사
     private String getFileExtension(String fileName) {
-        if (fileName.length() == 0) {
+        if (fileName == null || fileName.isEmpty()) {
             throw new NotFoundException(ErrorStatus.NOT_FOUND_IMAGE_EXCEPTION, ErrorStatus.NOT_FOUND_IMAGE_EXCEPTION.getMessage());
+        }
+        int dotIndex = fileName.lastIndexOf(".");
+        // 파일명에 "."가 아예 없으면(lastIndexOf가 -1) substring(-1)에서 그대로
+        // StringIndexOutOfBoundsException(500)이 나던 부분 — 확장자 없는 파일로 명확히 처리한다.
+        if (dotIndex == -1) {
+            throw new BadRequestException(ErrorStatus.NOT_FOUND_IMAGE_EXCEPTION, ErrorStatus.NOT_FOUND_IMAGE_EXCEPTION.getMessage());
         }
         ArrayList<String> fileValidate = new ArrayList<>();
         fileValidate.add(".jpg");
@@ -80,11 +86,11 @@ public class S3Service {
         fileValidate.add(".JPG");
         fileValidate.add(".JPEG");
         fileValidate.add(".PNG");
-        String idxFileName = fileName.substring(fileName.lastIndexOf("."));
+        String idxFileName = fileName.substring(dotIndex);
         if (!fileValidate.contains(idxFileName)) {
             throw new BadRequestException(ErrorStatus.NOT_FOUND_IMAGE_EXCEPTION, ErrorStatus.NOT_FOUND_IMAGE_EXCEPTION.getMessage());
         }
-        return fileName.substring(fileName.lastIndexOf("."));
+        return idxFileName;
     }
 
     // 이미지 삭제

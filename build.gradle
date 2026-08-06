@@ -75,6 +75,9 @@ dependencies {
 	// Sentry
 	implementation 'io.sentry:sentry-spring-boot-starter:4.3.0'
 
+	// Swagger (OpenAPI)
+	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+
 }
 
 tasks.named('test') {

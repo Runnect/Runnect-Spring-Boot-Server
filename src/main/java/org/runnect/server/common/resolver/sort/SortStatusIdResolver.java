@@ -31,8 +31,11 @@ public class SortStatusIdResolver implements HandlerMethodArgumentResolver{
     public Object resolveArgument(@NotNull MethodParameter parameter, ModelAndViewContainer modelAndViewContainer, @NotNull NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         final HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String queryString = request.getQueryString();
-        Map<String, List<String>> splitQuery = Util.splitQuery(queryString);
-
+        // 쿼리 파라미터가 하나도 없으면(예: ~url~/public-course) getQueryString()이 null을 반환해
+        // split()에서 NPE(500)가 나던 부분 — sort 키가 없는 경우와 동일하게 기본값으로 처리한다.
+        Map<String, List<String>> splitQuery = queryString == null
+                ? Collections.emptyMap()
+                : Util.splitQuery(queryString);
 
         if(!splitQuery.containsKey("sort") || splitQuery.get("sort").get(0)==null){
             // 1번째 조건 : ~url~/public-course

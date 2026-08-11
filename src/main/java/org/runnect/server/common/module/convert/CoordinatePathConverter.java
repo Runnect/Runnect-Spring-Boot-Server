@@ -18,8 +18,7 @@ public class CoordinatePathConverter {
         try {
             return getLineString(path);
         } catch (Exception e) {
-            log.warn("course 요청 데이터 값 (path) -> " + path);
-            log.warn("course 요청 데이터 값의 타입 (path) -> " + path.getClass().getName());
+            log.warn("course 요청 데이터 변환 실패 (size={}, type={}): {}", path.size(), path.getClass().getName(), e.getMessage());
             throw new BadRequestException(ErrorStatus.VALIDATION_COURSE_PATH_EXCEPTION, ErrorStatus.VALIDATION_COURSE_PATH_EXCEPTION.getMessage());
         }
     }
@@ -43,16 +42,11 @@ public class CoordinatePathConverter {
     }
 
     private static LineString getLineString(List<CoordinateDto> coordinateDtos) {
-        StringBuilder sb = new StringBuilder();
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         Coordinate[] coordinates = new Coordinate[coordinateDtos.size()];
         for (int i = 0; i < coordinateDtos.size(); i++) {
             coordinates[i] = new Coordinate(coordinateDtos.get(i).getLatitude(), coordinateDtos.get(i).getLongitude());
-            sb.append("(" + coordinateDtos.get(i).getLatitude() + ", " + coordinateDtos.get(i).getLongitude() + ")");
         }
-        LineString lineString = geometryFactory.createLineString(coordinates);
-        log.info("create course!");
-        log.info(sb.toString());
-        return lineString;
+        return geometryFactory.createLineString(coordinates);
     }
 }

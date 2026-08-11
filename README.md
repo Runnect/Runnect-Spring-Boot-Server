@@ -152,31 +152,20 @@
 
 ## 🌳 Branch
 
-🌱 git branch 전략
+🌱 Trunk-Based Development
 
-`main branch` : 운영 서버 배포 단위 branch
+`main branch` : 유일한 trunk. 항상 배포 가능한 상태를 유지하며, 운영 서버와 staging 서버 모두 이 branch에서 배포된다.
 
-`dev branch` : 주요 개발 branch, main merge 전 거치는 branch, test 서버로 배포되는 branch
+`feature branch`: 각 작업 단위의 짧은 수명 branch. `main`에서 분기해 하루~수일 내에 PR로 병합한다.
 
-`feat branch`: 각자 개발 branch
+- `main`에서 분기, `feat/#issue번호-작업요약` 형식으로 branch 생성
+  - 브랜치명이 `test/...`로 시작하면 GitHub ref 경로 충돌이 나므로 테스트 관련 branch는 `tests/...`(복수형) 사용
+- 작업 완료 후 PR 생성 (base: `main`)
+  - CI(`build` status check)를 통과해야 병합 가능
+  - 미완성 기능은 브랜치를 오래 살려두지 말고, feature flag로 감싸 `main`에 빠르게 합친다
+- 리뷰 완료 후 squash merge, 병합된 branch는 삭제
 
-- 할 일 issue 등록 후 issue 번호와 isuue 이름으로 branch 생성 후 작업
-  - ex) feat/#`issue num`-`isuue name(기능요약)`
-- 해당 branch 작업 완료 후 PR 보내기
-  - 항상 local에서 충돌 해결 후 → remote에 올리기
-  - reviewer에 서로 tag후 code-review
-  - comment 전 merge 불가!
-  - review반영 후, 본인이 merge.
-
-### branch 구조
-
-```jsx
-- main
-- dev
-- feat
-   ├── #1-isuue name1
-   └── #2-isuue name2
-```
+과거에는 `dev`/`main` 두 개의 장수 branch를 cherry-pick으로 동기화하는 방식이었으나, 두 branch가 내용상 계속 어긋나는 문제(cherry-pick hell)가 반복되어 폐기했다. staging 배포도 `main` push를 기준으로 트리거된다.
 
 </aside>
 <hr>

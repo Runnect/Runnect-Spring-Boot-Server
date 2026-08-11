@@ -4,6 +4,7 @@ package org.runnect.server.common.resolver.userId;
 import org.runnect.server.common.constant.TokenStatus;
 import org.runnect.server.common.constant.ErrorStatus;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.MDC;
 import org.runnect.server.common.module.check.TypeChecker;
 import org.runnect.server.user.exception.authException.InvalidAccessTokenException;
 import org.runnect.server.user.exception.authException.NullAccessTokenException;
@@ -76,6 +77,7 @@ public class UserIdResolver implements HandlerMethodArgumentResolver {
                 && request.getMethod().equals("GET")
                 && VISITOR_POSSIBLE_URLS.contains(removeLastPathSegment(request.getRequestURI()))){
             // 방문자모드 허용 api에 대한 요청이 맞는지 검증
+            MDC.put("userId", String.valueOf(VISITOR_ID));
             return VISITOR_ID;
         }
 
@@ -92,7 +94,9 @@ public class UserIdResolver implements HandlerMethodArgumentResolver {
         final String tokenContents = jwtService.getJwtContents(accessToken);
 
         try {
-            return Long.parseLong(tokenContents);
+            Long userId = Long.parseLong(tokenContents);
+            MDC.put("userId", String.valueOf(userId));
+            return userId;
         } catch (NumberFormatException e) {
             throw new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION, ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage());
         }

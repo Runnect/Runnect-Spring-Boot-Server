@@ -176,7 +176,14 @@
 | staging (Render) | `main` push | 자동 배포 |
 | 상용 (AWS CodeDeploy) | `v*` 형식의 git tag push | 수동 승격 |
 
-merge → staging에서 자동 확인 → 문제 없으면 `git tag v1.x.x && git push origin v1.x.x`로 상용 배포. 버전은 느슨한 semver(기능 추가 minor, 버그 수정 patch)를 따른다.
+merge → staging에서 자동 확인 → 문제 없으면 상용 배포. 태그를 로컬에서 직접 만들 필요 없이, **GitHub Actions의 `Promote to Production` workflow**(`workflow_dispatch`)를 실행하면 다음 semver 태그를 자동 계산해 push까지 해준다.
+
+```bash
+# Actions 탭에서 "Promote to Production" → Run workflow 버튼으로도 가능
+gh workflow run promote-to-prod.yml -f bump=patch   # patch | minor | major
+```
+
+이 태그 push가 `prod-cd.yml`의 트리거를 실행시켜 상용 배포로 이어진다.
 
 ### 🚩 Feature Flag
 

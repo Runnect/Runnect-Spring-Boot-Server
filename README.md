@@ -165,7 +165,18 @@
   - 미완성 기능은 브랜치를 오래 살려두지 말고, feature flag로 감싸 `main`에 빠르게 합친다
 - 리뷰 완료 후 squash merge, 병합된 branch는 삭제
 
-과거에는 `dev`/`main` 두 개의 장수 branch를 cherry-pick으로 동기화하는 방식이었으나, 두 branch가 내용상 계속 어긋나는 문제(cherry-pick hell)가 반복되어 폐기했다. staging 배포도 `main` push를 기준으로 트리거된다.
+과거에는 `dev`/`main` 두 개의 장수 branch를 cherry-pick으로 동기화하는 방식이었으나, 두 branch가 내용상 계속 어긋나는 문제(cherry-pick hell)가 반복되어 폐기했다.
+
+### 🚀 배포 전략 (Continuous Delivery)
+
+`main`은 항상 배포 가능한 상태를 유지하되, staging과 상용의 배포 트리거는 분리했다 — merge 즉시 상용까지 나가면 검증 없이 바로 노출되는 문제가 있어서다.
+
+| 환경 | 트리거 | 방식 |
+| --- | --- | --- |
+| staging (Render) | `main` push | 자동 배포 |
+| 상용 (AWS CodeDeploy) | `v*` 형식의 git tag push | 수동 승격 |
+
+merge → staging에서 자동 확인 → 문제 없으면 `git tag v1.x.x && git push origin v1.x.x`로 상용 배포. 버전은 느슨한 semver(기능 추가 minor, 버그 수정 patch)를 따른다.
 
 ### 🚩 Feature Flag
 

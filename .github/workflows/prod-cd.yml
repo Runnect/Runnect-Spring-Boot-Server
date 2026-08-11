@@ -2,10 +2,12 @@
 name: RUNNECT-PROD-CD
 
 # 해당 workflow가 언제 실행될 것인지에 대한 트리거를 지정
-# push시에 실행
+# v로 시작하는 태그가 push될 때만 실행 (예: v1.3.0)
+# main push마다 자동으로 상용까지 나가지 않도록, 상용 배포는 태그로 명시적으로 트리거한다.
+# staging(Render)은 main push에 그대로 자동 배포된다 — staging에서 먼저 확인 후 태그를 찍는 흐름.
 on:
   push:
-    branches: [ main ] # main branch로 push 될 때 실행됩니다.
+    tags: [ 'v*' ]
 
 env:
   S3_BUCKET_NAME: runnect-prod-bucket-604764467555-ap-northeast-2-an

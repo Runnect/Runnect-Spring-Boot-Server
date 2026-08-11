@@ -167,6 +167,33 @@
 
 과거에는 `dev`/`main` 두 개의 장수 branch를 cherry-pick으로 동기화하는 방식이었으나, 두 branch가 내용상 계속 어긋나는 문제(cherry-pick hell)가 반복되어 폐기했다. staging 배포도 `main` push를 기준으로 트리거된다.
 
+### 🚩 Feature Flag
+
+미완성/위험도 있는 기능을 브랜치에 오래 묵히지 않고 `main`에 먼저 merge한 뒤, 배포 이후 원하는 시점에 켤 수 있게 하는 최소 구현이다. (`org.runnect.server.config.featureflag`)
+
+```yaml
+# application.yml (environment별로 값이 다를 수 있음)
+feature-flags:
+  flags:
+    new-run-summary: false
+```
+
+```java
+@RequiredArgsConstructor
+public class SomeService {
+    private final FeatureFlags featureFlags;
+
+    public void doSomething() {
+        if (featureFlags.isEnabled("new-run-summary")) {
+            // 새 로직
+        }
+        // 기존 로직
+    }
+}
+```
+
+yml에 키가 없으면 기본값은 비활성(`false`)이다.
+
 </aside>
 <hr>
 </br>

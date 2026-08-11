@@ -1,0 +1,69 @@
+# GitHub Actions 탭에서 버튼 한 번으로 상용 배포를 트리거하기 위한 워크플로.
+# main의 다음 semver 태그(v1.2.3 형태)를 자동으로 계산해 push하고,
+# 그 태그 push가 prod-cd.yml의 트리거(on.push.tags)를 실행시켜 상용 배포로 이어진다.
+name: Promote to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "버전 증가 단위"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 다음 버전 태그 계산
+        id: version
+        run: |
+          git fetch --tags
+          LATEST=$(git tag --list 'v*' --sort=-v:refname | head -n1)
+          if [ -z "$LATEST" ]; then
+            LATEST="v0.0.0"
+          fi
+          echo "현재 최신 태그: $LATEST"
+
+          VERSION=${LATEST#v}
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MINOR=$(echo "$VERSION" | cut -d. -f2)
+          PATCH=$(echo "$VERSION" | cut -d. -f3)
+
+          case "${{ inputs.bump }}" in
+            major)
+              MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1)); PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+
+          NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "새 태그: $NEW_TAG"
+          echo "new_tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: 태그 생성 및 push (→ prod-cd.yml 트리거)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.version.outputs.new_tag }}"
+          git push origin "${{ steps.version.outputs.new_tag }}"
+
+      - name: 요약
+        run: echo "## ${{ steps.version.outputs.new_tag }} 태그 push 완료 — RUNNECT-PROD-CD가 곧 트리거됩니다." >> "$GITHUB_STEP_SUMMARY"

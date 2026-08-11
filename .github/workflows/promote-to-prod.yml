@@ -1,6 +1,11 @@
 # GitHub Actions 탭에서 버튼 한 번으로 상용 배포를 트리거하기 위한 워크플로.
-# main의 다음 semver 태그(v1.2.3 형태)를 자동으로 계산해 push하고,
-# 그 태그 push가 prod-cd.yml의 트리거(on.push.tags)를 실행시켜 상용 배포로 이어진다.
+# main의 다음 semver 태그(v1.2.3 형태)를 자동으로 계산해 push한 뒤,
+# prod-cd.yml을 workflow_dispatch로 직접 호출해 상용 배포로 이어지게 한다.
+#
+# 태그 push만으로 prod-cd.yml을 트리거하지 않는 이유: GitHub Actions는
+# 기본 GITHUB_TOKEN으로 push된 이벤트가 다른 워크플로를 연쇄 실행시키지
+# 않도록 막아둔다(무한루프 방지). 그래서 이 워크플로가 태그를 push해도
+# prod-cd.yml의 push 트리거는 켜지지 않아 명시적으로 호출해줘야 한다.
 name: Promote to Production
 
 on:
@@ -18,6 +23,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   tag:
@@ -58,12 +64,17 @@ jobs:
           echo "새 태그: $NEW_TAG"
           echo "new_tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
 
-      - name: 태그 생성 및 push (→ prod-cd.yml 트리거)
+      - name: 태그 생성 및 push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag "${{ steps.version.outputs.new_tag }}"
           git push origin "${{ steps.version.outputs.new_tag }}"
 
+      - name: RUNNECT-PROD-CD 직접 트리거
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run prod-cd.yml --ref "${{ steps.version.outputs.new_tag }}"
+
       - name: 요약
-        run: echo "## ${{ steps.version.outputs.new_tag }} 태그 push 완료 — RUNNECT-PROD-CD가 곧 트리거됩니다." >> "$GITHUB_STEP_SUMMARY"
+        run: echo "## ${{ steps.version.outputs.new_tag }} 태그 push 완료, RUNNECT-PROD-CD 트리거함" >> "$GITHUB_STEP_SUMMARY"

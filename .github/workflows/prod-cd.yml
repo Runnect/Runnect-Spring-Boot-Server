@@ -5,9 +5,15 @@ name: RUNNECT-PROD-CD
 # v로 시작하는 태그가 push될 때만 실행 (예: v1.3.0)
 # main push마다 자동으로 상용까지 나가지 않도록, 상용 배포는 태그로 명시적으로 트리거한다.
 # staging(Render)은 main push에 그대로 자동 배포된다 — staging에서 먼저 확인 후 태그를 찍는 흐름.
+#
+# workflow_dispatch도 함께 열어둔 이유: GitHub Actions는 기본 GITHUB_TOKEN으로
+# push된 이벤트가 다른 워크플로를 연쇄 트리거하지 않도록 막아둔다(무한루프 방지).
+# promote-to-prod.yml이 GITHUB_TOKEN으로 태그를 push해도 이 push 트리거가 안 켜지므로,
+# promote-to-prod.yml이 태그 push 직후 이 workflow_dispatch를 명시적으로 호출해 우회한다.
 on:
   push:
     tags: [ 'v*' ]
+  workflow_dispatch:
 
 env:
   S3_BUCKET_NAME: runnect-prod-bucket-604764467555-ap-northeast-2-an

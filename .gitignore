@@ -39,6 +39,9 @@ out/
 
 ### application.yml ###
 application.yaml
+application.yml
+src/main/resources/application.yml
+src/main/resources/application.yaml
 
 ### DS_Store
 .DS_Store

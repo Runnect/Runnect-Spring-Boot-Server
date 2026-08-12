@@ -12,6 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -21,6 +22,12 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class KakaoSignInService {
 
+    // 기본 RestTemplate은 타임아웃이 없어(무제한 대기), 카카오가 응답을 늦게 주면
+    // 그 요청을 처리하던 톰캣 스레드가 계속 묶여있게 된다. 스레드 풀이 이런 식으로
+    // 소진되면 카카오 로그인과 무관한 다른 API 요청까지 영향을 받는다.
+    private static final int CONNECT_TIMEOUT_MS = 3000;
+    private static final int READ_TIMEOUT_MS = 3000;
+
     public SocialInfoResponseDto getSocialInfo(String token) {
 
         HttpHeaders headers = new HttpHeaders();
@@ -28,7 +35,7 @@ public class KakaoSignInService {
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
-        RestTemplate rt = new RestTemplate();
+        RestTemplate rt = new RestTemplate(createTimeoutRequestFactory());
 
         String userId = null;
         String email = null;
@@ -60,5 +67,12 @@ public class KakaoSignInService {
                     ErrorStatus.INVALID_KAKAO_ID_TOKEN_EXCEPTION.getMessage());
         }
         return SocialInfoResponseDto.of(email, userId);
+    }
+
+    private SimpleClientHttpRequestFactory createTimeoutRequestFactory() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(CONNECT_TIMEOUT_MS);
+        factory.setReadTimeout(READ_TIMEOUT_MS);
+        return factory;
     }
 }

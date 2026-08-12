@@ -6,8 +6,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +18,9 @@ import org.runnect.server.common.entity.AuditingTimeEntity;
 
 @Getter
 @Entity
+@Table(indexes = {
+    @Index(name = "idx_heart_rate_sample_record_health_data_id", columnList = "record_health_data_id")
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HeartRateSample extends AuditingTimeEntity {
 

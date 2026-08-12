@@ -10,6 +10,9 @@ import javax.persistence.*;
 
 @Getter
 @Entity
+@Table(indexes = {
+    @Index(name = "idx_user_stamp_user_id", columnList = "user_id")
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserStamp extends AuditingTimeEntity {
 

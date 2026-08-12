@@ -212,6 +212,17 @@ public class SomeService {
 
 yml에 키가 없으면 기본값은 비활성(`false`)이다.
 
+### ✅ Diff Coverage 게이트
+
+PR에서 새로 추가/수정된 라인이 테스트로 커버되는지 CI(`build` job)가 자동으로 확인한다 — 로직을 고쳤는데 관련 테스트가 안 따라오는 경우를 기계적으로 잡기 위함. 전체 커버리지가 아니라 **이번 PR에서 바뀐 라인만** 대상으로 하며, 기준은 70%다.
+
+```bash
+# CI에서 실행되는 것과 동일한 방식으로 로컬에서 직접 확인
+./gradlew jacocoTestReport
+pip install diff-cover
+diff-cover build/reports/jacoco/test/jacocoTestReport.xml --compare-branch=origin/main
+```
+
 </aside>
 <hr>
 </br>

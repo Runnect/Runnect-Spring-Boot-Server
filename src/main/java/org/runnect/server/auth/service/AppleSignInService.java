@@ -6,6 +6,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.jwk.source.RemoteJWKSet;
 import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
+import com.nimbusds.jose.util.DefaultResourceRetriever;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
@@ -52,6 +53,10 @@ public class AppleSignInService {
     @Value("${apple.revoke-url}")
     private String APPLE_REVOKE_URL;
     private static final String APPLE_JWKS_URL = "https://appleid.apple.com/auth/keys";
+    // 애플 공개키(JWKS) 조회 및 회원탈퇴 통보에 타임아웃을 명시한다. 기본값(무제한 대기)이면
+    // 애플 쪽이 응답을 늦게 줄 때 이 요청을 처리하던 톰캣 스레드가 계속 묶여있게 된다.
+    private static final int CONNECT_TIMEOUT_MS = 3000;
+    private static final int READ_TIMEOUT_MS = 3000;
 
     private PrivateKey PRIVATE_KEY;
     @Value("${apple.p8key}")
@@ -109,7 +114,9 @@ public class AppleSignInService {
     }
 
     private JWTClaimsSet verifySignatureAndGetClaims(String idToken) throws Exception {
-        JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(APPLE_JWKS_URL));
+        JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(
+                new URL(APPLE_JWKS_URL),
+                new DefaultResourceRetriever(CONNECT_TIMEOUT_MS, READ_TIMEOUT_MS));
         ConfigurableJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
         JWSVerificationKeySelector<SecurityContext> keySelector =
                 new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, keySource);
@@ -137,7 +144,11 @@ public class AppleSignInService {
 
         String clientSecret = createClientSecret();
 
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(CONNECT_TIMEOUT_MS, java.util.concurrent.TimeUnit.MILLISECONDS)
+                .readTimeout(READ_TIMEOUT_MS, java.util.concurrent.TimeUnit.MILLISECONDS)
+                .writeTimeout(READ_TIMEOUT_MS, java.util.concurrent.TimeUnit.MILLISECONDS)
+                .build();
 
         RequestBody formBody = new FormBody.Builder()
                 .add("token", appleAccessToken)

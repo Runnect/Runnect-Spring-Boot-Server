@@ -22,6 +22,15 @@ public interface PublicCourseRepository  extends JpaRepository<PublicCourse, Lon
 
     List<PublicCourse> findByIdIn(Collection<Long> ids);
 
+    // deletePublicCourses에서 course/runnectUser(권한 검증)와 records(FK 해제)를 전부 순회하며
+    // 지연로딩을 트리거하던 N+1을 없애기 위한 전용 조회 (PublicCourseServiceTest 참고)
+    @Query("SELECT DISTINCT pc FROM PublicCourse pc " +
+            "JOIN FETCH pc.course c " +
+            "JOIN FETCH c.runnectUser " +
+            "LEFT JOIN FETCH pc.records " +
+            "WHERE pc.id IN :ids")
+    List<PublicCourse> findByIdInWithCourseAndRecords(@Param("ids") Collection<Long> ids);
+
     Long countBy();
 
     @Query("SELECT pc " +

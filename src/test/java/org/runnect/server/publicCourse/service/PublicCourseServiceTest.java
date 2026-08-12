@@ -583,7 +583,7 @@ class PublicCourseServiceTest {
             PublicCourse publicCourse = buildPublicCourse(100L, course);
 
             when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-            when(publicCourseRepository.findByIdIn(Collections.singletonList(100L))).thenReturn(
+            when(publicCourseRepository.findByIdInWithCourseAndRecords(Collections.singletonList(100L))).thenReturn(
                 Collections.singletonList(publicCourse));
 
             DeletePublicCoursesResponseDto response = publicCourseService.deletePublicCourses(1L,
@@ -600,7 +600,7 @@ class PublicCourseServiceTest {
         void 존재하지_않는_공개코스_포함() {
             RunnectUser user = buildUser(1L);
             when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-            when(publicCourseRepository.findByIdIn(Arrays.asList(100L, 999L))).thenReturn(Collections.emptyList());
+            when(publicCourseRepository.findByIdInWithCourseAndRecords(Arrays.asList(100L, 999L))).thenReturn(Collections.emptyList());
 
             assertThatThrownBy(() -> publicCourseService.deletePublicCourses(1L,
                 new DeletePublicCoursesRequestDto(Arrays.asList(100L, 999L))))
@@ -618,7 +618,7 @@ class PublicCourseServiceTest {
             PublicCourse othersPublicCourse = buildPublicCourse(101L, buildCourse(11L, otherUser, false));
 
             when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-            when(publicCourseRepository.findByIdIn(Arrays.asList(100L, 101L))).thenReturn(
+            when(publicCourseRepository.findByIdInWithCourseAndRecords(Arrays.asList(100L, 101L))).thenReturn(
                 Arrays.asList(ownPublicCourse, othersPublicCourse));
 
             assertThatThrownBy(() -> publicCourseService.deletePublicCourses(1L,
@@ -637,7 +637,7 @@ class PublicCourseServiceTest {
             PublicCourse othersPublicCourse = buildPublicCourse(101L, buildCourse(11L, otherUser, false));
 
             when(userRepository.findById(adminId)).thenReturn(Optional.of(admin));
-            when(publicCourseRepository.findByIdIn(Collections.singletonList(101L))).thenReturn(
+            when(publicCourseRepository.findByIdInWithCourseAndRecords(Collections.singletonList(101L))).thenReturn(
                 Collections.singletonList(othersPublicCourse));
 
             DeletePublicCoursesResponseDto response = publicCourseService.deletePublicCourses(adminId,

@@ -362,7 +362,7 @@ public class PublicCourseService {
                 .orElseThrow(() -> new NotFoundUserException(ErrorStatus.NOT_FOUND_USER_EXCEPTION,
                         ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
-        List<PublicCourse> publicCourses = publicCourseRepository.findByIdIn(
+        List<PublicCourse> publicCourses = publicCourseRepository.findByIdInWithCourseAndRecords(
                 requestDto.getPublicCourseIdList());
 
 

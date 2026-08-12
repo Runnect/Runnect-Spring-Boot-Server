@@ -18,6 +18,8 @@ import javax.persistence.*;
         @UniqueConstraint(
                 columnNames = {"user_id", "public_course_id"}
         )
+}, indexes = {
+        @Index(name = "idx_scrap_public_course_id", columnList = "public_course_id")
 })
 @DynamicUpdate
 public class Scrap extends AuditingTimeEntity {

@@ -16,6 +16,9 @@ import org.runnect.server.user.entity.RunnectUser;
 
 @Getter
 @Entity
+@Table(indexes = {
+    @Index(name = "idx_course_user_id", columnList = "user_id")
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Course extends AuditingTimeEntity {
 

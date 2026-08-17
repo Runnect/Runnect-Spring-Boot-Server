@@ -23,6 +23,10 @@ public interface RecordRepository extends Repository<Record, Long> {
 
     Optional<Record> findById(Long recordId);
 
+    // 코스별 기록 랭킹(Redis) 백필용 — 공개 코스에 연결된 기록만 대상으로 함
+    @Query("SELECT r FROM Record r JOIN FETCH r.runnectUser JOIN FETCH r.publicCourse WHERE r.publicCourse IS NOT NULL")
+    List<Record> findAllByPublicCourseIsNotNull();
+
     long countByRunnectUser(RunnectUser runnectUser);
 
     List<Record> findByIdIn(Collection<Long> ids);

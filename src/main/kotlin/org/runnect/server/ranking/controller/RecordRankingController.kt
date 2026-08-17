@@ -7,6 +7,7 @@ import org.runnect.server.ranking.service.RecordRankingService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -17,6 +18,15 @@ import org.springframework.web.bind.annotation.RestController
 class RecordRankingController(
     private val recordRankingService: RecordRankingService,
 ) {
+
+    // 배포 시 1회성으로 실행하는 운영용 백필 엔드포인트. 인증 없이 열려있지만
+    // ZADD LT라 여러 번 실행해도 안전(idempotent)하다. 값을 반환할 뿐 파괴적 동작은 없다.
+    @PostMapping("internal/ranking/backfill")
+    @ResponseStatus(HttpStatus.OK)
+    fun backfillRanking() = ApiResponseDto.success(
+        SuccessStatus.BACKFILL_RANKING_SUCCESS,
+        mapOf("updatedCount" to recordRankingService.backfillAll()),
+    )
 
     @GetMapping("course/{courseId}/ranking")
     @ResponseStatus(HttpStatus.OK)

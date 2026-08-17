@@ -3,6 +3,7 @@ package org.runnect.server.record.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -47,6 +48,8 @@ import org.runnect.server.user.repository.UserRepository;
 import org.runnect.server.user.service.UserStampService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @ExtendWith(MockitoExtension.class)
 class RecordServiceTest {
@@ -63,13 +66,15 @@ class RecordServiceTest {
     private UserStampService userStampService;
     @Mock
     private RecordHealthDataRepository recordHealthDataRepository;
+    @Mock
+    private org.runnect.server.ranking.service.RecordRankingService recordRankingService;
 
     private RecordService recordService;
 
     @BeforeEach
     void setUp() {
         recordService = new RecordService(recordRepository, userRepository, courseRepository,
-            publicCourseRepository, userStampService, recordHealthDataRepository);
+            publicCourseRepository, userStampService, recordHealthDataRepository, recordRankingService);
     }
 
     private RunnectUser buildUser(Long id) {
@@ -161,6 +166,7 @@ class RecordServiceTest {
             assertThat(user.getCreatedRecord()).isEqualTo(1L);
             verify(userStampService).createStampByUser(user, StampType.r);
             verify(publicCourseRepository, never()).findById(any());
+            verify(recordRankingService, never()).updateBestRecord(anyLong(), anyLong(), anyLong(), any());
         }
 
         @Test
@@ -184,6 +190,40 @@ class RecordServiceTest {
             recordService.createRecord(1L, request);
 
             verify(courseRepository, never()).findById(any());
+            verify(recordRankingService).updateBestRecord(20L, 1L, 100L, java.sql.Time.valueOf("00:25:00"));
+        }
+
+        @Test
+        @DisplayName("트랜잭션이 활성화된 상태면 랭킹 갱신은 커밋 이후로 지연되고, 커밋 전에는 호출되지 않는다")
+        void 트랜잭션_커밋_이후에_랭킹이_갱신된다() {
+            RunnectUser user = buildUser(1L);
+            Course course = buildCourse(10L, user);
+            PublicCourse publicCourse = PublicCourse.builder()
+                .course(course)
+                .title("공개 코스")
+                .description("설명")
+                .build();
+            ReflectionTestUtils.setField(publicCourse, "id", 20L);
+
+            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+            when(publicCourseRepository.findById(20L)).thenReturn(Optional.of(publicCourse));
+            stubSaveSetsCreatedAt();
+
+            CreateRecordRequestDto request = createRecordRequestDto(null, 20L, "00:25:00", "00:05:30");
+
+            TransactionSynchronizationManager.initSynchronization();
+            try {
+                recordService.createRecord(1L, request);
+
+                verify(recordRankingService, never()).updateBestRecord(anyLong(), anyLong(), anyLong(), any());
+
+                TransactionSynchronizationManager.getSynchronizations()
+                    .forEach(TransactionSynchronization::afterCommit);
+            } finally {
+                TransactionSynchronizationManager.clearSynchronization();
+            }
+
+            verify(recordRankingService).updateBestRecord(20L, 1L, 100L, java.sql.Time.valueOf("00:25:00"));
         }
 
         @Test

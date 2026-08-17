@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.runnect.server.course.entity.Course
+import org.runnect.server.publicCourse.entity.PublicCourse
 import org.runnect.server.record.entity.Record
 import org.runnect.server.record.repository.RecordRepository
 import org.runnect.server.user.entity.RunnectUser
@@ -113,6 +114,49 @@ class RecordRankingServiceTest {
 
         assertThat(myRanking.hasRecord).isFalse()
         assertThat(myRanking.rank).isNull()
+    }
+
+    @Test
+    fun `backfillAll은 publicCourse가 있는 기록만 대상으로 랭킹을 갱신하고 실제 갱신된 개수를 반환한다`() {
+        val user1 = buildUser(1L, "런너A")
+        val user2 = buildUser(2L, "런너B")
+        val recordWithPublicCourse1 = buildRecordWithPublicCourse(id = 100L, owner = user1, publicCourseId = 1L)
+        val recordWithPublicCourse2 = buildRecordWithPublicCourse(id = 101L, owner = user2, publicCourseId = 1L)
+
+        whenever(recordRepository.findAllByPublicCourseIsNotNull())
+            .thenReturn(listOf(recordWithPublicCourse1, recordWithPublicCourse2))
+
+        val hashOps: HashOperations<String, String, String> = mock(HashOperations::class.java) as HashOperations<String, String, String>
+        whenever(stringRedisTemplate.opsForHash<String, String>()).thenReturn(hashOps)
+        // 첫 번째 기록만 실제로 더 빠른 기록으로 갱신되고, 두 번째는 갱신되지 않는 상황을 시뮬레이션
+        whenever(stringRedisTemplate.execute(any<RedisCallback<Boolean>>()))
+            .thenReturn(true)
+            .thenReturn(false)
+
+        val updatedCount = service.backfillAll()
+
+        assertThat(updatedCount).isEqualTo(1)
+    }
+
+    private fun buildRecordWithPublicCourse(id: Long, owner: RunnectUser, publicCourseId: Long): Record {
+        val course = buildCourse(id + 1000, owner)
+        val publicCourse = PublicCourse.builder()
+            .course(course)
+            .title("공개 코스")
+            .description("설명")
+            .build()
+        ReflectionTestUtils.setField(publicCourse, "id", publicCourseId)
+
+        val record = Record.builder()
+            .runnectUser(owner)
+            .course(course)
+            .publicCourse(publicCourse)
+            .title("퇴근길 러닝")
+            .pace(Time.valueOf("00:05:30"))
+            .time(Time.valueOf("00:25:00"))
+            .build()
+        ReflectionTestUtils.setField(record, "id", id)
+        return record
     }
 
     private fun buildUser(id: Long, nickname: String): RunnectUser {

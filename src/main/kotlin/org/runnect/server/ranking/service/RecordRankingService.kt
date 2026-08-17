@@ -48,6 +48,18 @@ class RecordRankingService(
         return updated
     }
 
+    /**
+     * 이 랭킹 기능이 배포되기 전에 이미 쌓여있던 완주 기록을 Redis로 백필한다.
+     * 신규 기능 배포 시 1회성으로 실행하는 운영 작업 — 몇 번을 다시 돌려도
+     * ZADD LT가 "더 느린 기록이면 무시"하므로 안전하다(idempotent).
+     */
+    fun backfillAll(): Int {
+        val records = recordRepository.findAllByPublicCourseIsNotNull()
+        return records.count { record ->
+            updateBestRecord(record.publicCourse.id, record.runnectUser.id, record.id, record.time)
+        }
+    }
+
     fun getRanking(courseId: Long, limit: Long): RankingListResponse {
         val zSetOps = stringRedisTemplate.opsForZSet()
         val totalCount = zSetOps.zCard(rankingKey(courseId)) ?: 0L

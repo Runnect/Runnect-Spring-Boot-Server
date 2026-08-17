@@ -3,6 +3,7 @@ package org.runnect.server.record.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -63,13 +64,15 @@ class RecordServiceTest {
     private UserStampService userStampService;
     @Mock
     private RecordHealthDataRepository recordHealthDataRepository;
+    @Mock
+    private org.runnect.server.ranking.service.RecordRankingService recordRankingService;
 
     private RecordService recordService;
 
     @BeforeEach
     void setUp() {
         recordService = new RecordService(recordRepository, userRepository, courseRepository,
-            publicCourseRepository, userStampService, recordHealthDataRepository);
+            publicCourseRepository, userStampService, recordHealthDataRepository, recordRankingService);
     }
 
     private RunnectUser buildUser(Long id) {
@@ -161,6 +164,7 @@ class RecordServiceTest {
             assertThat(user.getCreatedRecord()).isEqualTo(1L);
             verify(userStampService).createStampByUser(user, StampType.r);
             verify(publicCourseRepository, never()).findById(any());
+            verify(recordRankingService, never()).updateBestRecord(anyLong(), anyLong(), anyLong(), any());
         }
 
         @Test
@@ -184,6 +188,7 @@ class RecordServiceTest {
             recordService.createRecord(1L, request);
 
             verify(courseRepository, never()).findById(any());
+            verify(recordRankingService).updateBestRecord(20L, 1L, 100L, java.sql.Time.valueOf("00:25:00"));
         }
 
         @Test

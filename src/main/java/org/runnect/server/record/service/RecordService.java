@@ -13,6 +13,7 @@ import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
+import org.runnect.server.ranking.service.RecordRankingService;
 import org.runnect.server.record.dto.request.CreateRecordRequestDto;
 import org.runnect.server.record.dto.request.DeleteRecordsRequestDto;
 import org.runnect.server.record.dto.request.UpdateRecordRequestDto;
@@ -36,6 +37,8 @@ import org.runnect.server.user.repository.UserRepository;
 import org.runnect.server.user.service.UserStampService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -48,6 +51,7 @@ public class RecordService {
     private final PublicCourseRepository publicCourseRepository;
     private final UserStampService userStampService;
     private final RecordHealthDataRepository recordHealthDataRepository;
+    private final RecordRankingService recordRankingService;
 
     @Transactional
     public CreateRecordResponseDto createRecord(Long userId, CreateRecordRequestDto request) {
@@ -83,6 +87,10 @@ public class RecordService {
 
         recordRepository.save(record);
 
+        if (publicCourse != null) {
+            registerRankingUpdateAfterCommit(publicCourse.getId(), userId, record.getId(), time);
+        }
+
         user.updateCreatedRecord();
         userStampService.createStampByUser(user, StampType.r);
 
@@ -92,6 +100,23 @@ public class RecordService {
 
         return response;
 
+    }
+
+    // 랭킹(Redis) 갱신은 DB 트랜잭션이 실제로 커밋된 뒤에만 실행한다.
+    // 커밋 전에 실행하면, 이후 로직(스탬프 적립 등)이 실패해 롤백될 때
+    // 존재하지 않는 recordId를 가리키는 랭킹 엔트리가 Redis에 남을 수 있다.
+    private void registerRankingUpdateAfterCommit(Long publicCourseId, Long userId, Long recordId, Time time) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            recordRankingService.updateBestRecord(publicCourseId, userId, recordId, time);
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                recordRankingService.updateBestRecord(publicCourseId, userId, recordId, time);
+            }
+        });
     }
 
     public GetRecordResponseDto getRecordByUser(Long userId) {

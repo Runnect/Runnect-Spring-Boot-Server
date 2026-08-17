@@ -3,6 +3,9 @@ plugins {
 	id 'jacoco'
 	id 'org.springframework.boot' version '2.7.14'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'org.jetbrains.kotlin.jvm' version '1.9.24'
+	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.24'
+	id 'org.jetbrains.kotlin.plugin.lombok' version '1.9.24'
 }
 
 group = 'org.runnect'
@@ -10,6 +13,20 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	sourceCompatibility = '11'
+}
+
+compileKotlin {
+	kotlinOptions {
+		freeCompilerArgs = ['-Xjsr305=strict', '-java-parameters']
+		jvmTarget = '11'
+	}
+}
+
+compileTestKotlin {
+	kotlinOptions {
+		freeCompilerArgs = ['-Xjsr305=strict', '-java-parameters']
+		jvmTarget = '11'
+	}
 }
 
 configurations {
@@ -75,6 +92,11 @@ dependencies {
 
 	// Swagger (OpenAPI)
 	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+
+	// Kotlin
+	implementation 'org.jetbrains.kotlin:kotlin-reflect'
+	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+	testImplementation 'org.mockito.kotlin:mockito-kotlin:4.1.0'
 
 }
 

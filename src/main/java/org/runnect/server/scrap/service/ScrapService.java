@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.NotFoundException;
+import org.runnect.server.common.module.concurrency.OptimisticLockRetrier;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.scrap.dto.request.CreateAndDeleteScrapRequestDto;
@@ -27,6 +28,7 @@ public class ScrapService {
     private final UserRepository userRepository;
     private final PublicCourseRepository publicCourseRepository;
     private final UserStampService userStampService;
+    private final OptimisticLockRetrier optimisticLockRetrier;
 
     @Transactional
     public CreateAndDeleteScrapResponseDto createAndDeleteScrap(Long userId, CreateAndDeleteScrapRequestDto request) {
@@ -44,8 +46,9 @@ public class ScrapService {
                         .runnectUser(user)
                         .build();
 
-                user.updateCreatedScrap();
-                userStampService.createStampByUser(user, StampType.s);
+                optimisticLockRetrier.runWithRetry(
+                    () -> userStampService.recordActivityAndAwardStamp(userId, StampType.s)
+                );
 
                 scrapRepository.save(newScrap);
             } else {

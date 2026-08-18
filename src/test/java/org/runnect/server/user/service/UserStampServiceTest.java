@@ -223,6 +223,32 @@ class UserStampServiceTest {
     }
 
     @Nested
+    @DisplayName("recordActivityAndAwardStamp")
+    class RecordActivityAndAwardStamp {
+
+        @Test
+        @DisplayName("userId로 유저를 다시 조회해서 카운터를 증가시키고 saveAndFlush로 저장한다")
+        void 정상_호출() {
+            RunnectUser user = buildUser(1L);
+            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+            userStampService.recordActivityAndAwardStamp(1L, StampType.c);
+
+            assertThat(user.getCreatedCourse()).isEqualTo(1L);
+            verify(userRepository).saveAndFlush(user);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 유저면 NotFoundUserException")
+        void 존재하지_않는_유저() {
+            when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> userStampService.recordActivityAndAwardStamp(1L, StampType.c))
+                .isInstanceOf(NotFoundUserException.class);
+        }
+    }
+
+    @Nested
     @DisplayName("findUserStamps")
     class FindUserStamps {
 

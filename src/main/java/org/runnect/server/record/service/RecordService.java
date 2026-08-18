@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
+import org.runnect.server.common.module.concurrency.OptimisticLockRetrier;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.publicCourse.entity.PublicCourse;
@@ -52,6 +53,7 @@ public class RecordService {
     private final UserStampService userStampService;
     private final RecordHealthDataRepository recordHealthDataRepository;
     private final RecordRankingService recordRankingService;
+    private final OptimisticLockRetrier optimisticLockRetrier;
 
     @Transactional
     public CreateRecordResponseDto createRecord(Long userId, CreateRecordRequestDto request) {
@@ -91,8 +93,9 @@ public class RecordService {
             registerRankingUpdateAfterCommit(publicCourse.getId(), userId, record.getId(), time);
         }
 
-        user.updateCreatedRecord();
-        userStampService.createStampByUser(user, StampType.r);
+        optimisticLockRetrier.runWithRetry(
+            () -> userStampService.recordActivityAndAwardStamp(userId, StampType.r)
+        );
 
         CreateRecordDto recordDto = new CreateRecordDto(record.getId(), record.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
 

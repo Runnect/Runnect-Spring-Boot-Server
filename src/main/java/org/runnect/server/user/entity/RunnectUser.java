@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -66,6 +67,14 @@ public class RunnectUser extends AuditingTimeEntity {
 
     @Column(nullable = false)
     private Long createdScrap;
+
+    /**
+     * 카운터 필드(createdCourse 등)를 다른 트랜잭션이 동시에 읽고 수정하면 Lost Update가
+     * 발생할 수 있어 낙관적 락을 건다. 충돌 시 UserStampService.recordActivityAndAwardStamp가
+     * 별도 트랜잭션에서 재시도한다.
+     */
+    @Version
+    private Long version;
 
     @OneToMany(mappedBy = "runnectUser")
     private List<Course> courses = new ArrayList<>();

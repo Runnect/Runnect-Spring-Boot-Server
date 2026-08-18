@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +22,7 @@ import org.locationtech.jts.geom.LineString;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.runnect.server.common.exception.NotFoundException;
+import org.runnect.server.common.module.concurrency.OptimisticLockRetrier;
 import org.runnect.server.common.module.convert.CoordinateDto;
 import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.course.entity.Course;
@@ -50,13 +53,20 @@ class ScrapServiceTest {
     private PublicCourseRepository publicCourseRepository;
     @Mock
     private UserStampService userStampService;
+    @Mock
+    private OptimisticLockRetrier optimisticLockRetrier;
 
     private ScrapService scrapService;
 
     @BeforeEach
     void setUp() {
         scrapService = new ScrapService(scrapRepository, userRepository, publicCourseRepository,
-            userStampService);
+            userStampService, optimisticLockRetrier);
+        lenient().doAnswer(invocation -> {
+            Runnable action = invocation.getArgument(0);
+            action.run();
+            return null;
+        }).when(optimisticLockRetrier).runWithRetry(any());
     }
 
     private RunnectUser buildUser(Long id) {
@@ -134,8 +144,7 @@ class ScrapServiceTest {
 
             assertThat(response.getScrapCount()).isEqualTo(1L);
             assertThat(response.getScrapTF()).isTrue();
-            assertThat(user.getCreatedScrap()).isEqualTo(1L);
-            verify(userStampService).createStampByUser(user, StampType.s);
+            verify(userStampService).recordActivityAndAwardStamp(1L, StampType.s);
             verify(scrapRepository).save(any(Scrap.class));
         }
 
@@ -155,7 +164,7 @@ class ScrapServiceTest {
             assertThat(existingScrap.getScrapTF()).isTrue();
             assertThat(user.getCreatedScrap()).isEqualTo(0L);
             verify(scrapRepository, never()).save(any());
-            verify(userStampService, never()).createStampByUser(any(), any());
+            verify(userStampService, never()).recordActivityAndAwardStamp(any(), any());
         }
 
         @Test

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.LineString;
 import org.runnect.server.common.dto.DepartureResponse;
 import org.runnect.server.common.exception.NotFoundException;
+import org.runnect.server.common.module.concurrency.OptimisticLockRetrier;
 import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.common.module.convert.DepartureConverter;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
@@ -39,6 +40,7 @@ public class CourseService {
     private final PublicCourseRepository publicCourseRepository;
     private final UserRepository userRepository;
     private final UserStampService userStampService;
+    private final OptimisticLockRetrier optimisticLockRetrier;
 
     @Transactional
     public CourseCreateResponseDto createCourse(Long userId, CourseCreateRequestDto requestDto,
@@ -65,8 +67,9 @@ public class CourseService {
             .build();
 
         Course saved = courseRepository.save(course);
-        user.updateCreatedCourse();
-        userStampService.createStampByUser(user, StampType.c);
+        optimisticLockRetrier.runWithRetry(
+            () -> userStampService.recordActivityAndAwardStamp(user.getId(), StampType.c)
+        );
 
         return CourseCreateResponseDto.of(saved.getId(), saved.getCreatedAt());
     }

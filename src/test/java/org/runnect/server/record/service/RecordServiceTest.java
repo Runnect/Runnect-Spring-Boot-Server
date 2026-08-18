@@ -24,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.exception.PermissionDeniedException;
+import org.runnect.server.common.module.concurrency.OptimisticLockRetrier;
 import org.runnect.server.course.entity.Course;
 import org.runnect.server.course.repository.CourseRepository;
 import org.runnect.server.health.entity.RecordHealthData;
@@ -68,13 +69,21 @@ class RecordServiceTest {
     private RecordHealthDataRepository recordHealthDataRepository;
     @Mock
     private org.runnect.server.ranking.service.RecordRankingService recordRankingService;
+    @Mock
+    private OptimisticLockRetrier optimisticLockRetrier;
 
     private RecordService recordService;
 
     @BeforeEach
     void setUp() {
         recordService = new RecordService(recordRepository, userRepository, courseRepository,
-            publicCourseRepository, userStampService, recordHealthDataRepository, recordRankingService);
+            publicCourseRepository, userStampService, recordHealthDataRepository, recordRankingService,
+            optimisticLockRetrier);
+        org.mockito.Mockito.lenient().doAnswer(invocation -> {
+            Runnable action = invocation.getArgument(0);
+            action.run();
+            return null;
+        }).when(optimisticLockRetrier).runWithRetry(any());
     }
 
     private RunnectUser buildUser(Long id) {
@@ -163,8 +172,7 @@ class RecordServiceTest {
             CreateRecordResponseDto response = recordService.createRecord(1L, request);
 
             assertThat(response.getRecord().getId()).isEqualTo(100L);
-            assertThat(user.getCreatedRecord()).isEqualTo(1L);
-            verify(userStampService).createStampByUser(user, StampType.r);
+            verify(userStampService).recordActivityAndAwardStamp(1L, StampType.r);
             verify(publicCourseRepository, never()).findById(any());
             verify(recordRankingService, never()).updateBestRecord(anyLong(), anyLong(), anyLong(), any());
         }

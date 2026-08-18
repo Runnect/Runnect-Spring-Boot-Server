@@ -3,6 +3,7 @@ package org.runnect.server.course.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -24,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.runnect.server.common.exception.BadRequestException;
 import org.runnect.server.common.exception.NotFoundException;
+import org.runnect.server.common.module.concurrency.OptimisticLockRetrier;
 import org.runnect.server.common.module.convert.CoordinateDto;
 import org.runnect.server.common.module.convert.CoordinatePathConverter;
 import org.runnect.server.course.dto.request.CourseCreateRequestDto;
@@ -55,13 +57,20 @@ class CourseServiceTest {
     private UserRepository userRepository;
     @Mock
     private UserStampService userStampService;
+    @Mock
+    private OptimisticLockRetrier optimisticLockRetrier;
 
     private CourseService courseService;
 
     @BeforeEach
     void setUp() {
         courseService = new CourseService(courseRepository, publicCourseRepository, userRepository,
-            userStampService);
+            userStampService, optimisticLockRetrier);
+        org.mockito.Mockito.lenient().doAnswer(invocation -> {
+            Runnable action = invocation.getArgument(0);
+            action.run();
+            return null;
+        }).when(optimisticLockRetrier).runWithRetry(any());
     }
 
     private RunnectUser buildUser(Long id) {
@@ -130,8 +139,7 @@ class CourseServiceTest {
 
             assertThat(response.getId()).isEqualTo(100L);
             assertThat(response.getCreatedAt()).isEqualTo(LocalDateTime.of(2026, 1, 1, 0, 0));
-            assertThat(user.getCreatedCourse()).isEqualTo(1L);
-            verify(userStampService).createStampByUser(user, StampType.c);
+            verify(userStampService).recordActivityAndAwardStamp(1L, StampType.c);
 
             ArgumentCaptor<Course> captor = ArgumentCaptor.forClass(Course.class);
             verify(courseRepository).save(captor.capture());

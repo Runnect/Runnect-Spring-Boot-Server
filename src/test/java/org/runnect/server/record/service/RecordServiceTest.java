@@ -83,7 +83,7 @@ class RecordServiceTest {
             Runnable action = invocation.getArgument(0);
             action.run();
             return null;
-        }).when(optimisticLockRetrier).runWithRetry(any());
+        }).when(optimisticLockRetrier).runAfterCommit(any());
     }
 
     private RunnectUser buildUser(Long id) {

@@ -150,5 +150,17 @@ class ScrapConcurrencyTest {
                 exception
             )
             .isInstanceOf(org.runnect.server.common.exception.ConflictException.class);
+
+        // 스크랩은 실제로 1건만 만들어졌는데(한쪽은 ConflictException으로 실패), 스탬프/카운터
+        // 업데이트가 저장 성공 여부와 무관하게 REQUIRES_NEW로 즉시 커밋돼버리면 두 번 다
+        // 반영돼 createdScrap이 2가 될 수 있다 — 실패한 시도까지 카운트되는 것이므로 그 자체가 버그.
+        RunnectUser user = userRepository.findById(testUserId).orElseThrow();
+        assertThat(user.getCreatedScrap())
+            .withFailMessage(
+                "실제로 생성된 스크랩은 1건인데 카운터가 %d로 기록됨 — 실패한 시도의 스탬프/카운터 갱신이 "
+                    + "메인 저장 실패와 무관하게 커밋돼버린 것",
+                user.getCreatedScrap()
+            )
+            .isEqualTo(1L);
     }
 }

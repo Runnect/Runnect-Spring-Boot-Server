@@ -67,7 +67,7 @@ public class CourseService {
             .build();
 
         Course saved = courseRepository.save(course);
-        optimisticLockRetrier.runWithRetry(
+        optimisticLockRetrier.runAfterCommit(
             () -> userStampService.recordActivityAndAwardStamp(user.getId(), StampType.c)
         );
 

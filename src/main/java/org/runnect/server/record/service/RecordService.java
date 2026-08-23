@@ -93,7 +93,7 @@ public class RecordService {
             registerRankingUpdateAfterCommit(publicCourse.getId(), userId, record.getId(), time);
         }
 
-        optimisticLockRetrier.runWithRetry(
+        optimisticLockRetrier.runAfterCommit(
             () -> userStampService.recordActivityAndAwardStamp(userId, StampType.r)
         );
 

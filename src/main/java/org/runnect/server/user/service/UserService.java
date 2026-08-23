@@ -21,6 +21,7 @@ import org.runnect.server.user.entity.SocialType;
 import org.runnect.server.user.exception.userException.DuplicateNicknameException;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +59,17 @@ public class UserService {
         }
 
         user.updateUserNickname(newNickname);
+
+        // 서로 다른 두 유저가 동시에 같은 새 닉네임으로 변경을 요청하면 위의 existsByNickname
+        // 조회에서 둘 다 "중복 없음"을 보고 여기까지 도달할 수 있다. 변경 자체는 더티 체킹이라
+        // 여기서 바로 flush하지 않으면 unique 제약 위반이 트랜잭션 커밋 시점에야 터져 이 메서드
+        // 밖에서 DataIntegrityViolationException으로 그대로 샌다. saveAndFlush로 여기서 직접
+        // 터뜨려 잡고, 이미 존재하는 다른 예외(DuplicateNicknameException)로 변환한다.
+        try {
+            userRepository.saveAndFlush(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateNicknameException(ErrorStatus.ALREADY_EXIST_NICKNAME_EXCEPTION, ErrorStatus.ALREADY_EXIST_NICKNAME_EXCEPTION.getMessage());
+        }
 
         return UpdateUserNicknameResponseDto.of(user, calculateUserLevelPercent(user));
     }

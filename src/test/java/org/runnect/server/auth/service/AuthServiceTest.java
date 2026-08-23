@@ -49,13 +49,15 @@ class AuthServiceTest {
     private JwtService jwtService;
     @Mock
     private RedisService redisService;
+    @Mock
+    private SocialSignUpRegistrar socialSignUpRegistrar;
 
     private AuthService authService;
 
     @BeforeEach
     void setUp() {
         authService = new AuthService(userRepository, googleSignInService, appleSignInService,
-            kakaoSignInService, jwtService, redisService);
+            kakaoSignInService, jwtService, redisService, socialSignUpRegistrar);
     }
 
     private RunnectUser buildUser(Long id, String email, SocialType provider) {
@@ -191,7 +193,8 @@ class AuthServiceTest {
             AuthResponseDto response = authService.signIn(new SignInRequestDto("kakao-token", "KAKAO"));
 
             assertThat(response).isInstanceOf(SignUpResponseDto.class);
-            verify(userRepository).save(any(RunnectUser.class));
+            verify(socialSignUpRegistrar).register(any(), org.mockito.ArgumentMatchers.eq("new@runnect.io"),
+                org.mockito.ArgumentMatchers.eq("social-1"), org.mockito.ArgumentMatchers.eq(SocialType.KAKAO));
         }
 
         @Test
@@ -209,7 +212,7 @@ class AuthServiceTest {
             AuthResponseDto response = authService.signIn(new SignInRequestDto("google-token", "GOOGLE"));
 
             assertThat(response).isInstanceOf(SignInResponseDto.class);
-            verify(userRepository, never()).save(any());
+            verify(socialSignUpRegistrar, never()).register(any(), any(), any(), any());
         }
 
         @Test

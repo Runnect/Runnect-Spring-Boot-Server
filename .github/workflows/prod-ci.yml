@@ -14,9 +14,14 @@ jobs:
 
     # 테스트(contextLoads 등)는 실제 prod DB/Redis가 아니라 CI 안에서 띄우는
     # 임시 컨테이너를 바라보게 한다 (원격 prod 환경에 직접 의존하지 않도록).
+    # Course.path가 PostGIS geometry 컬럼이라 순정 postgres 이미지로는 그 컬럼이 있는
+    # 테이블(course) 생성 자체가 실패한다(Hibernate가 ddl-auto 실패를 조용히 무시해서
+    # 지금까지 드러나지 않았을 뿐, course 테이블이 CI에 존재한 적이 없었다 — 실제 Course row가
+    # 필요 없던 테스트만 우연히 계속 통과해온 것). prod/staging과 동일하게 PostGIS가 포함된
+    # 이미지를 써서 CI가 실제 환경과 같은 스키마로 검증하도록 한다.
     services:
       postgres:
-        image: postgres:15
+        image: postgis/postgis:15-3.4
         env:
           POSTGRES_DB: runnect
           POSTGRES_USER: runnect

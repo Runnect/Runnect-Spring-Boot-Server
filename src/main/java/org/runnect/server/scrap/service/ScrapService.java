@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.constant.ErrorStatus;
 import org.runnect.server.common.exception.ConflictException;
 import org.runnect.server.common.exception.NotFoundException;
+import org.runnect.server.common.module.concurrency.OptimisticLockRetrier;
 import org.runnect.server.publicCourse.entity.PublicCourse;
 import org.runnect.server.publicCourse.repository.PublicCourseRepository;
 import org.runnect.server.scrap.dto.request.CreateAndDeleteScrapRequestDto;
@@ -29,6 +30,7 @@ public class ScrapService {
     private final UserRepository userRepository;
     private final PublicCourseRepository publicCourseRepository;
     private final UserStampService userStampService;
+    private final OptimisticLockRetrier optimisticLockRetrier;
 
     @Transactional
     public CreateAndDeleteScrapResponseDto createAndDeleteScrap(Long userId, CreateAndDeleteScrapRequestDto request) {
@@ -46,9 +48,6 @@ public class ScrapService {
                         .runnectUser(user)
                         .build();
 
-                user.updateCreatedScrap();
-                userStampService.createStampByUser(user, StampType.s);
-
                 // 동시에 같은 코스를 스크랩하는 요청이 겹치면 둘 다 "기존 스크랩 없음"을 보고
                 // 각자 저장을 시도할 수 있다 — (user_id, public_course_id) 유니크 제약으로 DB가
                 // 하나는 거부하는데, 그 예외를 그대로 두면 500으로 샌다(HealthService의 기존
@@ -60,6 +59,10 @@ public class ScrapService {
                         ErrorStatus.ALREADY_EXIST_SCRAP_EXCEPTION,
                         ErrorStatus.ALREADY_EXIST_SCRAP_EXCEPTION.getMessage());
                 }
+
+                optimisticLockRetrier.runAfterCommit(
+                    () -> userStampService.recordActivityAndAwardStamp(userId, StampType.s)
+                );
             } else {
                 // 기존 스크랩한 내역이 있을 때
                 scrap.updateScrapTF(true);

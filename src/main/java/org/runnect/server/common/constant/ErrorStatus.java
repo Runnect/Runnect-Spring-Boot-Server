@@ -29,6 +29,7 @@ public enum ErrorStatus {
     INVALID_PARAMETER_EXCEPTION(HttpStatus.BAD_REQUEST, "파라미터에 올바른 값이 입력되지 않았습니다."),
     NOT_FOUND_APPLE_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "appleAccessToken이 없습니다."),
     NOT_FOUND_SCRAP_EXCEPTION(HttpStatus.BAD_REQUEST, "스크랩한 코스가 없습니다."),
+    ALREADY_EXIST_SCRAP_EXCEPTION(HttpStatus.CONFLICT, "이미 처리된 스크랩 요청입니다."),
     NOT_FOUND_IMAGE_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 이미지 파일입니다"),
     NOT_FOUND_PUBLICCOURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "존재하지 않는 public course id입니다."),
     INVALID_HEALTH_DATA_EXCEPTION(HttpStatus.BAD_REQUEST, "유효하지 않은 건강 데이터입니다"),

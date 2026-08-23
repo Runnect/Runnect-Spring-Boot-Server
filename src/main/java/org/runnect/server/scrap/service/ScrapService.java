@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.runnect.server.common.constant.ErrorStatus;
+import org.runnect.server.common.exception.ConflictException;
 import org.runnect.server.common.exception.NotFoundException;
 import org.runnect.server.common.module.concurrency.OptimisticLockRetrier;
 import org.runnect.server.publicCourse.entity.PublicCourse;
@@ -17,6 +18,7 @@ import org.runnect.server.user.entity.StampType;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
 import org.runnect.server.user.service.UserStampService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +52,17 @@ public class ScrapService {
                     () -> userStampService.recordActivityAndAwardStamp(userId, StampType.s)
                 );
 
-                scrapRepository.save(newScrap);
+                // 동시에 같은 코스를 스크랩하는 요청이 겹치면 둘 다 "기존 스크랩 없음"을 보고
+                // 각자 저장을 시도할 수 있다 — (user_id, public_course_id) 유니크 제약으로 DB가
+                // 하나는 거부하는데, 그 예외를 그대로 두면 500으로 샌다(HealthService의 기존
+                // 처리 패턴과 동일하게 409로 변환).
+                try {
+                    scrapRepository.save(newScrap);
+                } catch (DataIntegrityViolationException e) {
+                    throw new ConflictException(
+                        ErrorStatus.ALREADY_EXIST_SCRAP_EXCEPTION,
+                        ErrorStatus.ALREADY_EXIST_SCRAP_EXCEPTION.getMessage());
+                }
             } else {
                 // 기존 스크랩한 내역이 있을 때
                 scrap.updateScrapTF(true);

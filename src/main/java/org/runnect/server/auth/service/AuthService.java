@@ -16,6 +16,7 @@ import org.runnect.server.user.exception.authException.InvalidRefreshTokenExcept
 import org.runnect.server.user.exception.authException.TimeExpiredRefreshTokenException;
 import org.runnect.server.user.exception.userException.NotFoundUserException;
 import org.runnect.server.user.repository.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class AuthService {
     private final KakaoSignInService kakaoSignInService;
     private final JwtService jwtService;
     private final RedisService redisService;
+    private final SocialSignUpRegistrar socialSignUpRegistrar;
 
     public GetNewTokenResponseDto getNewToken(String accessToken, String refreshToken) {
         //? 토큰 에러 분기 처리(reissueToken)
@@ -88,14 +90,12 @@ public class AuthService {
         boolean isRegistered = userRepository.existsByEmailAndProvider(socialInfo.getEmail(), socialType);
 
         if (!isRegistered) {
-            RunnectUser newUser = RunnectUser.builder()
-                .nickname(generateTemporaryNickname())
-                .email(socialInfo.getEmail())
-                .socialId(socialInfo.getSocialId())
-                .provider(socialType)
-                .build();
-
-            userRepository.save(newUser);
+            try {
+                socialSignUpRegistrar.register(
+                    generateTemporaryNickname(), socialInfo.getEmail(), socialInfo.getSocialId(), socialType);
+            } catch (DataIntegrityViolationException e) {
+                // 동시 요청이 먼저 저장을 마쳤다 — 아래 조회가 그 값을 그대로 읽는다.
+            }
         }
 
         RunnectUser user = userRepository.findByEmailAndProvider(socialInfo.getEmail(), socialType)

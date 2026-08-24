@@ -140,4 +140,34 @@ class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
         }
     }
+
+    // prod Grafana 로그 확인 결과, 최근 7일간 5xx 40건이 전부 정상 트래픽이 아니라
+    // Postman 등으로 잘못된 메서드/형식을 직접 찌른 요청(GET /api/auth, 잘못된
+    // Content-Type의 POST /api/auth)이었다. 원래는 405/415로 응답해야 할 요청인데
+    // ControllerExceptionAdvice의 범용 Exception 핸들러가 이걸 500으로 뭉개고
+    // Slack/Sentry 알림까지 매번 보내고 있었다 — 진짜 장애가 아닌데 노이즈만 쌓이는 구조.
+    @Nested
+    @DisplayName("잘못된 형태의 요청 (클라이언트 오류, 서버 장애 아님)")
+    class InvalidRequestShape {
+
+        @Test
+        @DisplayName("POST만 지원하는 /api/auth에 GET으로 요청하면 405를 반환하고 Slack 알림을 보내지 않는다")
+        void 지원하지_않는_메서드() throws Exception {
+            mockMvc.perform(get("/api/auth"))
+                .andExpect(status().isMethodNotAllowed());
+
+            BDDMockito.verifyNoInteractions(slackApi);
+        }
+
+        @Test
+        @DisplayName("JSON을 기대하는 /api/auth에 multipart로 요청하면 415를 반환하고 Slack 알림을 보내지 않는다")
+        void 지원하지_않는_컨텐츠타입() throws Exception {
+            mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                    .multipart("/api/auth")
+                    .file("token", "kakao-token".getBytes()))
+                .andExpect(status().isUnsupportedMediaType());
+
+            BDDMockito.verifyNoInteractions(slackApi);
+        }
+    }
 }

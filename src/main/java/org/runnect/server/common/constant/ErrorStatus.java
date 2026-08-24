@@ -65,6 +65,17 @@ public enum ErrorStatus {
      */
     NOT_FOUND_USER_EXCEPTION(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다"),
     NOT_FOUND_MARATHON_PUBLIC_COURSE_EXCEPTION(HttpStatus.NOT_FOUND, "마라톤 코스가 존재하지 않습니다."),
+
+    /**
+     * 405 METHOD NOT ALLOWED
+     */
+    INVALID_HTTP_METHOD_EXCEPTION(HttpStatus.METHOD_NOT_ALLOWED, "지원하지 않는 HTTP 메서드입니다."),
+
+    /**
+     * 415 UNSUPPORTED MEDIA TYPE
+     */
+    UNSUPPORTED_MEDIA_TYPE_EXCEPTION(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "지원하지 않는 요청 형식입니다."),
+
     /**
      * 409 CONFLICT
      */

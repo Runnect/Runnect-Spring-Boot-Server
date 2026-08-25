@@ -32,6 +32,8 @@ import org.runnect.server.scrap.entity.Scrap;
 })
 public class RunnectUser extends AuditingTimeEntity {
 
+    private static final int DEFAULT_MARKER_QUOTA_BALANCE = 20;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -69,6 +71,14 @@ public class RunnectUser extends AuditingTimeEntity {
     private Long createdScrap;
 
     /**
+     * 코스를 그릴 때 찍을 수 있는 마커 재화. 소비(코스 저장)와 적립(광고 시청 보상)이 각각
+     * UserRepository의 조건부 UPDATE(consumeMarkerQuota/grantMarkerQuota) 한 쿼리로 원자적으로
+     * 처리되므로, 이 필드는 벌크 UPDATE를 통해서만 바뀌고 엔티티 세터를 거치지 않는다.
+     */
+    @Column(nullable = false, columnDefinition = "integer default 20")
+    private int markerQuotaBalance;
+
+    /**
      * 카운터 필드(createdCourse 등)를 다른 트랜잭션이 동시에 읽고 수정하면 Lost Update가
      * 발생할 수 있어 낙관적 락을 건다. 충돌 시 UserStampService.recordActivityAndAwardStamp가
      * 별도 트랜잭션에서 재시도한다.
@@ -100,6 +110,7 @@ public class RunnectUser extends AuditingTimeEntity {
         this.createdRecord = 0L;
         this.createdPublicCourse = 0L;
         this.createdScrap = 0L;
+        this.markerQuotaBalance = DEFAULT_MARKER_QUOTA_BALANCE;
     }
 
     public RunnectUser(String nickname) {

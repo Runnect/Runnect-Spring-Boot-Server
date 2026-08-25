@@ -83,6 +83,7 @@ public enum ErrorStatus {
     ALREADY_EXIST_NICKNAME_EXCEPTION(HttpStatus.CONFLICT, "중복된 닉네임입니다."),
     ALREADY_UPLOAD_COURSE_EXCEPTION(HttpStatus.CONFLICT, "이미 업로드된 코스입니다."),
     ALREADY_EXIST_HEALTH_DATA_EXCEPTION(HttpStatus.CONFLICT, "이미 건강 데이터가 등록된 기록입니다"),
+    INSUFFICIENT_MARKER_QUOTA_EXCEPTION(HttpStatus.CONFLICT, "마커 수량이 부족합니다."),
 
     /**
      * 500 INTERNAL SERVER ERROR
